@@ -11,16 +11,28 @@ tabular.sorties.draw = () => {
     var html = "<h3>Sortie List</h3>";
     html += "<button class='btn btn-primary mb-2' onclick='sorties.add()'>Add Sortie</button>";
     html += "<table class='table table-striped table-bordered table-condensed'>";
-    html += "<thead><tr><th>Sqdrn</th><th>Cycle</th><th>Num</th><th>Off</th><th>On</th></tr></thead>";
+    html += "<thead><tr><th>Sqdrn</th><th>Launch</th><th>Type</th><th>Recovery</th><th>Type</th><th>Event #</th></tr></thead>";
     html += "<tbody>";
     events.squadrons.forEach((sqdrn, i) => {
         sqdrn.sorties.forEach((sortie, ii) => {
             html += "<tr>";
             html += "<td>"+sqdrn.name+"</td>";
-            html += "<td>"+sortie.startCycle+"</td>";
-            html += "<td>"+(ii+1)+"</td>";
-            html += "<td>"+sortie.start+"</td>";
-            html += "<td>"+sortie.end+"</td>";
+            if(sortie.startCycle) {
+                html += "<td>Cycle "+sortie.startCycle+"</td>";
+                sortie.start = events.cycles.filter(c => c.id == sortie.startCycle).reduce(c=>c).start; // Finds the cycle with the matching id and returns its start time.
+            } else {
+                html += "<td>"+sortie.start+"</td>";
+            }
+            html += "<td>"+sortie.startCondition+"</td>";
+            if(sortie.endCycle) {
+                html += "<td>Cycle "+sortie.endCycle+"</td>";
+                sortie.end = events.cycles.filter(c => c.id == sortie.endCycle).reduce(c=>c).end; // Finds the cycle with the matching id and returns its end time.
+            } else {
+                html += "<td>"+sortie.end+"</td>";
+            }
+            html += "<td>"+sortie.endCondition+"</td>";
+            let cycle = sortie.startCycle ? sortie.startCycle : events.cycles.filter(c=> c.start <= sortie.start && c.end >= sortie.start).reduce(c=>c,{id:0}).id;
+            html += "<td>"+cycle+(ii+1)+sqdrn.letter+"</td>";
             html += "<td><button class='btn btn-secondary' onclick='sorties.edit("+i+")'>Edit</button></td>";
             html += "</tr>";
         })

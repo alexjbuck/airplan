@@ -37,6 +37,7 @@ sorties.data = {
                 "cs": "WOLF",
                 "tms": "MH-60R",
                 "modex": "700",
+                "letter": "A",
                 "sorties":[
                     {
                         "start": 9.5,
