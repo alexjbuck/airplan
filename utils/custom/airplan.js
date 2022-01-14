@@ -1,6 +1,6 @@
-var sorties = new Object;
+var airplan = new Object;
 
-sorties.data = {
+airplan.data = {
     "header": {
         "title": {
             "title": "Airplan Title",
@@ -31,6 +31,30 @@ sorties.data = {
         }
     },
     "events": {
+        "sorties":[
+            {
+                "squadron": "VFA-201",
+                "start": 9.5,
+                "end": 12.5,
+                "startCycle": null,
+                "endCycle": null,
+                "startCondition": "pull",
+                "endCondition": "stuff",
+                "annotation": "SSC",
+                "id": "0"
+            },
+            {
+                "squadron": "VFA-201",
+                "start": 11,
+                "end": 13,
+                "startCycle": 1,
+                "endCycle": 2,
+                "startCondition": "flyOn",
+                "endCondition": "flyOff",
+                "annotation": "LOG",
+                "id": "1"
+            }
+        ],
         "squadrons": [
             {
                 "name": "VFA-201",
@@ -38,26 +62,13 @@ sorties.data = {
                 "tms": "MH-60R",
                 "modex": "700",
                 "letter": "A",
-                "sorties":[
-                    {
-                        "start": 9.5,
-                        "end": 12.5,
-                        "startCycle": null,
-                        "endCycle": null,
-                        "startCondition": "pull",
-                        "endCondition": "stuff",
-                        "annotation": "SSC"
-                    },
-                    {
-                        "start": null,
-                        "end": null,
-                        "startCycle": 1,
-                        "endCycle": 2,
-                        "startCondition": "flyOn",
-                        "endCondition": "flyOff",
-                        "annotation": "LOG"
-                    }
-                ]
+            },
+            {
+                "name": "VFA-202",
+                "cs": "DIMON",
+                "tms": "FA-18E",
+                "modex": "100",
+                "letter": "B",
             }
         ],
         "cycles": [
