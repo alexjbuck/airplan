@@ -33,7 +33,7 @@ sorties.data = {
     "events": {
         "squadrons": [
             {
-                "name": "Squadron 1",
+                "name": "VFA-201",
                 "cs": "WOLF",
                 "tms": "MH-60R",
                 "modex": "700",
