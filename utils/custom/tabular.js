@@ -73,7 +73,7 @@ tabular.cycles.add = () => {
     html += "<label for='end'>End</label>";
     html += "<input type='text' class='form-control' id='end' placeholder='End'>";
     html += "</div>";
-    html += "<button type='submit' class='btn btn-primary' onclick='cycles.addSubmit()'>Submit</button>";
+    html += "<button type='submit' class='btn btn-primary' onclick='tabular.cycles.addSubmit()'>Submit</button>";
     html += "</form>";
     openModal(html);
 }
@@ -81,31 +81,129 @@ tabular.cycles.add = () => {
 tabular.sorties.add = () => {
     var html = "<h3>Add Sortie</h3>";
     html += "<form>";
-    html += "<div class='form-group'>";
-    html += "<label for='startCycle'>Start Cycle</label>";
-    html += "<input type='text' class='form-control' id='startCycle' placeholder='Start Cycle'>";
-    html += "</div>";
-    html += "<div class='form-group'>";
-    html += "<label for='start'>Start</label>";
-    html += "<input type='text' class='form-control' id='start' placeholder='Start'>";
-    html += "</div>";
+
+    // Ask how the sortie should begin.
     html += "<div class='form-group'>";
     html += "<label for='startCondition'>Start Condition</label>";
-    html += "<input type='text' class='form-control' id='startCondition' placeholder='Start Condition'>";
+    html += "<select type='text' class='form-control' id='startCondition' placeholder='Start Condition'>";
+        html += "<option value='pull'>Pull</option>";
+        html += "<option value='flyOn'>Fly On</option>";
+        html += "<option value='hp'>Hot Pump (link to previous event)</option>";
+        html += "<option value='hpcs'>Hot Pump & Crew Swap (link to previous event)</option>";
+    html += "</select>";
     html += "</div>";
+
+    // If sortie begins with hp or hpcs, ask which prev event its connected to.
+    html += "<div class='form-group prev-event-link' style='display:none'>";
+    html += "<label for='prevEventLink'>Continues previous event</label>";
+    html += "<select type='text' class='form-control' id='prevEventLink' placeholder='Select previous event'>";
+    html += "</select>";
+    html += "</div>";
+
+    // Start time and conditions
     html += "<div class='form-group'>";
-    html += "<label for='endCycle'>End Cycle</label>";
-    html += "<input type='text' class='form-control' id='endCycle' placeholder='End Cycle'>";
+    html += "<label for='startCycleLink'>Launch with cycle?</label>";
+    html += "<input type='checkbox' class='form-control' id='startCycleLink'>";
     html += "</div>";
+        
+    html += "<div class='form-group start-time'>";
+    html += "<label for='startTime'>Start Time</label>";
+    html += "<input type='text' class='form-control' id='startTime' placeholder='0000'>";
+    html += "</div>";
+        
+        // Only show cycle if startCycleLink is checked
+        html += "<div class='form-group start-cycle' style='display:none'>";
+        html += "<label for='startCycle'>Start Cycle</label>";
+        html += "<input type='text' class='form-control' id='startCycle' placeholder='Start Cycle'>";
+        html += "</div>";
+
+    // End time and conditions
     html += "<div class='form-group'>";
-    html += "<label for='end'>End</label>";
-    html += "<input type='text' class='form-control' id='end' placeholder='End'>";
+    html += "<label for='endCycleLink'>Recover with cycle?</label>";
+    html += "<input type='checkbox' class='form-control' id='endCycleLink'>";
     html += "</div>";
+
+    html += "<div class='form-group end-time'>";
+    html += "<label for='end'>End Time</label>";
+    html += "<input type='text' class='form-control' id='end' placeholder='0000'>";
+    html += "</div>";
+
+        // Only show cycle if endCycleLink is checked
+        html += "<div class='form-group end-cycle' style='display:none'>";
+        html += "<label for='endCycle'>End Cycle</label>";
+        html += "<input type='text' class='form-control' id='endCycle' placeholder='End Cycle'>";
+        html += "</div>";
+
     html += "<div class='form-group'>";
     html += "<label for='endCondition'>End Condition</label>";
-    html += "<input type='text' class='form-control' id='endCondition' placeholder='End Condition'>";
+    html += "<select type='text' class='form-control' id='startCondition' placeholder='Start Condition'>";
+        html += "<option value='stuff'>Stuff</option>";
+        html += "<option value='flyOff'>Fly Off</option>";
+        html += "<option value='hp'>Hot Pump</option>";
+        html += "<option value='hpcs'>Hot Pump & Crew Swap</option>";
+    html += "</select>";
     html += "</div>";
-    html += "<button type='submit' class='btn btn-primary' onclick='sorties.addSubmit()'>Submit</button>";
+
+    // Annotations
+    html += "<div class='form-group'>";
+    html += "<label for='annotation'>Annotation</label>";
+    html += "<input type='text' class='form-control' id='annotation' placeholder='Mission'>";
+    html += "</div>";
+
     html += "</form>";
+    html += "<button type='submit' class='btn btn-primary' onclick='tabular.sorties.addSubmit()'>Submit</button>";
     openModal(html);
+    document.getElementById('startCycleLink').addEventListener('change', () => {
+        if (document.getElementById('startCycleLink').checked) {
+            console.log("cycle link checked");
+            $(`.start-cycle`).css('display', 'block');
+            $(`.start-time`).css('display', 'none');
+        } else {
+            console.log("cycle link unchecked");
+            $(`.start-cycle`).css('display', 'none');
+            $(`.start-time`).css('display', 'block');
+        }
+    }
+    );
+    document.getElementById('endCycleLink').addEventListener('change', () => {
+        if (document.getElementById('endCycleLink').checked) {
+            console.log("cycle link checked");
+            $(`.end-cycle`).css('display', 'block');
+            $(`.end-time`).css('display', 'none');
+        } else {
+            console.log("cycle link unchecked");
+            $(`.end-cycle`).css('display', 'none');
+            $(`.end-time`).css('display', 'block');
+        }
+    }
+    );
+    document.getElementById('startCondition').addEventListener('change', () => {
+        let val = document.getElementById('startCondition').value;
+        if ( val=='hp' || val=='hpcs' ) {
+            $(`.prev-event-link`).css('display', 'block');
+            $(`.start-time`).css('display', 'block');
+            $(`.start-time`).prop('disabled', true);
+        } else {
+            $(`.prev-event-link`).css('display', 'none');
+        }
+    }
+    );
+
+}
+
+tabular.sorties.addSubmit = () => {
+    let startCycle = $( "#startCycle" ).val();
+    let start = $( "#start" ).val();
+    let startCondition = $( "#startCondition" ).val();
+    let endCycle = $( "#endCycle" ).val();
+    let end = $( "#end" ).val();
+    let endCondition = $( "#endCondition" ).val();
+    console.log(startCycle, start, startCondition, endCycle, end, endCondition);
+    closeModal();
+}
+
+tabular.cycles.addSubmit = (form) => {
+    let start = $( "#start" ).val();
+    let end = $( "#end" ).val();
+    console.log(start, end);
 }
