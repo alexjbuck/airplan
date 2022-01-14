@@ -9,7 +9,7 @@ tabular.sorties = new Object;
 tabular.sorties.draw = () => {
     var events = sorties.data.events;//or wherever the data is stored, may need to change how we loop over it
     var html = "<h3>Sortie List</h3>";
-    html += "<button class='btn btn-primary mb-2' onclick='sorties.add()'>Add Sortie</button>";
+    html += "<button class='btn btn-primary mb-2' onclick='tabular.sorties.add()'>Add Sortie</button>";
     html += "<table class='table table-striped table-bordered table-condensed'>";
     html += "<thead><tr><th>Sqdrn</th><th>Launch</th><th>Type</th><th>Recovery</th><th>Type</th><th>Event #</th></tr></thead>";
     html += "<tbody>";
@@ -45,7 +45,7 @@ tabular.cycles = new Object;
 tabular.cycles.draw = () => {
     var cycles = sorties.data.events.cycles;//or wherever the data is stored, may need to change how we loop over it
     var html = "<h3>Cycle List</h3>";
-    html += "<button class='btn btn-primary mb-2' onclick='cycles.add()'>Add Cycle</button>";
+    html += "<button class='btn btn-primary mb-2' onclick='tabular.cycles.add()'>Add Cycle</button>";
     html += "<table class='table table-striped table-bordered table-condensed'>";
     html += "<thead><tr><th>Cycle #</th><th>Start</th><th>End</th></thead>";
     html += "<tbody>";
@@ -60,4 +60,52 @@ tabular.cycles.draw = () => {
     )
     html += "</tbody>";
     $("#tabular-cycles").html(html);
+}
+
+tabular.cycles.add = () => {
+    var html = "<h3>Add Cycle</h3>";
+    html += "<form>";
+    html += "<div class='form-group'>";
+    html += "<label for='start'>Start</label>";
+    html += "<input type='text' class='form-control' id='start' placeholder='Start'>";
+    html += "</div>";
+    html += "<div class='form-group'>";
+    html += "<label for='end'>End</label>";
+    html += "<input type='text' class='form-control' id='end' placeholder='End'>";
+    html += "</div>";
+    html += "<button type='submit' class='btn btn-primary' onclick='cycles.addSubmit()'>Submit</button>";
+    html += "</form>";
+    openModal(html);
+}
+
+tabular.sorties.add = () => {
+    var html = "<h3>Add Sortie</h3>";
+    html += "<form>";
+    html += "<div class='form-group'>";
+    html += "<label for='startCycle'>Start Cycle</label>";
+    html += "<input type='text' class='form-control' id='startCycle' placeholder='Start Cycle'>";
+    html += "</div>";
+    html += "<div class='form-group'>";
+    html += "<label for='start'>Start</label>";
+    html += "<input type='text' class='form-control' id='start' placeholder='Start'>";
+    html += "</div>";
+    html += "<div class='form-group'>";
+    html += "<label for='startCondition'>Start Condition</label>";
+    html += "<input type='text' class='form-control' id='startCondition' placeholder='Start Condition'>";
+    html += "</div>";
+    html += "<div class='form-group'>";
+    html += "<label for='endCycle'>End Cycle</label>";
+    html += "<input type='text' class='form-control' id='endCycle' placeholder='End Cycle'>";
+    html += "</div>";
+    html += "<div class='form-group'>";
+    html += "<label for='end'>End</label>";
+    html += "<input type='text' class='form-control' id='end' placeholder='End'>";
+    html += "</div>";
+    html += "<div class='form-group'>";
+    html += "<label for='endCondition'>End Condition</label>";
+    html += "<input type='text' class='form-control' id='endCondition' placeholder='End Condition'>";
+    html += "</div>";
+    html += "<button type='submit' class='btn btn-primary' onclick='sorties.addSubmit()'>Submit</button>";
+    html += "</form>";
+    openModal(html);
 }
