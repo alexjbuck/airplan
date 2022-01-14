@@ -1,0 +1,68 @@
+<html>
+    <head>
+        <title>Airplan</title>
+    </head>
+    <!-- Need to bring all these into libraries eventually -->
+    <link rel="stylesheet" href="utils/libraries/bootstrap.css">
+    <link rel="stylesheet" href="utils/libraries/bootstrap-slider.css">
+    <link rel="stylesheet" href="utils/libraries/modal.css">
+    <script src="utils/libraries/jquery.js"></script>
+    <script src="utils/libraries/bootstrap.bundle.js"></script>
+    
+    
+    <!--libraries-->
+    <link href="utils/libraries/customCSS.css" rel="stylesheet">
+    <script src="utils/libraries/xlsx.full.min.js"></script>
+    <script src="utils/libraries/fileSaver.js"></script>
+    <script src="utils/libraries/lap.js"></script>
+    <script src="utils/libraries/munkres.js"></script>
+    <script src="utils/libraries/bootstrap-slider.js"></script>
+    <script src="utils/libraries/rl.js"></script>
+    
+    <body>
+        <div class="row h-100">
+          <div id="graphic" class="container text-center col-9 h-100">
+            canvas area      
+          </div>
+          <div id="tabular" class="border border-primary border-start h-100 container text-center col-3">
+                tabular area
+            </div>
+        </div>
+        </div>
+
+          <!-- The Modal -->
+            <div id="myModal" class="modal">
+
+                <!-- Modal content -->
+                <div class="modal-content">
+                <span id="closeSpan" class="close">&times;</span>
+                <div id="modalContent" >Some text in the Modal..</div>
+                </div>
+            
+            </div>
+    </body>
+    <script>
+
+        // When the user clicks on the button, open the modal
+        var openModal = function(content) {
+            $("#modalContent").html(content)
+            document.getElementById("myModal").style.display = "block";
+        }
+
+        var closeModal = function() {
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+            document.getElementById("closeSpan").onclick = function() {
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+        if (event.target == document.getElementById("myModal")) {
+            document.getElementById("myModal").style.display = "none";
+        }
+        }
+    </script>
+</html>
