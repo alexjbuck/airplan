@@ -1,46 +1,27 @@
 var tabular = new Object;
 
+// Draw the sortie and cycles tables.
 tabular.draw = () => {
     tabular.sorties.draw()
     tabular.cycles.draw()
 }    
 
-tabular.sorties = new Object;
-tabular.sorties.draw = () => {
-    var events = sorties.data.events;//or wherever the data is stored, may need to change how we loop over it
-    var html = "<h3>Sortie List</h3>";
-    html += "<button class='btn btn-primary mb-2' onclick='tabular.sorties.add()'>Add Sortie</button>";
-    html += "<table class='table table-striped table-bordered table-condensed'>";
-    html += "<thead><tr><th>Sqdrn</th><th>Launch</th><th>Type</th><th>Recovery</th><th>Type</th><th>Event #</th></tr></thead>";
-    html += "<tbody>";
-    events.squadrons.forEach((sqdrn, i) => {
-        sqdrn.sorties.forEach((sortie, ii) => {
-            html += "<tr>";
-            html += "<td>"+sqdrn.name+"</td>";
-            if(sortie.startCycle) {
-                html += "<td>Cycle "+sortie.startCycle+"</td>";
-                sortie.start = events.cycles.filter(c => c.id == sortie.startCycle).reduce(c=>c).start; // Finds the cycle with the matching id and returns its start time.
-            } else {
-                html += "<td>"+sortie.start+"</td>";
-            }
-            html += "<td>"+sortie.startCondition+"</td>";
-            if(sortie.endCycle) {
-                html += "<td>Cycle "+sortie.endCycle+"</td>";
-                sortie.end = events.cycles.filter(c => c.id == sortie.endCycle).reduce(c=>c).end; // Finds the cycle with the matching id and returns its end time.
-            } else {
-                html += "<td>"+sortie.end+"</td>";
-            }
-            html += "<td>"+sortie.endCondition+"</td>";
-            let cycle = sortie.startCycle ? sortie.startCycle : events.cycles.filter(c=> c.start <= sortie.start && c.end >= sortie.start).reduce(c=>c,{id:0}).id;
-            html += "<td>"+cycle+(ii+1)+sqdrn.letter+"</td>";
-            html += "<td><button class='btn btn-secondary' onclick='sorties.edit("+i+")'>Edit</button></td>";
-            html += "</tr>";
-        })
-    })
-    html += "</tbody>";
-    $("#tabular-sorties").html(html);
+// Returns the cycle number for a sortie based on launch time.
+getCycle = ({start}) => {
+    let cycles = sorties.data.events.cycles;
+    if (start < cycles[0].start) {
+        // If the start is before the first cycle, it's cycle 0.
+        return 0;
+    } else if (start > cycles[cycles.length-1].end) {
+        // If the start is after the last cycle, it's the last cycle + 1 (which is the length, since it's zero-indexed).
+        return cycles.length;
+    } else {
+        // Otherwise, it's the first cycle that starts before and ends after the start.
+        return cycles.filter(c => c.start <= start && c.end >= start)[0].id;
+    }
 }
 
+// Tabular view of the cycles
 tabular.cycles = new Object;
 tabular.cycles.draw = () => {
     var cycles = sorties.data.events.cycles;//or wherever the data is stored, may need to change how we loop over it
@@ -62,148 +43,130 @@ tabular.cycles.draw = () => {
     $("#tabular-cycles").html(html);
 }
 
+tabular.sorties = new Object;
+tabular.sorties.draw = () => {
+    var events = sorties.data.events;//or wherever the data is stored, may need to change how we loop over it
+    var html = "<h3>Sortie List</h3>";
+    html += "<button class='btn btn-primary mb-2' onclick='tabular.sorties.add()'>Add Sortie</button>";
+    html += "<table class='table table-striped table-bordered table-condensed'>";
+    html += "<thead><tr><th>Sqdrn</th><th>Launch<br>Time</th><th>Launch<br>Condition</th><th>Recovery<br>Time</th><th>Recovery<br>Condition</th><th>Event</th></tr></thead>";
+    html += "<tbody>";
+    events.squadrons.forEach((sqdrn, i) => {
+        sqdrn.sorties.forEach((sortie, ii) => {
+            html += "<tr>";
+            html += "<td>"+sqdrn.name+"</td>";
+            html += "<td>"+sortie.start+"</td>";
+            html += "<td>"+sortie.startCondition+"</td>";
+            html += "<td>"+sortie.end+"</td>";
+            html += "<td>"+sortie.endCondition+"</td>";
+            let cycle = getCycle(sortie)
+            html += "<td>"+cycle+(ii+1)+sqdrn.letter+"</td>";
+            html += "<td><button class='btn btn-secondary' onclick='sorties.edit("+i+")'>Edit</button></td>";
+            html += "</tr>";
+        })
+    })
+    html += "</tbody>";
+    $("#tabular-sorties").html(html);
+}
+
+// Callback on the "Add Cycle" button.
 tabular.cycles.add = () => {
     var html = "<h3>Add Cycle</h3>";
-    html += "<form>";
+    // Cycle Number
+    html += "<div class='form-group'>";
+    html += "<label for='cycleNumber'>Cycle Number</label>";
+    html += "<input type='number' class='form-control' id='cycleNumber' placeholder='Cycle Number' required>";
+    html += "</div>"
+    // Start time
     html += "<div class='form-group'>";
     html += "<label for='start'>Start</label>";
-    html += "<input type='text' class='form-control' id='start' placeholder='Start'>";
+    html += "<input type='text' maxlength='4' class='form-control' id='start' placeholder='Start'>";
     html += "</div>";
+    // End time
     html += "<div class='form-group'>";
     html += "<label for='end'>End</label>";
-    html += "<input type='text' class='form-control' id='end' placeholder='End'>";
+    html += "<input type='text' maxlength='4' class='form-control' id='end' placeholder='End'>";
     html += "</div>";
     html += "<button type='submit' class='btn btn-primary' onclick='tabular.cycles.addSubmit()'>Submit</button>";
-    html += "</form>";
     openModal(html);
 }
 
+// Callback on the "Add Sortie" button.
 tabular.sorties.add = () => {
     var html = "<h3>Add Sortie</h3>";
-    html += "<form>";
-
-    // Ask how the sortie should begin.
+    // Squadron dropdown
+    html += "<div class='form-group'>";
+    html += "<label for='squadron'>Squadron</label>";
+    html += "<select class='form-control' id='squadron'>";
+    sorties.data.events.squadrons.forEach((sqdrn, i) => {
+        html += "<option value='"+i+"'>"+sqdrn.name+"</option>";
+    })
+    html += "</select>";
+    // Start Time
+    html += "<div class='form-group start-time'>";
+    html += "<label for='startTime'>Start Time</label>";
+    html += "<input type='text' class='form-control' id='startTime' placeholder='0000'>";
+    html += "</div>";
+    // Start Condition
     html += "<div class='form-group'>";
     html += "<label for='startCondition'>Start Condition</label>";
     html += "<select type='text' class='form-control' id='startCondition' placeholder='Start Condition'>";
         html += "<option value='pull'>Pull</option>";
         html += "<option value='flyOn'>Fly On</option>";
-        html += "<option value='hp'>Hot Pump (link to previous event)</option>";
-        html += "<option value='hpcs'>Hot Pump & Crew Swap (link to previous event)</option>";
+        html += "<option value='hp'>Hot Pump</option>";
+        html += "<option value='hpcs'>Hot Pump & Crew Swap</option>";
     html += "</select>";
     html += "</div>";
-
-    // If sortie begins with hp or hpcs, ask which prev event its connected to.
-    html += "<div class='form-group prev-event-link' style='display:none'>";
-    html += "<label for='prevEventLink'>Continues previous event</label>";
-    html += "<select type='text' class='form-control' id='prevEventLink' placeholder='Select previous event'>";
-    html += "</select>";
-    html += "</div>";
-
-    // Start time and conditions
-    html += "<div class='form-group'>";
-    html += "<label for='startCycleLink'>Launch with cycle?</label>";
-    html += "<input type='checkbox' class='form-control' id='startCycleLink'>";
-    html += "</div>";
-        
-    html += "<div class='form-group start-time'>";
-    html += "<label for='startTime'>Start Time</label>";
-    html += "<input type='text' class='form-control' id='startTime' placeholder='0000'>";
-    html += "</div>";
-        
-        // Only show cycle if startCycleLink is checked
-        html += "<div class='form-group start-cycle' style='display:none'>";
-        html += "<label for='startCycle'>Start Cycle</label>";
-        html += "<input type='text' class='form-control' id='startCycle' placeholder='Start Cycle'>";
-        html += "</div>";
-
-    // End time and conditions
-    html += "<div class='form-group'>";
-    html += "<label for='endCycleLink'>Recover with cycle?</label>";
-    html += "<input type='checkbox' class='form-control' id='endCycleLink'>";
-    html += "</div>";
-
+    // End time
     html += "<div class='form-group end-time'>";
-    html += "<label for='end'>End Time</label>";
-    html += "<input type='text' class='form-control' id='end' placeholder='0000'>";
+    html += "<label for='endTime'>End Time</label>";
+    html += "<input type='text' class='form-control' id='endTime' placeholder='0000'>";
     html += "</div>";
-
-        // Only show cycle if endCycleLink is checked
-        html += "<div class='form-group end-cycle' style='display:none'>";
-        html += "<label for='endCycle'>End Cycle</label>";
-        html += "<input type='text' class='form-control' id='endCycle' placeholder='End Cycle'>";
-        html += "</div>";
-
+    // End Condition
     html += "<div class='form-group'>";
     html += "<label for='endCondition'>End Condition</label>";
-    html += "<select type='text' class='form-control' id='startCondition' placeholder='Start Condition'>";
+    html += "<select type='text' class='form-control' id='endCondition' placeholder='End Condition'>";
         html += "<option value='stuff'>Stuff</option>";
         html += "<option value='flyOff'>Fly Off</option>";
         html += "<option value='hp'>Hot Pump</option>";
         html += "<option value='hpcs'>Hot Pump & Crew Swap</option>";
     html += "</select>";
     html += "</div>";
-
-    // Annotations
+    // Annotation
     html += "<div class='form-group'>";
     html += "<label for='annotation'>Annotation</label>";
     html += "<input type='text' class='form-control' id='annotation' placeholder='Mission'>";
     html += "</div>";
-
-    html += "</form>";
     html += "<button type='submit' class='btn btn-primary' onclick='tabular.sorties.addSubmit()'>Submit</button>";
     openModal(html);
-    document.getElementById('startCycleLink').addEventListener('change', () => {
-        if (document.getElementById('startCycleLink').checked) {
-            console.log("cycle link checked");
-            $(`.start-cycle`).css('display', 'block');
-            $(`.start-time`).css('display', 'none');
-        } else {
-            console.log("cycle link unchecked");
-            $(`.start-cycle`).css('display', 'none');
-            $(`.start-time`).css('display', 'block');
-        }
-    }
-    );
-    document.getElementById('endCycleLink').addEventListener('change', () => {
-        if (document.getElementById('endCycleLink').checked) {
-            console.log("cycle link checked");
-            $(`.end-cycle`).css('display', 'block');
-            $(`.end-time`).css('display', 'none');
-        } else {
-            console.log("cycle link unchecked");
-            $(`.end-cycle`).css('display', 'none');
-            $(`.end-time`).css('display', 'block');
-        }
-    }
-    );
-    document.getElementById('startCondition').addEventListener('change', () => {
-        let val = document.getElementById('startCondition').value;
-        if ( val=='hp' || val=='hpcs' ) {
-            $(`.prev-event-link`).css('display', 'block');
-            $(`.start-time`).css('display', 'block');
-            $(`.start-time`).prop('disabled', true);
-        } else {
-            $(`.prev-event-link`).css('display', 'none');
-        }
-    }
-    );
-
 }
 
-tabular.sorties.addSubmit = () => {
-    let startCycle = $( "#startCycle" ).val();
-    let start = $( "#start" ).val();
-    let startCondition = $( "#startCondition" ).val();
-    let endCycle = $( "#endCycle" ).val();
-    let end = $( "#end" ).val();
-    let endCondition = $( "#endCondition" ).val();
-    console.log(startCycle, start, startCondition, endCycle, end, endCondition);
-    closeModal();
-}
-
+// Callback on the "Submit" button in the "Add Cycle" modal.
 tabular.cycles.addSubmit = (form) => {
-    let start = $( "#start" ).val();
-    let end = $( "#end" ).val();
+    let cycle = new Object;
+    cycle.id = $("#cycleNumber").val();
+    cycle.start = $( "#start" ).val();
+    cycle.end = $( "#end" ).val();
     console.log(start, end);
+    // Push the new cycle to the data object.
+    sorties.data.events.cycles.push(cycle);
+    closeModal();
+    tabular.draw();
 }
+
+// Callback on the "Submit" button in the "Add Sortie" modal.
+tabular.sorties.addSubmit = () => {
+    let sortie = new Object;
+    squadron = $("#squadron").val();
+    sortie.start = $( "#startTime" ).val();
+    sortie.startCondition = $( "#startCondition" ).val();
+    sortie.end = $( "#endTime" ).val();
+    sortie.endCondition = $( "#endCondition" ).val();
+    sortie.annotation = $( "#annotation" ).val();
+    console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.annotation);
+    // push the sortie to the data object.
+    sorties.data.events.squadrons[squadron].sorties.push(sortie);
+    closeModal();
+    tabular.draw()
+}
+
