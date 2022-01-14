@@ -3,14 +3,16 @@
         <title>Airplan</title>
     </head>
     <!-- Need to bring all these into libraries eventually -->
+    <script src="https://unpkg.com/konva@8/konva.min.js"></script>
+
+    
+    
+    <!--libraries-->
     <link rel="stylesheet" href="utils/libraries/bootstrap.css">
     <link rel="stylesheet" href="utils/libraries/bootstrap-slider.css">
     <link rel="stylesheet" href="utils/libraries/modal.css">
     <script src="utils/libraries/jquery.js"></script>
     <script src="utils/libraries/bootstrap.bundle.js"></script>
-    
-    
-    <!--libraries-->
     <link href="utils/libraries/customCSS.css" rel="stylesheet">
     <script src="utils/libraries/xlsx.full.min.js"></script>
     <script src="utils/libraries/fileSaver.js"></script>
@@ -60,7 +62,8 @@
             canvas.height = canvas.offsetHeight;
         }
 
-        fitToContainer(document.getElementById("myCanvas"))
+ 
+        //fitToContainer(document.getElementById("myCanvas"))
         // When the user clicks on the button, open the modal
         var openModal = function(content) {
             $("#modalContent").html(content)
@@ -83,4 +86,6 @@
         }
         }
     </script>
+
+    <script src="utils/custom/graphical.js"></script>
 </html>
