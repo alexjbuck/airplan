@@ -38,7 +38,7 @@ tabular.cycles.draw = () => {
         html += "<td>" + cycle.id + "</td>";
         html += "<td>" + cycle.start + "</td>";
         html += "<td>" + cycle.end + "</td>";
-        html += "<td><button class='btn btn-secondary' onclick='tabular.cycles.edit(" + index + ")'>Edit</button></td>"; // Method needs to be exitCycles or something like that. cycles.edit, whatever works.
+        html += "<td><button class='btn btn-secondary' onclick='tabular.cycles.edit(" + index + ")'>Edit</button><button onclick=tabular.cycles.delete("+index+") class='btn btn-danger'>Delete</button></td>"; // Method needs to be exitCycles or something like that. cycles.edit, whatever works.
         html += "</tr>";
         }
     )
@@ -64,9 +64,11 @@ tabular.sorties.draw = () => {
             html += "<td>"+sortie.startCondition+"</td>";
             html += "<td>"+sortie.end+"</td>";
             html += "<td>"+sortie.endCondition+"</td>";
-            let cycle = getCycle(sortie)
+            // Broken: Unhandled errors in getCycle()
+            // let cycle = getCycle(sortie)
+            let cycle = 0;
             html += "<td>"+cycle+sqdrn.letter+(ii+1)+"</td>";
-            html += "<td><button class='btn btn-secondary' onclick='tabular.sorties.edit("+sortie.id+")'>Edit</button></td>";
+            html += "<td><button class='btn btn-secondary' onclick='tabular.sorties.edit("+sortie.id+")'>Edit</button><button onclick=tabular.sorties.delete("+sortie.id+") class='btn btn-danger'>Delete</button></td>";
             html += "</tr>";
         })
     })
@@ -85,12 +87,12 @@ tabular.cycles.add = () => {
     // Start time
     html += "<div class='form-group'>";
     html += "<label for='start'>Start</label>";
-    html += "<input type='text' maxlength='4' class='form-control' id='start' placeholder='Start'>";
+    html += "<input type='datetime-local' class='form-control' id='start' placeholder='Start'>";
     html += "</div>";
     // End time
     html += "<div class='form-group'>";
     html += "<label for='end'>End</label>";
-    html += "<input type='text' maxlength='4' class='form-control' id='end' placeholder='End'>";
+    html += "<input type='datetime-local' class='form-control' id='end' placeholder='End'>";
     html += "</div>";
     html += "<button type='submit' class='btn btn-primary' onclick='tabular.cycles.addSubmit()'>Submit</button>";
     openModal(html);
@@ -110,7 +112,7 @@ tabular.sorties.add = () => {
     // Start Time
     html += "<div class='form-group start-time'>";
     html += "<label for='startTime'>Start Time</label>";
-    html += "<input type='text' class='form-control' id='startTime' placeholder='0000'>";
+    html += "<input type='datetime-local' class='form-control' id='startTime' placeholder='0000'>";
     html += "</div>";
     // Start Condition
     html += "<div class='form-group'>";
@@ -125,7 +127,7 @@ tabular.sorties.add = () => {
     // End time
     html += "<div class='form-group end-time'>";
     html += "<label for='endTime'>End Time</label>";
-    html += "<input type='text' class='form-control' id='endTime' placeholder='0000'>";
+    html += "<input type='datetime-local' class='form-control' id='endTime' placeholder='0000'>";
     html += "</div>";
     // End Condition
     html += "<div class='form-group'>";
@@ -168,7 +170,7 @@ tabular.sorties.addSubmit = () => {
     sortie.end = $( "#endTime" ).val();
     sortie.endCondition = $( "#endCondition" ).val();
     sortie.annotation = $( "#annotation" ).val();
-    sortie.id = airplan.data.events.sorties.length;
+    sortie.id = +airplan.data.events.sorties[airplan.data.events.sorties.length-1].id+1;
     console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.annotation);
     // push the sortie to the data object.
     airplan.data.events.sorties.push(sortie);
@@ -186,12 +188,12 @@ tabular.cycles.edit = (i) => {
     // Start time
     html += "<div class='form-group'>";
     html += "<label for='start'>Start</label>";
-    html += "<input type='text' maxlength='4' class='form-control' id='start' placeholder='Start'>";
+    html += "<input type='datetime-local' maxlength='4' class='form-control' id='start' placeholder='Start'>";
     html += "</div>";
     // End time
     html += "<div class='form-group'>";
     html += "<label for='end'>End</label>";
-    html += "<input type='text' maxlength='4' class='form-control' id='end' placeholder='End'>";
+    html += "<input type='datetime-local' maxlength='4' class='form-control' id='end' placeholder='End'>";
     html += "</div>";
     html += "<button type='submit' class='btn btn-primary' onclick='tabular.cycles.editSubmit("+i+")'>Submit</button>";
     openModal(html);
@@ -270,6 +272,7 @@ tabular.sorties.edit = (i) => {
 }
 
 tabular.sorties.editSubmit = (i) => {
+    console.log("processing edit of sortie "+i);
     let sortie = airplan.data.events.sorties[i]
     sortie.squadron = $("#squadron").val();
     sortie.start = $( "#startTime" ).val();
@@ -282,4 +285,10 @@ tabular.sorties.editSubmit = (i) => {
     airplan.data.events.sorties[i] = sortie;
     closeModal();
     tabular.draw()
+}
+
+tabular.cycles.delete = (i) => {
+}
+
+tabular.sorties.delete = (i) => {
 }
