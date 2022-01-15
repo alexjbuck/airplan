@@ -23,7 +23,7 @@
 
     <!--custom js-->
     <script src="utils/custom/tabular.js"></script>
-    <script src="utils/custom/sorties.js"></script>
+    <script src="utils/custom/airplan.js"></script>
     
     <body>
         <div class="row h-100">
@@ -75,7 +75,7 @@
         }
 
         // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
+        window.onmousedown = function(event) {
         if (event.target == document.getElementById("myModal")) {
             document.getElementById("myModal").style.display = "none";
         }
