@@ -52,16 +52,11 @@
             
             </div>
     </body>
+    <script src="utils/custom/graphical.js"></script>
     <script>
         tabular.draw();
 
-        function fitToContainer(canvas){
-            canvas.style.width='100%';
-            canvas.style.height='100%';
-            canvas.width  = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-        }
-
+        graphical.draw()
  
         //fitToContainer(document.getElementById("myCanvas"))
         // When the user clicks on the button, open the modal
@@ -87,5 +82,5 @@
         }
     </script>
 
-    <script src="utils/custom/graphical.js"></script>
+    
 </html>
