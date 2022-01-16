@@ -75,12 +75,12 @@ airplan.data = {
             {
                 "start": 10,
                 "end": 12,
-                "id": 1
+                "number": 1
             },
             {
                 "start": 12.5,
                 "end": 15,
-                "id": 2
+                "number": 2
             }
         ]
     }
