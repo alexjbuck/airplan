@@ -35,7 +35,7 @@
     <body>
         <div class="row h-100">
           <div id="graphic" class="col-7 h-100">
-            <canvas id="myCanvas" width="100%" height="100%"></canvas>    
+            <div id="stage" width="100%" height="100%"></div>    
           </div>
           <div id="tabular" class="border border-primary border-start h-100 col-5">
             <div id="tabular-cycles">
@@ -63,9 +63,8 @@
     <script>
         tabular.draw();
 
-        graphical.draw()
+        g.draw()
  
-        //fitToContainer(document.getElementById("myCanvas"))
         // When the user clicks on the button, open the modal
         var openModal = function(content) {
             $("#modalContent").html(content)
