@@ -103,7 +103,7 @@ tabular.cycles.add = () => {
 tabular.cycles.addSubmit = () => {
     let cycle = tabular.cycles.readForm();
     // if valid cycle, push to data object, log, close modal, redraw table.
-    if (tabular.cycles.validateCycle(cycle)) {
+    if (tabular.cycles.validate(cycle)) {
         // Push the new cycle to the data object.
         console.log("New Cycle: ",cycle.number, cycle.start, cycle.end);
         airplan.data.events.cycles.push(cycle);
@@ -239,9 +239,9 @@ tabular.sorties.addEditForm = () => {
     html += "</select>";
     html += "</div>";
     // Start Time
-    html += "<div class='form-group row align-items-center start-time'>";
+    html += "<div class='form-group row align-items-center'>";
     html += "<label for='startTime' class='col-12 col-md-3 text-left text-md-right'>Start Time</label>";
-    html += "<input type='datetime-local' class='col form-control-10' id='startTime' placeholder='0000'>";
+    html += "<input type='datetime-local' class='col form-control' id='startTime' placeholder='0000'>";
     html += "</div>";
     // Start Condition
     html += "<div class='form-group row align-items-center'>";
