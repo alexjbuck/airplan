@@ -18,13 +18,37 @@ config.textOptions = {
     align: 'center',
   },
 }
+// {padX=0,padY=0}={} allows for default values of padX and padY. 
+// If a param object isn't passed, the ={} is needed to not thrown an error on destructuring
+fitWidthToChildren = function(p,{padX=0,padY=0}={}) {
+  if (p.children.length>0){
+    let width  = p.children.map(c=>{return c.x()+c.width()-c.offsetX() - Math.min(c.x()-c.offsetX(),0)}).reduce((prev,curr)=>Math.max(prev,curr))
+    p.width(width+padX)
+  }
+  return p
+}
+
+fitHeightToChildren = function(p,{padX=0,padY=0}={}) {
+  if (p.children.length>0){
+    let height = p.children.map(c=>{return c.y()+c.height()-c.offsetY()-Math.min(c.y()-c.offsetY(),0)}).reduce((prev,curr)=>Math.max(prev,curr))
+    p.height(height+padY)
+  }
+  return p
+}
+
+fitSizeToChildren = function(p,{padX=0,padY=0}={}) {
+  p = fitWidthToChildren(p,{padX,padY})
+  p = fitHeightToChildren(p,{padX,padY})
+  return p
+}
+
 fitStageIntoParentContainer = function({stage, sceneHeight, sceneWidth}) {
   if (this === window) {
     stage = g.stage;
     sceneHeight = g.sceneHeight;
-    sceneWidth = g.scenewidth;
+    sceneWidth = g.sceneWidth;
   }
-  var container = document.querySelector('#stage');
+  var container = document.querySelector('#graphical-stage');
   // now we need to fit stage into parent container
   var containerWidth = container.offsetWidth;
   // but we also make the full scene visible so we need to scale all objects on canvas
@@ -34,6 +58,24 @@ fitStageIntoParentContainer = function({stage, sceneHeight, sceneWidth}) {
   stage.scale({ x: scale, y: scale });
 }
 window.addEventListener('resize', fitStageIntoParentContainer);
+
+drawBoundingBox = function(c,{stroke='black',strokeWidth='1',name}={}){
+  let x=0,y=0
+  if (c.children.length) {
+    x = c.children.map(c=>c.x()-c.offsetX()).reduce((prev,curr)=>Math.min(prev,curr),0)
+    y = c.children.map(c=>c.y()-c.offsetY()).reduce((prev,curr)=>Math.min(prev,curr),0)
+  }
+  c.add(new Konva.Rect({
+    x: x,
+    y: y,
+    width: c.width(),
+    height: c.height(),
+    stroke: stroke,
+    strokeWidth: strokeWidth,
+    name: name
+  }))
+  return c
+}
 
 var g = {
   // Page Margin
@@ -51,42 +93,34 @@ var g = {
     fitStageIntoParentContainer(this);
     console.log('Make Stage');
   },
+
   makeStage: function() {
+    console.log('Draw Stage')
     let stage = new Konva.Stage({
-      container: 'stage',   // id of container <div>
+      container: 'graphical-stage',   // id of container <div>
       width: this.sceneWidth,
       height: this.sceneHeight,
       name: 'stage',
     });
     this.stage = stage;
-    console.log('Draw Stage')
-    stage.pageArea = this.makePageArea(stage);
-    stage.add(stage.pageArea)
+    stage.pageLayer = this.makePageLayer(stage);
+    stage.add(stage.pageLayer)
+    drawBoundingBox(stage.pageLayer,{stroke:'red',strokeWidth:5,name:'pageLayerBoundary'})
     stage.draw();
     return stage;
   },
   // Page area is the whole page, then add it to stage, draw it, and add a red bounding box
-  makePageArea: function(parent) {
-    console.log('MakePageArea')
-    let pageArea = new Konva.Layer({
-      name: 'pageArea',
+  makePageLayer: function(p) {
+    console.log('MakePageLayer')
+    let pageLayer = new Konva.Layer({
+      name: 'pageLayer',
     });
-    pageArea.add( new Konva.Rect({
-      x: 0,
-      y: 0,
-      width: this.sceneWidth,
-      height: this.sceneHeight,
-      stroke: 'red',
-      strokeWidth: 5,
-      name: 'pageAreaBoundary',
-    }))
-    pageArea.printArea = this.makePrintArea(pageArea);
-    pageArea.add(pageArea.printArea);
-    // pageArea.draw()
-    return pageArea;
+    pageLayer.printArea = this.makePrintArea(pageLayer);
+    pageLayer.add(pageLayer.printArea);
+    return pageLayer;
   },
   // Print Area is the printable area, inset by a margin of g.m on all sides, add it to stage, and draw it
-  makePrintArea: function(parent) {
+  makePrintArea: function(p) {
     console.log('MakePrintArea')
     let printArea = new Konva.Group({
       x: this.m,
@@ -95,49 +129,43 @@ var g = {
       height: this.sceneHeight-2*this.m,
       name: 'printArea',
     })
+    drawBoundingBox(printArea,{name:'printAreaBoundary'})
     printArea.header = this.makeHeader(printArea);
     printArea.events = this.makeEvents(printArea);
     printArea.add(printArea.header);
     printArea.add(printArea.events);
-    printArea.add( new Konva.Rect({
-      x: 0,
-      y: 0,
-      width: printArea.width(),
-      height: printArea.height(),
-      stroke: 'black',
-      strokeWidth: 1,
-      name: 'printAreaBoundary',
-    }))
-    // printArea.draw()
     return printArea;
   },
 }
-g.makeHeader = function(parent) {
+g.makeHeader = function(p) {
   console.log('MakeHeader')
   let header = new Konva.Group({
     x: 0,
     y: 0,
-    width: parent.width(),
-    height: parent.height(),
+    width: p.width(),
+    height: 100,
     name: 'header',
-  });
-  let bottomLine = new Konva.Line({
-    points: [0, header.height(), header.width(), header.height()],
-    stroke: 'black',
-    strokeWidth: 1,
   });
   header.slap = this.makeSlap(header);
   header.title = this.makeTitle(header);
   header.time = this.makeTime(header);
-  header.add(bottomLine);
   header.add(header.slap);
   header.add(header.title);
   header.add(header.time);
+  header = fitHeightToChildren(header,{padY:this.m})
+  drawBoundingBox(header)
+  let bottomLine = new Konva.Line({
+    points: [0, header.height(), header.width(), header.height()],
+    stroke: 'black',
+    strokeWidth: 1,
+    name: 'headerLine'
+  });
+  // header.add(bottomLine);
   // header.draw()
   return header
 }
 
-g.makeSlap = function(parent) {
+g.makeSlap = function(p) {
   let slap = new Konva.Group({
       x: config.textOptions.body.padding,
       y: config.textOptions.body.padding,
@@ -163,16 +191,17 @@ g.makeSlap = function(parent) {
   slap.add(slapLabel);
   slap.add(slapData);
   // slap.draw()
+  slap = fitSizeToChildren(slap)
+  drawBoundingBox(slap,{stroke:'green'})
   return slap
 }
 
-g.makeTitle = function(parent) {
+g.makeTitle = function(p) {
   let title = new Konva.Group({
-    x: parent.width()/2,
+    x: p.width()/2,
     y: config.textOptions.body.padding,
     name: 'title_group',
   })
-  title.offsetX(title.width()/2)
   // Title Text
   var titleText = new Konva.Text({
     text: 'AIR PLAN',
@@ -183,27 +212,29 @@ g.makeTitle = function(parent) {
   });
   // Subtitle Text
   var subTitleText = new Konva.Text({
-      y: titleText.height() + config.textOptions.subtitle.padding,
-      text: 'CQ Day 1',
-      fontSize: config.textOptions.subtitle.fontSize,
-      fontFamily: config.textOptions.subtitle.fontFamily,
-      align: config.textOptions.subtitle.align,
-      name: 'subtitle',
+    y: titleText.height() + config.textOptions.subtitle.padding,
+    text: 'CQ Day 1',
+    fontSize: config.textOptions.subtitle.fontSize,
+    fontFamily: config.textOptions.subtitle.fontFamily,
+    align: config.textOptions.subtitle.align,
+    name: 'subtitle',
   });
   // Add to Group
   title.add(titleText);
   title.add(subTitleText);
+  title.children.forEach(c=>{c.offsetX(c.width()/2)})
+  title = fitSizeToChildren(title)
+  drawBoundingBox(title,{stroke:'green'})
   // title.draw()
   return title
 }
 
-g.makeTime = function(parent) {
+g.makeTime = function(p) {
   let time = new Konva.Group({
-    x: parent.width()-config.textOptions.body.padding,
+    x: p.width()-config.textOptions.body.padding,
     y: config.textOptions.body.padding,
     name: 'time_group',
   })
-  time.offsetX(time.width())
   // Time Label
   let timeLabel = new Konva.Text({
     text: ['flight quarters:','Helo quarters','Mag Var:','Time Zone:'].join('\n').toUpperCase(),
@@ -214,6 +245,7 @@ g.makeTime = function(parent) {
   });
   // Time Data
   let timeData = new Konva.Text({
+    x: timeLabel.width()+config.textOptions.body.padding,
     text: ['1','2','0','0'].join('\n'),
     fontSize: timeLabel.fontSize(),
     fontFamily: timeLabel.fontFamily(),
@@ -222,16 +254,19 @@ g.makeTime = function(parent) {
   // Add to Group
   time.add(timeLabel);
   time.add(timeData);
+  time = fitSizeToChildren(time);
+  time.offsetX(time.width())
+  drawBoundingBox(time,{stroke:'green'})
   // time.draw()
   return time
 }
 
-g.makeEvents = function(parent) {
+g.makeEvents = function(p) {
   let events = new Konva.Group({
     x: 0,
-    y: parent.header.height(),
-    width: parent.width(),
-    height: parent.height()-parent.header.height(),
+    y: p.header.height(),
+    width: p.width(),
+    height: p.height()-p.header.height(),
     name: 'events',
   })
   return events
@@ -241,8 +276,8 @@ g.makeEvents = function(parent) {
 // add it to print area
 
 g.buildStageTree = () => {
-  g.stage.add(g.pageArea);
-    g.pageArea.add(g.printArea);
+  g.stage.add(g.pageLayer);
+    g.pageLayer.add(g.printArea);
       g.printArea.add(g.header);
         g.header.add(g.header.slap);
         g.header.add(g.header.title);
