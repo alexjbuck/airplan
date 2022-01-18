@@ -40,20 +40,23 @@ tabular.cycles = new Object;
 tabular.cycles.draw = () => {
     var cycles = airplan.data.events.cycles;//or wherever the data is stored, may need to change how we loop over it
     var html = "<h3>Cycle List</h3>";
-    html += "<button class='btn btn-primary mb-2' onclick='tabular.cycles.add()'>Add Cycle</button>";
+    html += "<button class='col btn btn-primary mb-2' onclick='tabular.cycles.add()'>Add Cycle</button>";
     html += "<table class='table table-striped table-bordered table-condensed text-center'>";
     html += "<thead><tr>";
-    html += "<th class='col-3'>Cycle</th>";
+    html += "<th class='col-2'>Cycle</th>";
     html += "<th class='col-3'>Start</th>"
     html += "<th class='col-3'>End</th>";
-    html += "<th class='col-3'></th></thead>";
+    html += "<th class='col-4'></th></thead>";
     html += "<tbody>";
     cycles.forEach((cycle, index) => {
         html += "<tr>";
         html += "<td>" + cycle.number + "</td>";
         html += "<td>" + cycle.start + "</td>";
         html += "<td>" + cycle.end + "</td>";
-        html += "<td><button class='btn btn-secondary' onclick='tabular.cycles.edit(" + index + ")'>Edit</button><button onclick=tabular.cycles.delete("+index+") class='btn btn-danger'>X</button></td>"; // Method needs to be exitCycles or something like that. cycles.edit, whatever works.
+        html += "<td>"
+        html +=   "<button class='col-6 btn btn-secondary' onclick='tabular.cycles.edit(" + index + ")'>Edit</button>"
+        html +=   "<button class='col-6 btn btn-danger'    onclick=tabular.cycles.delete("+index+")>X</button>"
+        html += "</td>"; // Method needs to be exitCycles or something like that. cycles.edit, whatever works.
         html += "</tr>";
         }
     )
@@ -189,15 +192,15 @@ tabular.sorties = new Object;
 tabular.sorties.draw = () => {
     var events = airplan.data.events;//or wherever the data is stored, may need to change how we loop over it
     var html = "<h3>Sortie List</h3>";
-    html += "<button class='btn btn-primary mb-2' onclick='tabular.sorties.add()'>Add Sortie</button>";
+    html += "<button class='col btn btn-primary mb-2' onclick='tabular.sorties.add()'>Add Sortie</button>";
     html += "<table class='table table-striped table-bordered table-condensed text-center'>";
     // html += "<thead><tr><th class='col'>Sqdrn</th><th class='col'>Launch<br>Time</th><th class='col'>Launch<br>Condition</th><th class='col'>Recovery<br>Time</th><th class='col'>Recovery<br>Condition</th><th class='col'>Event</th></tr></thead>";
     html += "<thead><tr>"
-    html += "<th class='col-3'>Sqdrn</th>"
+    html += "<th class='col-2'>Sqdrn</th>"
     html += "<th class='col-2'>Launch</th>"
     html += "<th class='col-2'>Recovery</th>"
     html += "<th class='col-2'>Event</th>"
-    html += "<th class='col-3'></th>";
+    html += "<th class='col-4'></th>";
     html += "</tr></thead>";
     html += "<tbody>";
     events.squadrons.forEach((sqdrn, i) => {
@@ -214,7 +217,10 @@ tabular.sorties.draw = () => {
             // let cycle = getCycle(sortie)
             let cycle = 0;
             html += "<td>"+cycle+sqdrn.letter+(ii+1)+"</td>";
-            html += "<td><button class='btn btn-secondary' onclick='tabular.sorties.edit("+sortie.id+")'>Edit</button><button onclick=tabular.sorties.delete("+sortie.id+") class='btn btn-danger'>X</button></td>";
+            html += "<td>"
+            html +=   "<button class='col-6 btn btn-secondary' onclick='tabular.sorties.edit("+sortie.id+")'>Edit</button>"
+            html +=   "<button class='col-6 btn btn-danger'    onclick=tabular.sorties.delete("+sortie.id+") >X</button>"
+            html += "</td>";
             html += "</tr>";
         })
     })
