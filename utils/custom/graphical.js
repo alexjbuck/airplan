@@ -1,92 +1,374 @@
-var graphical = {};
-
-// first we need to create a stage
-graphical.stage = new Konva.Stage({
-    container: 'graphic',   // id of container <div>
-    height: $("#graphic").width(),
-    width: $("#graphic").height()
-  });
-
-
-
-  graphical.addSunMoonText = () => {
-    graphical.sunMoonLayer = new Konva.Layer();
-
-    //create lables
-    var sunMoonText = new Konva.Text({
-        x: 10,
-        y: 10,
-        text: 'SUNRISE:\nSUNSET:\nMOONRISE:\nMOONSET:\nMOONPHASE:',
-        fontSize: 8,
-        fontFamily: 'Calibri',
-    });
-    graphical.sunMoonLayer.add(sunMoonText);
-
-    //create data
-    var sunMoonData = new Konva.Text({
-        x: 65,
-        y: 10,
-        text: '0800L\n1730L\n1530L\n2230L\n50% ILLUMINATION',
-        fontSize: 8,
-        fontFamily: 'Calibri',
-    });
-    graphical.sunMoonLayer.add(sunMoonData);
-
-    //add layer to stage and draw
-    graphical.stage.add(graphical.sunMoonLayer);
-    graphical.sunMoonLayer.draw();
+let config = new Object();
+config.textOptions = {
+  body: {
+    fontFamily: 'sans-serif',
+    fontSize: 14,
+    padding: 10,
+  },
+  title: {
+    fontFamily: 'Calibri',
+    fontSize: 36,
+    padding: 10,
+    align: 'center',
+  },
+  subtitle: {
+    fontFamily: 'sans-serif',
+    fontSize: 18,
+    padding: 10,
+    align: 'center',
+  },
+}
+// {padX=0,padY=0}={} allows for default values of padX and padY. 
+// If a param object isn't passed, the ={} is needed to not thrown an error on destructuring
+fitWidthToChildren = function(p,{padX=0,padY=0}={}) {
+  if (p.children.length>0){
+    let width  = p.children.map(c=>{return c.x()+c.width()-c.offsetX() - Math.min(c.x()-c.offsetX(),0)}).reduce((prev,curr)=>Math.max(prev,curr))
+    p.width(width+padX)
   }
+  return p
+}
+
+fitHeightToChildren = function(p,{padX=0,padY=0}={}) {
+  if (p.children.length>0){
+    let height = p.children.map(c=>{return c.y()+c.height()-c.offsetY()-Math.min(c.y()-c.offsetY(),0)}).reduce((prev,curr)=>Math.max(prev,curr))
+    p.height(height+padY)
+  }
+  return p
+}
+
+fitSizeToChildren = function(p,{padX=0,padY=0}={}) {
+  p = fitWidthToChildren(p,{padX,padY})
+  p = fitHeightToChildren(p,{padX,padY})
+  return p
+}
+
+fitStageIntoParentContainer = function({stage, sceneHeight, sceneWidth}) {
+  if (this === window) {
+    stage = g.stage;
+    sceneHeight = g.sceneHeight;
+    sceneWidth = g.sceneWidth;
+  }
+  var container = document.querySelector('#graphical-stage');
+  // now we need to fit stage into parent container
+  var containerWidth = container.offsetWidth;
+  // but we also make the full scene visible so we need to scale all objects on canvas
+  var scale = containerWidth / g.sceneWidth;
+  stage.width(g.sceneWidth * scale);
+  stage.height(g.sceneHeight * scale);
+  stage.scale({ x: scale, y: scale });
+}
+window.addEventListener('resize', fitStageIntoParentContainer);
+
+drawBoundingBox = function(c,{stroke='black',strokeWidth='1',name}={}){
+  let x=0,y=0
+  if (c.children.length) {
+    x = c.children.map(c=>c.x()-c.offsetX()).reduce((prev,curr)=>Math.min(prev,curr),0)
+    y = c.children.map(c=>c.y()-c.offsetY()).reduce((prev,curr)=>Math.min(prev,curr),0)
+  }
+  c.add(new Konva.Rect({
+    x: x,
+    y: y,
+    width: c.width(),
+    height: c.height(),
+    stroke: stroke,
+    strokeWidth: strokeWidth,
+    name: name
+  }))
+  return c
+}
+
+var g = {
+  // Page Margin
+  m: 10,
   
+  // This means that the scene drawn in units of 1/10th inch. 
+  // Also forces aspect ratio to be 11:8.5, which is the ratio of the paper size.
+  sceneWidth: 1100,
+  sceneHeight: 850,
 
-  graphical.addTitle = () => {
-    graphical.titleLayer = new Konva.Layer();
+  stage: {},
 
-    //create lables
-    var titleText = new Konva.Text({
-        x: 155,
-        y: 13,
-        text: 'AIR PLAN',
-        fontSize: 16,
-        fontFamily: 'Calibri',
+  draw: function() {
+    this.makeStage();
+    fitStageIntoParentContainer(this);
+    console.log('Make Stage');
+  },
+
+  makeStage: function() {
+    console.log('Draw Stage')
+    let stage = new Konva.Stage({
+      container: 'graphical-stage',   // id of container <div>
+      width: this.sceneWidth,
+      height: this.sceneHeight,
+      name: 'stage',
     });
-    graphical.titleLayer.add(titleText);
-
-    //add layer to stage and draw
-    graphical.stage.add(graphical.titleLayer);
-    graphical.titleLayer.draw();
-  }
-
-  graphical.addBox = () => {
-    graphical.outerBoxLayer = new Konva.Layer();
-
-    //create lables
-    var outerBox = new Konva.Rect({
-        x: 5,
-        y: 5,
-        width: $("#graphic").width()-10,
-        height: $("#graphic").height()-20,
-        fillEnabled: false,
-        stroke: '#000',
-        strokeWidth: 1,
+    this.stage = stage;
+    stage.pageLayer = this.makePageLayer(stage);
+    stage.add(stage.pageLayer)
+    drawBoundingBox(stage.pageLayer,{stroke:'red',strokeWidth:5,name:'pageLayerBoundary'})
+    stage.draw();
+    return stage;
+  },
+  // Page area is the whole page, then add it to stage, draw it, and add a red bounding box
+  makePageLayer: function(p) {
+    console.log('MakePageLayer')
+    let pageLayer = new Konva.Layer({
+      name: 'pageLayer',
     });
-    graphical.outerBoxLayer.add(outerBox);
+    pageLayer.printArea = this.makePrintArea(pageLayer);
+    pageLayer.add(pageLayer.printArea);
+    return pageLayer;
+  },
+  // Print Area is the printable area, inset by a margin of g.m on all sides, add it to stage, and draw it
+  makePrintArea: function(p) {
+    console.log('MakePrintArea')
+    let printArea = new Konva.Group({
+      x: this.m,
+      y: this.m,  
+      width: this.sceneWidth-2*this.m,
+      height: this.sceneHeight-2*this.m,
+      name: 'printArea',
+    })
+    drawBoundingBox(printArea,{name:'printAreaBoundary'})
+    printArea.header = this.makeHeader(printArea);
+    printArea.events = this.makeEvents(printArea);
+    printArea.add(printArea.header);
+    printArea.add(printArea.events);
+    return printArea;
+  },
+}
+g.makeHeader = function(p) {
+  console.log('MakeHeader')
+  let header = new Konva.Group({
+    x: 0,
+    y: 0,
+    width: p.width(),
+    height: 100,
+    name: 'header',
+  });
+  header.slap = this.makeSlap(header);
+  header.title = this.makeTitle(header);
+  header.time = this.makeTime(header);
+  header.add(header.slap);
+  header.add(header.title);
+  header.add(header.time);
+  header = fitHeightToChildren(header,{padY:this.m})
+  drawBoundingBox(header)
+  let bottomLine = new Konva.Line({
+    points: [0, header.height(), header.width(), header.height()],
+    stroke: 'black',
+    strokeWidth: 1,
+    name: 'headerLine'
+  });
+  // header.add(bottomLine);
+  // header.draw()
+  return header
+}
 
-    var topLine = new Konva.Line({
-        points: [5, 60, $("#graphic").width()-5, 60],
+g.makeSlap = function(p) {
+  let slap = new Konva.Group({
+      x: config.textOptions.body.padding,
+      y: config.textOptions.body.padding,
+      name: 'slap_group',
+  })
+  // Label Text
+  var slapLabel = new Konva.Text({
+    text: Object.keys(airplan.data.header.slap).join('\n').toUpperCase(),
+    fontSize: config.textOptions.body.fontSize,
+    align: 'left',
+    fontFamily: config.textOptions.body.fontFamily,
+    name: 'slap_label',
+  });
+  // SLAP Data
+  var slapData = new Konva.Text({
+    text: ['0800L','1730L','1530L','2230L','50% ILLUMINATION'].join('\n'),
+    fontSize: slapLabel.fontSize(),
+    fontFamily: slapLabel.fontFamily(),
+    name: 'slap_data',
+  });
+  slapData.offsetX(-1*(slapLabel.width()+config.textOptions.body.padding));  
+  // Add to Group
+  slap.add(slapLabel);
+  slap.add(slapData);
+  // slap.draw()
+  slap = fitSizeToChildren(slap)
+  drawBoundingBox(slap,{stroke:'green'})
+  return slap
+}
+
+g.makeTitle = function(p) {
+  let title = new Konva.Group({
+    x: p.width()/2,
+    y: config.textOptions.body.padding,
+    name: 'title_group',
+  })
+  // Title Text
+  var titleText = new Konva.Text({
+    text: 'AIR PLAN',
+    fontSize: config.textOptions.title.fontSize,
+    fontFamily: config.textOptions.title.fontFamily,
+    align: config.textOptions.title.align,
+    name: 'title',
+  });
+  // Subtitle Text
+  var subTitleText = new Konva.Text({
+    y: titleText.height() + config.textOptions.subtitle.padding,
+    text: 'CQ Day 1',
+    fontSize: config.textOptions.subtitle.fontSize,
+    fontFamily: config.textOptions.subtitle.fontFamily,
+    align: config.textOptions.subtitle.align,
+    name: 'subtitle',
+  });
+  // Add to Group
+  title.add(titleText);
+  title.add(subTitleText);
+  title.children.forEach(c=>{c.offsetX(c.width()/2)})
+  title = fitSizeToChildren(title)
+  drawBoundingBox(title,{stroke:'green'})
+  // title.draw()
+  return title
+}
+
+g.makeTime = function(p) {
+  let time = new Konva.Group({
+    x: p.width()-config.textOptions.body.padding,
+    y: config.textOptions.body.padding,
+    name: 'time_group',
+  })
+  // Time Label
+  let timeLabel = new Konva.Text({
+    text: ['flight quarters:','Helo quarters','Mag Var:','Time Zone:'].join('\n').toUpperCase(),
+    fontSize: config.textOptions.body.fontSize,
+    fontFamily: config.textOptions.body.fontFamily,
+    align: 'right',
+    name: 'time_label',
+  });
+  // Time Data
+  let timeData = new Konva.Text({
+    x: timeLabel.width()+config.textOptions.body.padding,
+    text: ['1','2','0','0'].join('\n'),
+    fontSize: timeLabel.fontSize(),
+    fontFamily: timeLabel.fontFamily(),
+    name: 'time_data',
+  });
+  // Add to Group
+  time.add(timeLabel);
+  time.add(timeData);
+  time = fitSizeToChildren(time);
+  time.offsetX(time.width())
+  drawBoundingBox(time,{stroke:'green'})
+  // time.draw()
+  return time
+}
+
+g.makeEvents = function(p) {
+  let events = new Konva.Group({
+    x: 0,
+    y: p.header.height(),
+    width: p.width(),
+    height: p.height()-p.header.height(),
+    name: 'events',
+  })
+  drawBoundingBox(events,{stroke:'blue',strokeWidth:'5'})
+  // events.timeline = this.makeTimeline(events)
+  return events
+}
+
+g.makeEventsOld = function(p) {
+  // Define Events group, starting at the bottom left of the header, full width, height of remaining printable area
+  // add it to print area
+  let events = new Konva.Group({
+    x: 0,
+    y: offsetY,
+    width: width,
+    height: height,
+    name: 'events',
+  })
+
+  // Define the event groups: timeline, squadron, cycle totals
+  // Add the timeline group to the events group
+  events.timeline = new Konva.Group({
+    x: 0,
+    y: 0,
+    width: events.width(),
+    height: 40,
+    name: 'timeline',
+  })
+  // Add the cycle totals group to the events group, offsetY to anchor at bottom left corner
+  events.cycleTotals = new Konva.Group({
+    x: 0,
+    y: events.height(),
+    width: events.width(),
+    height: 20,
+    name: 'cycleTotals',
+  })
+  events.cycleTotals.offsetY(events.cycleTotals.height())
+  // Add the squadron group to the events group
+  events.squadronArea = new Konva.Group({
+    x: 0,
+    y: g.stage.find('.timeline')[0].height(),
+    width: events.width(),
+    height: events.height()-events.timeline.height()-events.cycleTotals.height(),
+    name: 'squadronArea',
+  })
+  return events;
+}
+
+g.addSquadrons = () => {
+  g.squadronLayer = new Konva.Layer();
+  let squadronWidth = 100;
+  let squadronYPos = 140;
+  let squadronHeight = sceneHeight-squadronYPos-g.m
+  
+  let squadronBoundingBox = new Konva.Line({
+    x: g.m,
+    y: squadronYPos,
+    points: [0, 0, squadronWidth, 0, squadronWidth, squadronHeight],
+    stroke: 'black',
+    strokeWidth: 1,
+    // fillEnabled: false,
+  })
+
+  let squadronHeader = new Konva.Text({
+    x: squadronBoundingBox.x()+squadronBoundingBox.width()/2,
+    y: squadronBoundingBox.y(),
+    text: 'squadron'.toUpperCase(),
+    fontSize: config.textOptions.body.fontSize,
+    fontFamily: config.textOptions.body.fontFamily,
+    fontStyle: 'bold',
+    align: 'left',
+  })
+  squadronHeader.offsetX((squadronHeader.width()/2))
+  squadronHeader.offsetY(squadronHeader.height());
+
+  let squadronData = airplan.data.events.squadrons.forEach((squadron, index, arr) => {
+    let n = arr.length;
+    let height = squadronBoundingBox.height()/n;
+
+    // Draw a line across the top of each squadron (except the first one, its topline is the bounding box)
+    if (index!=0) {
+      let line = new Konva.Line({
+        points: [squadronBoundingBox.x(), squadronBoundingBox.y()+height*index, squadronBoundingBox.x()+squadronBoundingBox.width(), squadronBoundingBox.y()+height*index],
         stroke: 'black',
         strokeWidth: 1,
-      });
-    graphical.outerBoxLayer.add(topLine);
-
-    //add layer to stage and draw
-    graphical.stage.add(graphical.outerBoxLayer);
-    graphical.outerBoxLayer.draw();
-  }
-
-  graphical.draw = () => {
-    graphical.addSunMoonText();
-    graphical.addTitle();
-    graphical.addBox();
-
-  }
-
+      })
+      g.squadronLayer.add(line);
+    }
+    
+    // Draw the squadron text block
+    let text = new Konva.Text({
+      text: [squadron.name , squadron.cs , squadron.tms , squadron.modex].join('\n').toUpperCase(),
+      x: squadronBoundingBox.x()+squadronBoundingBox.width()/2,
+      y: squadronBoundingBox.y()+height*index + height/2,
+      align: 'center',
+    })
+    text.offsetX(text.width()/2)
+    text.offsetY(text.height()/2)
+    g.squadronLayer.add(text);
+  })
+  
+  g.squadronLayer.add(squadronHeader);
+  g.squadronLayer.add(squadronBoundingBox);
+  g.squadronLayer.draw();
+  g.stage.add(g.squadronLayer);
+}

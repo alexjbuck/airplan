@@ -3,8 +3,7 @@
         <title>Airplan</title>
     </head>
     <!-- Need to bring all these into libraries eventually -->
-    <script src="https://unpkg.com/konva@8/konva.min.js"></script>
-
+    
     <style>
         .form-group label, .form-group input, .form-group select {
             margin-top: 0;
@@ -12,30 +11,43 @@
             margin-left: 1em;
             margin-right: 1em;
         }
+        .form-group {
+            font-size: 10px;
+        }
+        .table, .table .btn {
+            font-size: small;
+        }
+        #tabular .table th, #tabular .table td {
+            padding: 0;
+            font-size: small;
+            vertical-align: middle;
+        }
     </style>
     
     <!--libraries-->
     <link rel="stylesheet" href="utils/libraries/bootstrap.css">
     <link rel="stylesheet" href="utils/libraries/bootstrap-slider.css">
     <link rel="stylesheet" href="utils/libraries/modal.css">
+    <link rel="stylesheet" href="utils/libraries/customCSS.css">
     <script src="utils/libraries/jquery.js"></script>
     <script src="utils/libraries/bootstrap.bundle.js"></script>
-    <link href="utils/libraries/customCSS.css" rel="stylesheet">
+    <script src="utils/libraries/bootstrap-slider.js"></script>
     <script src="utils/libraries/xlsx.full.min.js"></script>
     <script src="utils/libraries/fileSaver.js"></script>
+    <script src="utils/libraries/konva.min.js"></script>
     <script src="utils/libraries/lap.js"></script>
     <script src="utils/libraries/munkres.js"></script>
-    <script src="utils/libraries/bootstrap-slider.js"></script>
     <script src="utils/libraries/rl.js"></script>
 
     <!--custom js-->
-    <script src="utils/custom/tabular.js"></script>
     <script src="utils/custom/airplan.js"></script>
+    <script src="utils/custom/tabular.js"></script>
+    <script src="utils/custom/graphical.js"></script>
     
     <body>
         <div class="row h-100">
-          <div id="graphic" class="col-7 h-100">
-            <canvas id="myCanvas" width="100%" height="100%"></canvas>    
+          <div id="graphical" class="col-7 h-100">
+            <div id="graphical-stage" width="100%" height="100%"></div>    
           </div>
           <div id="tabular" class="border border-primary border-start h-100 col-5">
             <div id="tabular-cycles">
@@ -59,13 +71,10 @@
             
             </div>
     </body>
-    <script src="utils/custom/graphical.js"></script>
     <script>
         tabular.draw();
-
-        graphical.draw()
+        g.draw()
  
-        //fitToContainer(document.getElementById("myCanvas"))
         // When the user clicks on the button, open the modal
         var openModal = function(content) {
             $("#modalContent").html(content)
