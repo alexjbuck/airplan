@@ -18,18 +18,20 @@ config.textOptions = {
     align: 'center',
   },
 }
-fitStageIntoParentContainer = function() {
+fitStageIntoParentContainer = function({stage, sceneHeight, sceneWidth}) {
+  if (this === window) {
+    stage = g.stage;
+    sceneHeight = g.sceneHeight;
+    sceneWidth = g.scenewidth;
+  }
   var container = document.querySelector('#stage');
   // now we need to fit stage into parent container
   var containerWidth = container.offsetWidth;
-  // but we also make the full scene visible
-  // so we need to scale all objects on canvas
+  // but we also make the full scene visible so we need to scale all objects on canvas
   var scale = containerWidth / g.sceneWidth;
-  g.stage.width(g.sceneWidth * scale);
-  g.stage.height(g.sceneHeight * scale);
-  g.stage.scale({ x: scale, y: scale });
-  // console.log("this: ",this)
-  // console.log('Resize event. Stage size: ' + g.stage.width() + 'x' + g.stage.height());
+  stage.width(g.sceneWidth * scale);
+  stage.height(g.sceneHeight * scale);
+  stage.scale({ x: scale, y: scale });
 }
 window.addEventListener('resize', fitStageIntoParentContainer);
 
@@ -46,6 +48,7 @@ var g = {
 
   draw: function() {
     this.makeStage();
+    fitStageIntoParentContainer(this);
     console.log('Make Stage');
   },
   makeStage: function() {
