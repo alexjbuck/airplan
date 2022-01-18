@@ -269,89 +269,49 @@ g.makeEvents = function(p) {
     height: p.height()-p.header.height(),
     name: 'events',
   })
+  drawBoundingBox(events,{stroke:'blue',strokeWidth:'5'})
+  // events.timeline = this.makeTimeline(events)
   return events
 }
 
-// Define Header group, starting at the top left of the printable area, full width, height of 100
-// add it to print area
+g.makeEventsOld = function(p) {
+  // Define Events group, starting at the bottom left of the header, full width, height of remaining printable area
+  // add it to print area
+  let events = new Konva.Group({
+    x: 0,
+    y: offsetY,
+    width: width,
+    height: height,
+    name: 'events',
+  })
 
-g.buildStageTree = () => {
-  g.stage.add(g.pageLayer);
-    g.pageLayer.add(g.printArea);
-      g.printArea.add(g.header);
-        g.header.add(g.header.slap);
-        g.header.add(g.header.title);
-        g.header.add(g.header.time);
-      g.printArea.add(g.events);
-        g.events.add(g.events.timeline);
-        g.events.add(g.events.squadronArea);
-        g.events.add(g.events.cycleTotals);
-}
-
-g.addHeader = () => {
-  var header = new Konva.Layer({
-    x: g.m,
-    y: g.m,
-    width: sceneWidth - 2 * g.m,
-    height: 100,
-  });
-  var title = new Konva.Text({
-    x: header.width() / 2,
-    y: g.m,
-    text: 'AIR PLAN',
-    fontSize: config.textOptions.title.fontSize,
-    fontFamily: config.textOptions.title.fontFamily,
-    align: config.textOptions.title.align,
-  });
-  title.offsetX(title.width() / 2);
-  header.add(titleText);
-
-  var subTitleText = new Konva.Text({
-      x: header.width() / 2,
-      y: titleText.height() + config.textOptions.subtitle.padding,
-      text: 'CQ Day 1',
-      fontSize: config.textOptions.subtitle.fontSize,
-      fontFamily: config.textOptions.subtitle.fontFamily,
-      align: config.textOptions.subtitle.align,
-  });
-  subTitleText.offsetX(subTitleText.width() / 2);
-  header.add(subTitleText);
-  g.stage.add(header);
-  header.draw();
-}
-
-
-
-//
-// TIME
-//
-g.addTimeText = () => {
-  g.timeLayer = new Konva.Layer();
-  let timeText = new Konva.Text({
-      x: sceneWidth-2*g.m,
-      y: 2*g.m,
-      text: 'flight quarters:\nHelo quarters\nMag Var:\nTime Zone:'.toUpperCase(),
-      fontSize: 14,
-      fontFamily: 'sans-serif',
-      align: 'right',
-  });
-  g.timeLayer.add(timeText);
-  
-  let timeData = new Konva.Text({
-    x: timeText.x(),
-    y: timeText.y(),
-    text: '0800L\n1730L\n1530L\nT (+5)'.toUpperCase(),
-    fontSize: timeText.fontSize(),
-    fontFamily: timeText.fontFamily(),
-    align: 'left',
-  });
-  g.timeLayer.add(timeData);
-
-  timeText.offsetX(timeText.width()+timeData.width()+config.textOptions.body.padding);
-  timeData.offsetX(timeData.width())
-
-  g.stage.add(g.timeLayer);
-  g.timeLayer.draw()
+  // Define the event groups: timeline, squadron, cycle totals
+  // Add the timeline group to the events group
+  events.timeline = new Konva.Group({
+    x: 0,
+    y: 0,
+    width: events.width(),
+    height: 40,
+    name: 'timeline',
+  })
+  // Add the cycle totals group to the events group, offsetY to anchor at bottom left corner
+  events.cycleTotals = new Konva.Group({
+    x: 0,
+    y: events.height(),
+    width: events.width(),
+    height: 20,
+    name: 'cycleTotals',
+  })
+  events.cycleTotals.offsetY(events.cycleTotals.height())
+  // Add the squadron group to the events group
+  events.squadronArea = new Konva.Group({
+    x: 0,
+    y: g.stage.find('.timeline')[0].height(),
+    width: events.width(),
+    height: events.height()-events.timeline.height()-events.cycleTotals.height(),
+    name: 'squadronArea',
+  })
+  return events;
 }
 
 g.addSquadrons = () => {
@@ -412,6 +372,3 @@ g.addSquadrons = () => {
   g.squadronLayer.draw();
   g.stage.add(g.squadronLayer);
 }
-
-
-// adapt the stage on any window resize
