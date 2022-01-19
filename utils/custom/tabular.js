@@ -40,23 +40,23 @@ tabular.cycles = new Object;
 tabular.cycles.draw = () => {
     var cycles = airplan.data.events.cycles;//or wherever the data is stored, may need to change how we loop over it
     var html = "<h3>Cycle List</h3>";
-    html += "<button class='col btn btn-primary mb-2' onclick='tabular.cycles.add()'>Add Cycle</button>";
-    html += "<table class='table table-striped table-bordered table-condensed text-center'>";
+    html += "<button class='btn btn-primary btn-block mb-2' onclick='tabular.cycles.add()'>Add Cycle</button>";
+    html += "<table class='table table-striped table-hover table-sm text-center'>";
     html += "<thead><tr>";
-    html += "<th class='col-2'>Cycle</th>";
+    html += "<th class='col-3'>Cycle</th>";
     html += "<th class='col-3'>Start</th>"
     html += "<th class='col-3'>End</th>";
-    html += "<th class='col-4'></th></thead>";
+    html += "<th class='col-3'></th></thead>";
     html += "<tbody>";
     cycles.forEach((cycle, index) => {
         html += "<tr>";
-        html += "<td>" + cycle.number + "</td>";
-        html += "<td>" + cycle.start + "</td>";
-        html += "<td>" + cycle.end + "</td>";
-        html += "<td>"
-        html +=   "<button class='col-6 btn btn-secondary' onclick='tabular.cycles.edit(" + index + ")'>Edit</button>"
-        html +=   "<button class='col-6 btn btn-danger'    onclick=tabular.cycles.delete("+index+")>X</button>"
-        html += "</td>"; // Method needs to be exitCycles or something like that. cycles.edit, whatever works.
+        html += "<td class='align-middle'>" + cycle.number + "</td>";
+        html += "<td class='align-middle'>" + cycle.start + "</td>";
+        html += "<td class='align-middle'>" + cycle.end + "</td>";
+        html += "<td class='align-middle'><div class='btn-group' role='group'>"
+        html +=   "<button class='btn btn-sm btn-secondary' onclick='tabular.cycles.edit(" + index + ")'>Edit</button>"
+        html +=   "<button class='btn btn-sm btn-danger'    onclick=tabular.cycles.delete("+index+")>X</button>"
+        html += "</div></td>"; // Method needs to be exitCycles or something like that. cycles.edit, whatever works.
         html += "</tr>";
         }
     )
@@ -67,17 +67,17 @@ tabular.cycles.draw = () => {
 tabular.cycles.addEditForm = () => {
     // Cycle Number
     let html = "<div class='form-group row align-items-center'>";
-    html += "<label for='number' class='col-12 col-md-3 text-left text-md-right'>Cycle #</label>";
+    html += "<label for='number' class='col-12 col-md-2 text-left text-md-right'>Cycle #</label>";
     html += "<input type='number' class='col form-control' id='number' placeholder='Cycle Number' required>";
     html += "</div>"
     // Start time
     html += "<div class='form-group row align-items-center'>";
-    html += "<label for='start' class='col-12 col-md-3 text-left text-md-right'>Start</label>";
+    html += "<label for='start' class='col-12 col-md-2 text-left text-md-right'>Start</label>";
     html += "<input type='datetime-local' class='col form-control' id='start' placeholder='Start'>";
     html += "</div>";
     // End time
     html += "<div class='form-group row align-items-center'>";
-    html += "<label for='end' class='col-12 col-md-3 text-left text-md-right'>End</label>";
+    html += "<label for='end' class='col-12 col-md-2 text-left text-md-right'>End</label>";
     html += "<input type='datetime-local' class='col form-control' id='end' placeholder='End'>";
     html += "</div>";
     return html
@@ -192,15 +192,14 @@ tabular.sorties = new Object;
 tabular.sorties.draw = () => {
     var events = airplan.data.events;//or wherever the data is stored, may need to change how we loop over it
     var html = "<h3>Sortie List</h3>";
-    html += "<button class='col btn btn-primary mb-2' onclick='tabular.sorties.add()'>Add Sortie</button>";
-    html += "<table class='table table-striped table-bordered table-condensed text-center'>";
-    // html += "<thead><tr><th class='col'>Sqdrn</th><th class='col'>Launch<br>Time</th><th class='col'>Launch<br>Condition</th><th class='col'>Recovery<br>Time</th><th class='col'>Recovery<br>Condition</th><th class='col'>Event</th></tr></thead>";
+    html += "<button class='btn btn-primary btn-block mb-2' onclick='tabular.sorties.add()'>Add Sortie</button>";
+    html += "<table class='table table-striped table-hover table-sm text-center'>";
     html += "<thead><tr>"
-    html += "<th class='col-2'>Sqdrn</th>"
-    html += "<th class='col-2'>Launch</th>"
+    html += "<th class='col-3'>Sqdrn</th>"
+    html += "<th class='col-2'>Time</th>"
     html += "<th class='col-2'>Recovery</th>"
     html += "<th class='col-2'>Event</th>"
-    html += "<th class='col-4'></th>";
+    html += "<th class='col-3'></th>";
     html += "</tr></thead>";
     html += "<tbody>";
     events.squadrons.forEach((sqdrn, i) => {
@@ -208,19 +207,15 @@ tabular.sorties.draw = () => {
         events.sorties.filter(sortie=>sortie.squadron == sqdrn.name).forEach((sortie, ii) => {
             console.log("  Sortie: "+ii+" "+sortie);
             html += "<tr>";
-            html += "<td>"+sortie.squadron+"</td>";
-            html += "<td>"+sortie.start+"</td>";
-            // html += "<td>"+sortie.startCondition+"</td>";
-            html += "<td>"+sortie.end+"</td>";
-            // html += "<td>"+sortie.endCondition+"</td>";
-            // Broken: Unhandled errors in getCycle()
-            // let cycle = getCycle(sortie)
+            html += "<td class='align-middle'>"+sortie.squadron+"</td>";
+            html += "<td class='align-middle'>"+sortie.start+"</td>";
+            html += "<td class='align-middle'>"+sortie.end+"</td>";
             let cycle = 0;
-            html += "<td>"+cycle+sqdrn.letter+(ii+1)+"</td>";
-            html += "<td>"
-            html +=   "<button class='col-6 btn btn-secondary' onclick='tabular.sorties.edit("+sortie.id+")'>Edit</button>"
-            html +=   "<button class='col-6 btn btn-danger'    onclick=tabular.sorties.delete("+sortie.id+") >X</button>"
-            html += "</td>";
+            html += "<td class='align-middle'>"+cycle+sqdrn.letter+(ii+1)+"</td>";
+            html += "<td class='align-middle'><div class='btn-group'>"
+            html +=   "<button class='btn btn-sm btn-secondary' onclick='tabular.sorties.edit("+sortie.id+")'>Edit</button>"
+            html +=   "<button class='btn btn-sm btn-danger'    onclick=tabular.sorties.delete("+sortie.id+") >X</button>"
+            html += "</div></td>";
             html += "</tr>";
         })
     })
