@@ -73,8 +73,8 @@ airplan.data = {
         ],
         "cycles": [
             {
-                "start": '2022-01-18T11:00',
-                "end": '2022-01-18T12:00',
+                "start": 10,
+                "end": 11.5,
                 "number": 1
             },
             {
@@ -82,7 +82,9 @@ airplan.data = {
                 "end": 15,
                 "number": 2
             }
-        ]
+        ],
+        "start": 8,
+        "end": 18,
     }
 } 
         

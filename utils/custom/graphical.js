@@ -59,7 +59,7 @@ fitStageIntoParentContainer = function({stage, sceneHeight, sceneWidth}) {
 }
 window.addEventListener('resize', fitStageIntoParentContainer);
 
-drawBoundingBox = function(c,{stroke='black',strokeWidth='1',name}={}){
+drawBoundingBox = function(c,{stroke='black',strokeWidth='1',name, fillEnabled='false', fill=''}={}){
   let x=0,y=0
   if (c.children.length) {
     x = c.children.map(c=>c.x()-c.offsetX()).reduce((prev,curr)=>Math.min(prev,curr),0)
@@ -72,9 +72,18 @@ drawBoundingBox = function(c,{stroke='black',strokeWidth='1',name}={}){
     height: c.height(),
     stroke: stroke,
     strokeWidth: strokeWidth,
-    name: name
+    name: name,
+    fillEnabled: fillEnabled,
+    fill: fill,
   }))
   return c
+}
+
+hours2pixels = function(h,p) {
+  let pixels = (h-airplan.data.events.start) * p.width()/(airplan.data.events.end-airplan.data.events.start)
+  pixels = pixels<0 ? 0 : pixels
+  pixels = pixels>p.width() ? p.width(): pixels
+  return pixels
 }
 
 var g = {
@@ -85,8 +94,6 @@ var g = {
   // Also forces aspect ratio to be 11:8.5, which is the ratio of the paper size.
   sceneWidth: 1100,
   sceneHeight: 850,
-
-  stage: {},
 
   draw: function() {
     this.makeStage();
@@ -158,7 +165,7 @@ g.makeHeader = function(p) {
     points: [0, header.height(), header.width(), header.height()],
     stroke: 'black',
     strokeWidth: 1,
-    name: 'headerLine'
+    name: 'header.line'
   });
   // header.add(bottomLine);
   // header.draw()
@@ -169,7 +176,7 @@ g.makeSlap = function(p) {
   let slap = new Konva.Group({
       x: config.textOptions.body.padding,
       y: config.textOptions.body.padding,
-      name: 'slap_group',
+      name: 'slap',
   })
   // Label Text
   var slapLabel = new Konva.Text({
@@ -177,14 +184,14 @@ g.makeSlap = function(p) {
     fontSize: config.textOptions.body.fontSize,
     align: 'left',
     fontFamily: config.textOptions.body.fontFamily,
-    name: 'slap_label',
+    name: 'slap.label',
   });
   // SLAP Data
   var slapData = new Konva.Text({
     text: ['0800L','1730L','1530L','2230L','50% ILLUMINATION'].join('\n'),
     fontSize: slapLabel.fontSize(),
     fontFamily: slapLabel.fontFamily(),
-    name: 'slap_data',
+    name: 'slap.data',
   });
   slapData.offsetX(-1*(slapLabel.width()+config.textOptions.body.padding));  
   // Add to Group
@@ -200,7 +207,7 @@ g.makeTitle = function(p) {
   let title = new Konva.Group({
     x: p.width()/2,
     y: config.textOptions.body.padding,
-    name: 'title_group',
+    name: 'title',
   })
   // Title Text
   var titleText = new Konva.Text({
@@ -208,7 +215,7 @@ g.makeTitle = function(p) {
     fontSize: config.textOptions.title.fontSize,
     fontFamily: config.textOptions.title.fontFamily,
     align: config.textOptions.title.align,
-    name: 'title',
+    name: 'title.title',
   });
   // Subtitle Text
   var subTitleText = new Konva.Text({
@@ -217,7 +224,7 @@ g.makeTitle = function(p) {
     fontSize: config.textOptions.subtitle.fontSize,
     fontFamily: config.textOptions.subtitle.fontFamily,
     align: config.textOptions.subtitle.align,
-    name: 'subtitle',
+    name: 'title.subtitle',
   });
   // Add to Group
   title.add(titleText);
@@ -233,7 +240,7 @@ g.makeTime = function(p) {
   let time = new Konva.Group({
     x: p.width()-config.textOptions.body.padding,
     y: config.textOptions.body.padding,
-    name: 'time_group',
+    name: 'time',
   })
   // Time Label
   let timeLabel = new Konva.Text({
@@ -241,7 +248,7 @@ g.makeTime = function(p) {
     fontSize: config.textOptions.body.fontSize,
     fontFamily: config.textOptions.body.fontFamily,
     align: 'right',
-    name: 'time_label',
+    name: 'time.label',
   });
   // Time Data
   let timeData = new Konva.Text({
@@ -249,7 +256,7 @@ g.makeTime = function(p) {
     text: ['1','2','0','0'].join('\n'),
     fontSize: timeLabel.fontSize(),
     fontFamily: timeLabel.fontFamily(),
-    name: 'time_data',
+    name: 'time.data',
   });
   // Add to Group
   time.add(timeLabel);
@@ -262,6 +269,7 @@ g.makeTime = function(p) {
 }
 
 g.makeEvents = function(p) {
+  console.log('Make Events')
   let events = new Konva.Group({
     x: 0,
     y: p.header.height(),
@@ -269,9 +277,213 @@ g.makeEvents = function(p) {
     height: p.height()-p.header.height(),
     name: 'events',
   })
-  drawBoundingBox(events,{stroke:'blue',strokeWidth:'5'})
-  // events.timeline = this.makeTimeline(events)
+  events.leftColWidth = 100
+  events.rightColWidth = 50
+  this.hours2pixels = (events.width()-events.leftColWidth-events.rightColWidth)/(airplan.data.events.end-airplan.data.events.start)
+
+  events.timeline = this.makeTimeline(events)
+  events.cycleTotals = this.makeCycleTotals(events)
+  events.squadrons = this.makeSquadrons(events)
+  events.add(events.timeline)
+  events.add(events.cycleTotals)
+  events.add(events.squadrons)
+  // drawBoundingBox(events,{stroke:'blue',strokeWidth:'5'})
   return events
+}
+
+g.makeTimeline = function(p){
+  console.log('Make Timeline')
+  let timeline = new Konva.Group({
+    x: 0,
+    y: 0,
+    width: p.width(),
+    height:40,
+    name: 'timeline'
+  })
+  // drawBoundingBox(timeline,{stroke:'red', fillEnabled:true, fill: 'red'})
+  timeline.add( new Konva.Line({
+    points: [0,timeline.height()/2,timeline.width(),timeline.height()/2],
+    stroke: 'black',
+    strokeWidth: 1,
+  }))
+  timeline.add( new Konva.Line({
+    points: [0,timeline.height()  ,timeline.width(),timeline.height()  ],
+    stroke: 'black',
+    strokeWidth: 1,
+  }))
+  // Create a timebox that is sized to use this.hours2pixels conversions
+  timeline.timebox = new Konva.Group({
+    x: p.leftColWidth,
+    y: 0,
+    width: timeline.width() - p.leftColWidth - p.rightColWidth,
+    height: timeline.height(),
+    name: 'timeline.timebox'
+  })
+  // drawBoundingBox(timeline.timebox)
+  timeline.add(timeline.timebox)
+  timeline.timebox.add( new Konva.Arc({
+    x: hours2pixels(7,timeline.timebox),
+    y: 20,
+    innerRadius: 0,
+    outerRadius: 15,
+    angle: 180,
+    clockwise: true,
+    stroke: 'black',
+    strokeWidth: 1,
+    name: 'sunrise.icon'
+  }))
+  
+  // This is sunset
+  timeline.timebox.add( new Konva.Arc({
+    x: hours2pixels(16,timeline.timebox),
+    y: 20,
+    innerRadius: 0,
+    outerRadius: 15,
+    angle: 180,
+    clockwise: true,
+    stroke: 'black',
+    fill: 'black',
+    strokeWidth: 1,
+    name: 'sunset.icon'
+  }))
+
+  airplan.data.events.cycles.forEach((cycle)=>{
+    // This is a cycle start line
+    let x = hours2pixels(cycle.start,timeline.timebox)
+    timeline.timebox.add( new Konva.Line({
+      points: [x,timeline.height()  ,x,p.height()  ],
+      stroke: 'black',
+      strokeWidth: 1,
+      name: 'cycle'
+    }))
+    // This is the cycle label
+    x = hours2pixels((cycle.start+cycle.end)/2,timeline.timebox)
+    let cycleText = new Konva.Text({
+      x: x,
+      y: timeline.height(),
+      text: cycle.number,
+    })
+    timeline.timebox.add(cycleText)
+    cycleText.offsetY(cycleText.height())
+    // This is a cycle start line
+    x = hours2pixels(cycle.end,timeline.timebox)
+    timeline.timebox.add( new Konva.Line({
+      points: [x,timeline.height(),  x,p.height()  ],
+      stroke: 'black',
+      strokeWidth: 1,
+      name: 'cycle'
+    }))
+  })
+
+  return timeline
+}
+
+g.makeCycleTotals = function(p){
+  console.log('Make Cycle Totals')
+  let cycleTotals = new Konva.Group({
+    x: 0,
+    y: p.height(),
+    width: p.width(),
+    height: 40,
+    name: 'cycleTotals'
+  })
+  cycleTotals.offsetY(cycleTotals.height())
+  // drawBoundingBox(cycleTotals,{stroke:'green', fillEnabled:true, fill: 'green'})
+  return cycleTotals
+}
+g.makeSquadrons = function(p){
+  console.log('Make Squadrons')
+  let squadrons = new Konva.Group({
+    x: 0,
+    y: p.timeline.height(),
+    width: p.width(),
+    height:p.height()-p.cycleTotals.height()-p.timeline.height(),
+    name: 'squadrons'
+  })
+  // Right border of squadron labels
+  squadrons.add( new Konva.Line({
+    points:[p.leftColWidth,0,  p.leftColWidth,squadrons.height()],
+    stroke: 'black',
+    strokeWidth: 1,
+  }))
+  let header = new Konva.Text({
+    x: p.leftColWidth/2,
+    y: 0,
+    text: 'SQUADRON',
+    align: 'center',
+    style: 'bold',
+  })
+  header.offsetX(header.width()/2)
+  header.offsetY(header.height())
+  squadrons.add(header)
+  squadrons.squadronGroups = []
+  let n = airplan.data.events.squadrons.length
+  let squadronHeight = squadrons.height()/n
+  // --------- Loop over all squadrons ---------
+  airplan.data.events.squadrons.forEach((s,i,arr)=>{
+      let group = new Konva.Group({
+        x:0,
+        y:i*squadronHeight,
+        width: squadrons.width(),
+        height: squadronHeight,
+        name: 'squadron'
+      })
+      // ------ Context below this is within a squadron group --------
+      group.add( new Konva.Line({
+        points: [0,group.height(),  group.width(), group.height()],
+        stroke: 'black',
+        strokeWidth: 1,
+        name:'squadron.bottomline'
+      }))
+      // vertical line between text and letter
+      let letterWidth = 15
+      group.add( new Konva.Line({
+        points: [p.leftColWidth-letterWidth, 0, p.leftColWidth-letterWidth, group.height()],
+        stroke: 'black',
+        strokeWidth: 1,
+      }))
+      // A,B,C,... letter labels
+      let letterText = new Konva.Text({
+        x: p.leftColWidth-letterWidth/2,
+        y: group.height()/2,
+        text: s.letter,
+        align: 'center',
+      })
+      letterText.offsetX(letterText.width()/2)
+      letterText.offsetY(letterText.height()/2)
+      // Squadron name/cs/type/modex labels
+      let groupText = new Konva.Text({
+        x: (p.leftColWidth-letterWidth)/2,
+        y: group.height()/2,
+        text: [s.name, s.cs, s.tms, s.modex].join('\n').toUpperCase(),
+        align: 'center',
+      })
+      groupText.offsetX(groupText.width()/2)
+      groupText.offsetY(groupText.height()/2)
+      
+      // squadron totals vertical line
+      group.add( new Konva.Line({
+        points: [group.width()-p.rightColWidth,0,  group.width()-p.rightColWidth,group.height()],
+        stroke: 'black',
+        strokeWidth: 1,
+      }))
+      group.add(letterText)
+      group.add(groupText)
+      squadrons.squadronGroups.push(group)
+      squadrons.add(group)
+  })
+  // drawBoundingBox(squadrons,{stroke:'black', fillEnabled:true, fill: 'orange'})
+  return squadrons  
+}
+
+g.makeSquadronGroup = function(p) {
+  let group = new Konva.Group({
+    x:0,
+    y:i*squadronHeight,
+    width: squadrons.width(),
+    height: squadronHeight,
+    name: 'squadron_group'
+  })
 }
 
 g.makeEventsOld = function(p) {
@@ -316,14 +528,14 @@ g.makeEventsOld = function(p) {
 
 g.addSquadrons = () => {
   g.squadronLayer = new Konva.Layer();
-  let squadronWidth = 100;
+  let leftColWidth = 100;
   let squadronYPos = 140;
   let squadronHeight = sceneHeight-squadronYPos-g.m
   
   let squadronBoundingBox = new Konva.Line({
     x: g.m,
     y: squadronYPos,
-    points: [0, 0, squadronWidth, 0, squadronWidth, squadronHeight],
+    points: [0, 0, leftColWidth, 0, leftColWidth, squadronHeight],
     stroke: 'black',
     strokeWidth: 1,
     // fillEnabled: false,
