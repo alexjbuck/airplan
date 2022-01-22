@@ -79,8 +79,8 @@ drawBoundingBox = function(c,{stroke='black',strokeWidth='1',name, fillEnabled='
   return c
 }
 
-hours2pixels = function(h,p) {
-  let pixels = (h-airplan.data.events.start) * p.width()/(airplan.data.events.end-airplan.data.events.start)
+time2pixels = function(h,p) {
+  let pixels = (h.valueOf()-airplan.data.events.start.valueOf()) * p.width()/(airplan.data.events.end.valueOf()-airplan.data.events.start.valueOf())
   pixels = pixels<0 ? 0 : pixels
   pixels = pixels>p.width() ? p.width(): pixels
   return pixels
@@ -188,7 +188,7 @@ g.makeSlap = function(p) {
   });
   // SLAP Data
   var slapData = new Konva.Text({
-    text: ['0800L','1730L','1530L','2230L','50% ILLUMINATION'].join('\n'),
+    text: Object.values(airplan.data.header.slap).map(v=>prettyPrintTime(v)).join('\n'),
     fontSize: slapLabel.fontSize(),
     fontFamily: slapLabel.fontFamily(),
     name: 'slap.data',
@@ -279,7 +279,7 @@ g.makeEvents = function(p) {
   })
   events.leftColWidth = 100
   events.rightColWidth = 50
-  this.hours2pixels = (events.width()-events.leftColWidth-events.rightColWidth)/(airplan.data.events.end-airplan.data.events.start)
+  this.time2pixels = (events.width()-events.leftColWidth-events.rightColWidth)/(airplan.data.events.end-airplan.data.events.start)
 
   events.timeline = this.makeTimeline(events)
   events.cycleTotals = this.makeCycleTotals(events)
@@ -311,7 +311,7 @@ g.makeTimeline = function(p){
     stroke: 'black',
     strokeWidth: 1,
   }))
-  // Create a timebox that is sized to use this.hours2pixels conversions
+  // Create a timebox that is sized to use this.time2pixels conversions
   timeline.timebox = new Konva.Group({
     x: p.leftColWidth,
     y: 0,
@@ -322,7 +322,7 @@ g.makeTimeline = function(p){
   // drawBoundingBox(timeline.timebox)
   timeline.add(timeline.timebox)
   timeline.timebox.add( new Konva.Arc({
-    x: hours2pixels(7,timeline.timebox),
+    x: time2pixels(airplan.data.header.slap.sunrise,timeline.timebox),
     y: 20,
     innerRadius: 0,
     outerRadius: 15,
@@ -332,10 +332,18 @@ g.makeTimeline = function(p){
     strokeWidth: 1,
     name: 'sunrise.icon'
   }))
+  timeline.find('.sunrise.icon').forEach((s)=>{
+    timeline.timebox.add( new Konva.Text({
+      x: s.x(),
+      y: s.y(),
+      text: prettyPrintTime(airplan.data.header.slap.sunrise),
+      name: 'sunrise.text',
+    }))
+  })
   
   // This is sunset
   timeline.timebox.add( new Konva.Arc({
-    x: hours2pixels(16,timeline.timebox),
+    x: time2pixels(airplan.data.header.slap.sunset,timeline.timebox),
     y: 20,
     innerRadius: 0,
     outerRadius: 15,
@@ -346,10 +354,20 @@ g.makeTimeline = function(p){
     strokeWidth: 1,
     name: 'sunset.icon'
   }))
+  timeline.find('.sunset.icon').forEach((s)=>{
+    timeline.timebox.add( new Konva.Text({
+      x: s.x(),
+      y: s.y(),
+      text: prettyPrintTime(airplan.data.header.slap.sunset),
+      name: 'sunrise.text',
+    }))
+  })
+  
 
+  // Iterate over all cycles!
   airplan.data.events.cycles.forEach((cycle)=>{
     // This is a cycle start line
-    let x = hours2pixels(cycle.start,timeline.timebox)
+    let x = time2pixels(cycle.start,timeline.timebox)
     timeline.timebox.add( new Konva.Line({
       points: [x,timeline.height()  ,x,p.height()  ],
       stroke: 'black',
@@ -357,7 +375,7 @@ g.makeTimeline = function(p){
       name: 'cycle'
     }))
     // This is the cycle label
-    x = hours2pixels((cycle.start+cycle.end)/2,timeline.timebox)
+    x = time2pixels((cycle.start.valueOf()+cycle.end.valueOf())/2,timeline.timebox)
     let cycleText = new Konva.Text({
       x: x,
       y: timeline.height(),
@@ -366,7 +384,7 @@ g.makeTimeline = function(p){
     timeline.timebox.add(cycleText)
     cycleText.offsetY(cycleText.height())
     // This is a cycle start line
-    x = hours2pixels(cycle.end,timeline.timebox)
+    x = time2pixels(cycle.end,timeline.timebox)
     timeline.timebox.add( new Konva.Line({
       points: [x,timeline.height(),  x,p.height()  ],
       stroke: 'black',
