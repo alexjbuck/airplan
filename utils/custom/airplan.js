@@ -7,10 +7,10 @@ airplan.data = {
             "subtitle": "Subtitle"
         },
         "slap": {
-            "sunrise": "0550",
-            "sunset": "1920",
-            "moonrise": "2120",
-            "moonset": "0440",
+            "sunrise": new Date(1642675800000),
+            "sunset": new Date(1642724400000),
+            "moonrise": new Date(1650284400000),
+            "moonset": new Date(1650530400000),
             "moonphase": "25%"
         },
         "time": {
@@ -34,8 +34,8 @@ airplan.data = {
         "sorties":[
             {
                 "squadron": "VFA-201",
-                "start": 9.5,
-                "end": 12.5,
+                "start": new Date(1642698000000),
+                "end": new Date(1642702500000),
                 "startCycle": null,
                 "endCycle": null,
                 "startCondition": "pull",
@@ -45,8 +45,8 @@ airplan.data = {
             },
             {
                 "squadron": "VFA-201",
-                "start": 11,
-                "end": 13,
+                "start": new Date(1642702500000),
+                "end": new Date(1642707000000),
                 "startCycle": 1,
                 "endCycle": 2,
                 "startCondition": "flyOn",
@@ -57,34 +57,41 @@ airplan.data = {
         ],
         "squadrons": [
             {
-                "name": "VFA-201",
+                "name": "VFA-213",
                 "cs": "WOLF",
                 "tms": "MH-60R",
                 "modex": "700",
                 "letter": "A",
             },
             {
-                "name": "VFA-202",
+                "name": "VFA-201",
                 "cs": "DIMON",
                 "tms": "FA-18E",
                 "modex": "100",
                 "letter": "B",
+            },
+            {
+                "name": "VFA-37",
+                "cs": "TOMCAT",
+                "tms": "FA-18E",
+                "modex": "200",
+                "letter": "C",
             }
         ],
         "cycles": [
             {
-                "start": 10,
-                "end": 11.5,
+                "start": new Date(1642698000000), // Thu Jan 20 2022 12:00:00 GMT-0500 (Eastern Standard Time)
+                "end": new Date(1642702500000), // Thu Jan 20 2022 13:15:00 GMT-0500 (Eastern Standard Time)
                 "number": 1
             },
             {
-                "start": 12.5,
-                "end": 15,
+                "start": new Date(1642702500000), // Thu Jan 20 2022 13:15:00 GMT-0500 (Eastern Standard Time)
+                "end": new Date(1642707000000), // Thu Jan 20 2022 14:30:00 GMT-0500 (Eastern Standard Time)
                 "number": 2
             }
         ],
-        "start": 8,
-        "end": 18,
+        "start": 1642692600000, // Thu Jan 20 2022 10:30:00 GMT-0500 (Eastern Standard Time)
+        "end": 1642717800000, // Thu Jan 20 2022 17:30:00 GMT-0500 (Eastern Standard Time)
     }
 } 
         
