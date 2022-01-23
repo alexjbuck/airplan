@@ -112,7 +112,7 @@ var g = {
     this.stage = stage;
     stage.pageLayer = this.makePageLayer(stage);
     stage.add(stage.pageLayer)
-    drawBoundingBox(stage.pageLayer,{stroke:'red',strokeWidth:5,name:'pageLayerBoundary'})
+    // drawBoundingBox(stage.pageLayer,{stroke:'red',strokeWidth:5,name:'pageLayerBoundary'})
     return stage;
   },
   // Page area is the whole page, then add it to stage, draw it, and add a red bounding box
@@ -204,7 +204,7 @@ g.makeSlap = function(p) {
   slap.add(slapData);
   // slap.draw()
   slap = fitSizeToChildren(slap)
-  drawBoundingBox(slap,{stroke:'green'})
+  // drawBoundingBox(slap,{stroke:'green'})
   return slap
 }
 
@@ -236,7 +236,7 @@ g.makeTitle = function(p) {
   title.add(subTitleText);
   title.children.forEach(c=>{c.offsetX(c.width()/2)})
   title = fitSizeToChildren(title)
-  drawBoundingBox(title,{stroke:'green'})
+  // drawBoundingBox(title,{stroke:'green'})
   // title.draw()
   return title
 }
@@ -249,7 +249,7 @@ g.makeTime = function(p) {
   })
   // Time Label
   let timeLabel = new Konva.Text({
-    text: ['flight quarters:','Helo quarters','Mag Var:','Time Zone:'].join('\n').toUpperCase(),
+    text: ['flight quarters:','Helo quarters:','Mag Var:','Time Zone:'].join('\n').toUpperCase(),
     fontSize: config.textOptions.body.fontSize,
     fontFamily: config.textOptions.body.fontFamily,
     align: 'right',
@@ -258,7 +258,14 @@ g.makeTime = function(p) {
   // Time Data
   let timeData = new Konva.Text({
     x: timeLabel.width()+config.textOptions.body.padding,
-    text: ['1','2','0','0'].join('\n'),
+    text: ['flightquarters','heloquarters','variation','timezone'].map((k)=>{
+      let v = airplan.data.header.time[k]
+      if(typeof(v)=='object'){
+        return v.toHHMM()
+      } else {
+        return v
+      }
+    }).join('\n'),
     fontSize: timeLabel.fontSize(),
     fontFamily: timeLabel.fontFamily(),
     name: 'time.data',
@@ -268,7 +275,7 @@ g.makeTime = function(p) {
   time.add(timeData);
   time = fitSizeToChildren(time);
   time.offsetX(time.width())
-  drawBoundingBox(time,{stroke:'green'})
+  // drawBoundingBox(time,{stroke:'green'})
   // time.draw()
   return time
 }
