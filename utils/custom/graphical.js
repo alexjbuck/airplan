@@ -98,11 +98,11 @@ var g = {
   draw: function() {
     this.makeStage();
     fitStageIntoParentContainer(this);
-    console.log('Make Stage');
+    // console.log('Make Stage');
   },
 
   makeStage: function() {
-    console.log('Draw Stage')
+    console.log('Make Stage')
     let stage = new Konva.Stage({
       container: 'graphical-stage',   // id of container <div>
       width: this.sceneWidth,
@@ -113,12 +113,11 @@ var g = {
     stage.pageLayer = this.makePageLayer(stage);
     stage.add(stage.pageLayer)
     drawBoundingBox(stage.pageLayer,{stroke:'red',strokeWidth:5,name:'pageLayerBoundary'})
-    stage.draw();
     return stage;
   },
   // Page area is the whole page, then add it to stage, draw it, and add a red bounding box
   makePageLayer: function(p) {
-    console.log('MakePageLayer')
+    console.log('Make Page Layer')
     let pageLayer = new Konva.Layer({
       name: 'pageLayer',
     });
@@ -128,7 +127,7 @@ var g = {
   },
   // Print Area is the printable area, inset by a margin of g.m on all sides, add it to stage, and draw it
   makePrintArea: function(p) {
-    console.log('MakePrintArea')
+    console.log('Make Print Area')
     let printArea = new Konva.Group({
       x: this.m,
       y: this.m,  
@@ -145,7 +144,7 @@ var g = {
   },
 }
 g.makeHeader = function(p) {
-  console.log('MakeHeader')
+  console.log('Make Header')
   let header = new Konva.Group({
     x: 0,
     y: 0,
@@ -188,7 +187,13 @@ g.makeSlap = function(p) {
   });
   // SLAP Data
   var slapData = new Konva.Text({
-    text: Object.values(airplan.data.header.slap).map(v=>prettyPrintTime(v)).join('\n'),
+    text: Object.values(airplan.data.header.slap).map((v)=>{
+      if(typeof(v)=='object'){
+        return v.toHHMM()
+      } else {
+        return v
+      }
+    }).join('\n'),
     fontSize: slapLabel.fontSize(),
     fontFamily: slapLabel.fontFamily(),
     name: 'slap.data',
@@ -332,11 +337,12 @@ g.makeTimeline = function(p){
     strokeWidth: 1,
     name: 'sunrise.icon'
   }))
+  
   timeline.find('.sunrise.icon').forEach((s)=>{
     timeline.timebox.add( new Konva.Text({
       x: s.x(),
       y: s.y(),
-      text: prettyPrintTime(airplan.data.header.slap.sunrise),
+      text: airplan.data.header.slap.sunrise.toHHMM(),
       name: 'sunrise.text',
     }))
   })
@@ -358,7 +364,7 @@ g.makeTimeline = function(p){
     timeline.timebox.add( new Konva.Text({
       x: s.x(),
       y: s.y(),
-      text: prettyPrintTime(airplan.data.header.slap.sunset),
+      text: airplan.data.header.slap.sunset.toHHMM(),
       name: 'sunrise.text',
     }))
   })
@@ -372,7 +378,7 @@ g.makeTimeline = function(p){
       points: [x,timeline.height()  ,x,p.height()  ],
       stroke: 'black',
       strokeWidth: 1,
-      name: 'cycle'
+      name: 'cycle.start'
     }))
     // This is the cycle label
     x = time2pixels((cycle.start.valueOf()+cycle.end.valueOf())/2,timeline.timebox)
@@ -383,13 +389,13 @@ g.makeTimeline = function(p){
     })
     timeline.timebox.add(cycleText)
     cycleText.offsetY(cycleText.height())
-    // This is a cycle start line
+    // This is a cycle end line
     x = time2pixels(cycle.end,timeline.timebox)
     timeline.timebox.add( new Konva.Line({
       points: [x,timeline.height(),  x,p.height()  ],
       stroke: 'black',
       strokeWidth: 1,
-      name: 'cycle'
+      name: 'cycle.end'
     }))
   })
 
@@ -409,6 +415,7 @@ g.makeCycleTotals = function(p){
   // drawBoundingBox(cycleTotals,{stroke:'green', fillEnabled:true, fill: 'green'})
   return cycleTotals
 }
+
 g.makeSquadrons = function(p){
   console.log('Make Squadrons')
   let squadrons = new Konva.Group({
@@ -434,75 +441,165 @@ g.makeSquadrons = function(p){
   header.offsetX(header.width()/2)
   header.offsetY(header.height())
   squadrons.add(header)
+  squadrons.leftColWidth = p.leftColWidth
+  squadrons.rightColWidth = p.rightColWidth
   squadrons.squadronGroups = []
-  let n = airplan.data.events.squadrons.length
-  let squadronHeight = squadrons.height()/n
   // --------- Loop over all squadrons ---------
-  airplan.data.events.squadrons.forEach((s,i,arr)=>{
-      let group = new Konva.Group({
-        x:0,
-        y:i*squadronHeight,
-        width: squadrons.width(),
-        height: squadronHeight,
-        name: 'squadron'
-      })
-      // ------ Context below this is within a squadron group --------
-      group.add( new Konva.Line({
-        points: [0,group.height(),  group.width(), group.height()],
-        stroke: 'black',
-        strokeWidth: 1,
-        name:'squadron.bottomline'
-      }))
-      // vertical line between text and letter
-      let letterWidth = 15
-      group.add( new Konva.Line({
-        points: [p.leftColWidth-letterWidth, 0, p.leftColWidth-letterWidth, group.height()],
-        stroke: 'black',
-        strokeWidth: 1,
-      }))
-      // A,B,C,... letter labels
-      let letterText = new Konva.Text({
-        x: p.leftColWidth-letterWidth/2,
-        y: group.height()/2,
-        text: s.letter,
-        align: 'center',
-      })
-      letterText.offsetX(letterText.width()/2)
-      letterText.offsetY(letterText.height()/2)
-      // Squadron name/cs/type/modex labels
-      let groupText = new Konva.Text({
-        x: (p.leftColWidth-letterWidth)/2,
-        y: group.height()/2,
-        text: [s.name, s.cs, s.tms, s.modex].join('\n').toUpperCase(),
-        align: 'center',
-      })
-      groupText.offsetX(groupText.width()/2)
-      groupText.offsetY(groupText.height()/2)
-      
-      // squadron totals vertical line
-      group.add( new Konva.Line({
-        points: [group.width()-p.rightColWidth,0,  group.width()-p.rightColWidth,group.height()],
-        stroke: 'black',
-        strokeWidth: 1,
-      }))
-      group.add(letterText)
-      group.add(groupText)
-      squadrons.squadronGroups.push(group)
-      squadrons.add(group)
+  airplan.data.events.squadrons.forEach((s,i)=>{
+    let group = this.makeSquadronGroup(s,i,squadrons)
+    squadrons.squadronGroups.push(group)
+    squadrons.add(group)
   })
   // drawBoundingBox(squadrons,{stroke:'black', fillEnabled:true, fill: 'orange'})
   return squadrons  
 }
 
-g.makeSquadronGroup = function(p) {
+g.makeSquadronGroup = function(s,i,p) {
+  let n = airplan.data.events.squadrons.length
+  let squadronHeight = p.height()/n
   let group = new Konva.Group({
     x:0,
     y:i*squadronHeight,
-    width: squadrons.width(),
+    width: p.width(),
     height: squadronHeight,
-    name: 'squadron_group'
+    name: 'squadron.group'
   })
+  group.add( new Konva.Line({
+    points: [0,group.height(),  group.width(), group.height()],
+    stroke: 'black',
+    strokeWidth: 1,
+    name:'squadron.bottomline'
+  }))
+  // vertical line between text and letter
+  let letterWidth = 15
+  group.add( new Konva.Line({
+    points: [p.leftColWidth-letterWidth, 0, p.leftColWidth-letterWidth, group.height()],
+    stroke: 'black',
+    strokeWidth: 1,
+  }))
+  // A,B,C,... letter labels
+  let letterText = new Konva.Text({
+    x: p.leftColWidth-letterWidth/2,
+    y: group.height()/2,
+    text: s.letter,
+    align: 'center',
+    name: 'squadron.letter'
+  })
+  letterText.offsetX(letterText.width()/2)
+  letterText.offsetY(letterText.height()/2)
+  // Squadron name/cs/type/modex labels
+  let groupText = new Konva.Text({
+    x: (p.leftColWidth-letterWidth)/2,
+    y: group.height()/2,
+    text: [s.name, s.cs, s.tms, s.modex].join('\n').toUpperCase(),
+    align: 'center',
+    name: 'squadron.name'
+  })
+  groupText.offsetX(groupText.width()/2)
+  groupText.offsetY(groupText.height()/2)
+  
+  // squadron totals vertical line
+  group.add( new Konva.Line({
+    points: [group.width()-p.rightColWidth,0,  group.width()-p.rightColWidth,group.height()],
+    stroke: 'black',
+    strokeWidth: 1,
+  }))
+  group.add(letterText)
+  group.add(groupText)
+
+  // Squadron Sorties
+  let sortieGroup = new Konva.Group({
+    x: p.leftColWidth,
+    y: 0,
+    width: group.width()-p.rightColWidth-p.leftColWidth,
+    height: group.height(),
+    name: 'sortie.group',
+  })
+  console.log("Sorties for "+s.name)
+  let sorties = airplan.data.events.sorties.filter(sortie=>sortie.squadron==s.name)
+  let ns = sorties.length
+  let h = group.height()/(ns+2)
+  sorties.forEach((s,i)=>{
+    let x1 = time2pixels(s.start,sortieGroup)
+    let x2 = time2pixels(s.end,sortieGroup)
+    let y = h*(i+1)
+    sortieGroup.add( new Konva.Line({
+      points: [x1,y,x2,y],
+      stroke: 'black',
+      strokeWidth: 1,
+      name: 'sortie.line'
+    }))
+    sortieGroup.add( new Konva.Text({
+      x: x1+5,
+      y: y-15,
+      text: s.annotation,
+    }))
+    this.makeCondition[s.startCondition](x1,y,sortieGroup)
+    this.makeCondition[s.endCondition](x2,y,sortieGroup)
+  })
+  group.add(sortieGroup)
+  group.sortieGroup = sortieGroup
+  return group
 }
+
+g.makeCondition = {}
+// Swoosh down to start point
+g.makeFlyOn = function(x,y,p) {
+  p.add( new Konva.Line({
+    points: [x-14,y-14,x,y],
+    stroke:'black',
+    strokeWidth:1,
+    name: 'flyon'
+  }))
+}
+g.makeCondition.flyOn = g.makeFlyOn
+
+// swoosh up from start point
+g.makeFlyOff = function(x,y,p) {
+  p.add( new Konva.Line({
+    points: [x,y,x+14,y-14],
+    strokeWidth: 1,
+    stroke: 'black',
+    name: 'flyoff',
+  }))
+}
+g.makeCondition.flyOff = g.makeFlyOff
+
+// vertical bar
+g.makePullStuff = function(x,y,p) {
+  p.add( new Konva.Line({
+    points: [x,y-10,x,y+10],
+    stroke: 'black',
+    strokeWidth: 1,
+    name: 'pullstuff',
+  }))
+}
+g.makeCondition.stuff= g.makePullStuff
+g.makeCondition.pull = g.makePullStuff
+
+g.makeHotPump = function(x,y,p) {
+  p.add( new Konva.Line({
+    points: [x,y+10, x+5,y,  x,y-10,  x-5,y,  x,y+10],
+    stroke: 'black',
+    strokeWidth: 1,
+    closed: true,
+    fill: 'white',
+    fillEnabled: true,
+  }))
+}
+g.makeCondition.hp = g.makeHotPump
+
+g.makeHotPumpCrewSwap = function(x,y,p) {
+  p.add( new Konva.Line({
+    points: [x,y+10, x+5,y,  x,y-10,  x-5,y,  x,y+10],
+    stroke: 'black',
+    strokeWidth: 1,
+    fill:'black',
+    fillEnabled:true,
+    closed: true,
+  }))
+}
+g.makeCondition.hpcs = g.makeHotPumpCrewSwap
 
 g.makeEventsOld = function(p) {
   // Define Events group, starting at the bottom left of the header, full width, height of remaining printable area
