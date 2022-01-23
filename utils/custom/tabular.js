@@ -1,11 +1,17 @@
 var tabular = new Object;
 
+// Process add or edit submits
+tabular.processSubmit = function() {
+    closeModal()
+    this.draw()
+    g.draw()
+}
+
 // Draw the sortie and cycles tables.
 tabular.draw = () => {
     tabular.sorties.draw()
     tabular.cycles.draw()
 }
-
 
 highlightInvalidInput = ($object) => {
     $object.css("border-color", "red");
@@ -25,11 +31,12 @@ getCycle = ({start}) => {
         // If the start is before the first cycle, it's cycle 0.
         return 0;
     } else if (start > cycles[cycles.length-1].end) {
-        // If the start is after the last cycle, it's the last cycle + 1 (which is the length, since it's zero-indexed).
-        return cycles.length;
+        // If the start is after the last cycle, it's the last cycle + 1 (which is the length+1).
+        return cycles.length+1;
     } else {
         // Otherwise, it's the first cycle that starts before and ends after the start.
-        return cycles.filter(c => c.start <= start && c.end >= start)[0].id;
+        let cycle = cycles.filter(c => c.start <= start && c.end > start).reduce((p,c)=>p).number
+        return cycle ? cycle : '-'
     }
 }
 
@@ -51,8 +58,8 @@ tabular.cycles.draw = () => {
     cycles.forEach((cycle, index) => {
         html += "<tr>";
         html += "<td class='align-middle'>" + cycle.number + "</td>";
-        html += "<td class='align-middle'>" + cycle.start + "</td>";
-        html += "<td class='align-middle'>" + cycle.end + "</td>";
+        html += "<td class='align-middle'>" + cycle.start.toHHMM() + "</td>";
+        html += "<td class='align-middle'>" + cycle.end.toHHMM() + "</td>";
         html += "<td class='align-middle'><div class='btn-group' role='group'>"
         html +=   "<button class='btn btn-sm btn-secondary' onclick='tabular.cycles.edit(" + index + ")'>Edit</button>"
         html +=   "<button class='btn btn-sm btn-danger'    onclick=tabular.cycles.delete("+index+")>X</button>"
@@ -85,8 +92,8 @@ tabular.cycles.addEditForm = () => {
 
 tabular.cycles.readForm = () => {
     let number    = $( "#number" ).val();
-    let start     = $( "#start"  ).val();
-    let end       = $( "#end"    ).val();
+    let start     = new Date(Date.parse($('#start').val()));
+    let end       = new Date(Date.parse($( '#end' ).val()));
     return {number: number, start: start, end: end}
 }
 
@@ -107,8 +114,7 @@ tabular.cycles.addSubmit = () => {
         // Push the new cycle to the data object.
         console.log("New Cycle: ",cycle.number, cycle.start, cycle.end);
         airplan.data.events.cycles.push(cycle);
-        closeModal();
-        tabular.draw();
+        tabular.processSubmit()
     }
 }
 
@@ -117,9 +123,9 @@ tabular.cycles.edit = (i) => {
     html += tabular.cycles.addEditForm();
     html += "<button type='submit' class='btn btn-primary' onclick='tabular.cycles.editSubmit("+i+")'>Submit</button>";
     openModal(html);
-    $("#number").val(airplan.data.events.cycles[i].id);
-    $("#start").val(airplan.data.events.cycles[i].start);
-    $("#end").val(airplan.data.events.cycles[i].end);
+    $("#number").val(airplan.data.events.cycles[i].number);
+    $("#start").val(airplan.data.events.cycles[i].start.toLocalTimeString());
+    $("#end").val(airplan.data.events.cycles[i].end.toLocalTimeString());
 }
 
 tabular.cycles.editSubmit = (i) => {
@@ -130,8 +136,7 @@ tabular.cycles.editSubmit = (i) => {
         // Update the cycle in the data object.
         console.log("Updated Cycle: ",cycle.number, cycle.start, cycle.end);
         airplan.data.events.cycles[i] = cycle;
-        closeModal();
-        tabular.draw();
+        tabular.processSubmit()
     }
 }
 
@@ -157,10 +162,10 @@ tabular.cycles.validate = ({number,start,end}) => {
         valid.end = false;
     }
     // Check if the cycle number is unique.
-    if (airplan.data.events.cycles.filter(c => c.number == number).length > 0) {
-        alert("Cycle number must be unique.");
-        valid.number = false;
-    }
+    // if (airplan.data.events.cycles.filter(c => c.number == number).length > 0) {
+    //     alert("Cycle number must be unique.");
+    //     valid.number = false;
+    // }
     // Check if the start is before the end.
     if (start > end) {
         alert("Start must be before end.");
@@ -208,9 +213,9 @@ tabular.sorties.draw = () => {
             console.log("  Sortie: "+ii+" "+sortie);
             html += "<tr>";
             html += "<td class='align-middle'>"+sortie.squadron+"</td>";
-            html += "<td class='align-middle'>"+sortie.start+"</td>";
-            html += "<td class='align-middle'>"+sortie.end+"</td>";
-            let cycle = 0;
+            html += "<td class='align-middle'>"+sortie.start.toHHMM()+"</td>";
+            html += "<td class='align-middle'>"+sortie.end.toHHMM()+"</td>";
+            let cycle = getCycle(sortie);
             html += "<td class='align-middle'>"+cycle+sqdrn.letter+(ii+1)+"</td>";
             html += "<td class='align-middle'><div class='btn-group'>"
             html +=   "<button class='btn btn-sm btn-secondary' onclick='tabular.sorties.edit("+sortie.id+")'>Edit</button>"
@@ -279,22 +284,25 @@ tabular.sorties.add = () => {
     openModal(html);
 }
 
+tabular.sorties.readForm = function() {
+    let sortie = new Object;
+    sortie.squadron =                  $("#squadron").val();
+    sortie.start = new Date(Date.parse($( "#startTime" ).val()));
+    sortie.startCondition =            $( "#startCondition" ).val();
+    sortie.end   = new Date(Date.parse($( "#endTime" ).val()));
+    sortie.endCondition =              $( "#endCondition" ).val();
+    sortie.annotation =                $( "#annotation" ).val();
+    return sortie
+}
+
 // Callback on the "Submit" button in the "Add Sortie" modal.
 tabular.sorties.addSubmit = () => {
-    let sortie = new Object;
-    sortie.squadron = $("#squadron").val();
-    sortie.start = $( "#startTime" ).val();
-    sortie.startCondition = $( "#startCondition" ).val();
-    sortie.end = $( "#endTime" ).val();
-    sortie.endCondition = $( "#endCondition" ).val();
-    sortie.annotation = $( "#annotation" ).val();
+    let sortie = tabular.sorties.readForm()
     sortie.id = +airplan.data.events.sorties[airplan.data.events.sorties.length-1].id+1;
     if (tabular.sorties.validate(sortie)) {
         airplan.data.events.sorties.push(sortie);
         console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.annotation);
-        closeModal();
-        tabular.draw();
-    }
+        tabular.processSubmit()    }
 }
 
 tabular.sorties.edit = (i) => {
@@ -304,9 +312,9 @@ tabular.sorties.edit = (i) => {
     html += "<button type='submit' class='btn btn-primary' onclick='tabular.sorties.editSubmit("+i+")'>Submit</button>";
     openModal(html);
     $("#squadron").val(airplan.data.events.sorties[i].squadron);
-    $("#startTime").val(airplan.data.events.sorties[i].start);
+    $("#startTime").val(airplan.data.events.sorties[i].start.toLocalTimeString());
     $("#startCondition").val(airplan.data.events.sorties[i].startCondition);
-    $("#endTime").val(airplan.data.events.sorties[i].end);
+    $("#endTime").val(airplan.data.events.sorties[i].end.toLocalTimeString());
     $("#endCondition").val(airplan.data.events.sorties[i].endCondition);
     $("#annotation").val(airplan.data.events.sorties[i].annotation);
 }
@@ -314,23 +322,17 @@ tabular.sorties.edit = (i) => {
 tabular.sorties.editSubmit = (i) => {
     console.log("processing edit of sortie "+i);
     let sortie = airplan.data.events.sorties[i]
-    sortie.squadron = $("#squadron").val();
-    sortie.start = $( "#startTime" ).val();
-    sortie.startCondition = $( "#startCondition" ).val();
-    sortie.end = $( "#endTime" ).val();
-    sortie.endCondition = $( "#endCondition" ).val();
-    sortie.annotation = $( "#annotation" ).val();
+    sortie = tabular.sorties.readForm()
     console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.annotation);
-    // push the sortie to the data object.
-    airplan.data.events.sorties[i] = sortie;
-    closeModal();
-    tabular.draw()
+    if (tabular.sorties.validate(sortie)) {
+        airplan.data.events.sorties[i] = sortie;
+        console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.annotation);
+        tabular.processSubmit()    }
 }
 
 tabular.sorties.validate = (sortie) => {
     return true
 }
-
 
 tabular.cycles.delete = (i) => {
     // Todo: delete cycle
