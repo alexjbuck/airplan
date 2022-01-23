@@ -127,11 +127,11 @@ tabular.cycles.addSubmit = () => {
 tabular.cycles.edit = (id) => {
     var html = "<h3>Edit Cycle</h3>";
     html += tabular.cycles.addEditForm();
-    html += "<button type='submit' class='btn btn-primary' onclick='tabular.cycles.editSubmit("+i+")'>Submit</button>";
+    html += "<button type='submit' class='btn btn-primary' onclick='tabular.cycles.editSubmit('"+id+"')'>Submit</button>";
     openModal(html);
-    $("#number").val(airplan.data.events.cycles[i].number);
-    $("#start").val(airplan.data.events.cycles[i].start.toLocalTimeString());
-    $("#end").val(airplan.data.events.cycles[i].end.toLocalTimeString());
+    $("#number").val(airplan.data.events.cycles[id].number);
+    $("#start").val(airplan.data.events.cycles[id].start.toLocalTimeString());
+    $("#end").val(airplan.data.events.cycles[id].end.toLocalTimeString());
 }
 
 tabular.cycles.editSubmit = (id) => {
