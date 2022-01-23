@@ -1,6 +1,7 @@
 var airplan = new Object;
 
 airplan.data = {
+    "date": new Date(),
     "header": {
         "title": {
             "title": "Airplan Title",
@@ -14,8 +15,8 @@ airplan.data = {
             "moonphase": "25%"
         },
         "time": {
-            "flightquarters": "1000",
-            "heloquarters": "0930",
+            "flightquarters": new Date(1642675800000),
+            "heloquarters": new Date(1642724400000),
             "variation": "10 W",
             "timezone": "L",
             "sorties": {
