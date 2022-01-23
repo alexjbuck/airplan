@@ -10,6 +10,13 @@ Date.prototype.toLocalTimeString = function() {
     return yyyy+'-'+mm+'-'+dd+'T'+HH+':'+MM
 }
 
+Date.prototype.toYYYYMMDD = function() {
+    let yyyy = this.getFullYear()
+    let mm = this.getMonth() < 9 ? '0'+(+this.getMonth()+1) : this.getMonth()+1 // getMonth returns 0-11
+    let dd = this.getDate() < 10 ? '0'+this.getDate() : this.getDate()
+    return yyyy+'-'+mm+'-'+dd
+}
+
 Date.prototype.toHHMM = function() {
     // return the datetime object as HHMM string
     let HH = this.getHours() < 10 ? '0'+this.getHours() : this.getHours()
