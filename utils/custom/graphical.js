@@ -370,8 +370,8 @@ g.makeTimeline = function(p){
   })
   
 
-  // Iterate over all cycles!
-  airplan.data.events.cycles.forEach((cycle)=>{
+  // Iterate over all cycles.
+  Object.values(airplan.data.events.cycles).forEach((cycle)=>{
     // This is a cycle start line
     let x = time2pixels(cycle.start,timeline.timebox)
     timeline.timebox.add( new Konva.Line({
@@ -516,7 +516,7 @@ g.makeSquadronGroup = function(s,i,p) {
     name: 'sortie.group',
   })
   console.log("Sorties for "+s.name)
-  let sorties = airplan.data.events.sorties.filter(sortie=>sortie.squadron==s.name)
+  let sorties = Object.values(airplan.data.events.sorties).filter(sortie=>sortie.squadron==s.name)
   let ns = sorties.length
   let h = group.height()/(ns+2)
   sorties.forEach((s,i)=>{

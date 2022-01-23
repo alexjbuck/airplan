@@ -40,6 +40,11 @@ getCycle = ({start}) => {
     }
 }
 
+getMissionNumber = (sortie) => {
+    return '1A1'
+}
+
+
 //
 //  Cycles Table
 // 
@@ -55,14 +60,14 @@ tabular.cycles.draw = () => {
     html += "<th class='col-3'>End</th>";
     html += "<th class='col-3'></th></thead>";
     html += "<tbody>";
-    cycles.forEach((cycle, index) => {
+    Object.entries(cycles).forEach(([id,cycle]) => {
         html += "<tr>";
         html += "<td class='align-middle'>" + cycle.number + "</td>";
         html += "<td class='align-middle'>" + cycle.start.toHHMM() + "</td>";
         html += "<td class='align-middle'>" + cycle.end.toHHMM() + "</td>";
         html += "<td class='align-middle'><div class='btn-group' role='group'>"
-        html +=   "<button class='btn btn-sm btn-secondary' onclick='tabular.cycles.edit(" + index + ")'>Edit</button>"
-        html +=   "<button class='btn btn-sm btn-danger'    onclick=tabular.cycles.delete("+index+")>X</button>"
+        html +=   "<button class='btn btn-sm btn-secondary' onclick=tabular.cycles.edit('"+id+"')>Edit</button>"
+        html +=   "<button class='btn btn-sm btn-danger'    onclick=tabular.cycles.delete('"+id+"')>X</button>"
         html += "</div></td>"; // Method needs to be exitCycles or something like that. cycles.edit, whatever works.
         html += "</tr>";
         }
@@ -108,17 +113,18 @@ tabular.cycles.add = () => {
 
 // Callback on the "Submit" button in the "Add Cycle" modal.
 tabular.cycles.addSubmit = () => {
-    let cycle = tabular.cycles.readForm();
-    // if valid cycle, push to data object, log, close modal, redraw table.
-    if (tabular.cycles.validate(cycle)) {
-        // Push the new cycle to the data object.
-        console.log("New Cycle: ",cycle.number, cycle.start, cycle.end);
-        airplan.data.events.cycles.push(cycle);
-        tabular.processSubmit()
-    }
+    tabular.cycles.editSubmit(uuidv4());
+    // let cycle = tabular.cycles.readForm();
+    // // if valid cycle, push to data object, log, close modal, redraw table.
+    // if (tabular.cycles.validate(cycle)) {
+    //     // Push the new cycle to the data object.
+    //     console.log("New Cycle: ",cycle.number, cycle.start, cycle.end);
+    //     airplan.data.events.cycles.push(cycle);
+    //     tabular.processSubmit()
+    // }
 }
 
-tabular.cycles.edit = (i) => {
+tabular.cycles.edit = (id) => {
     var html = "<h3>Edit Cycle</h3>";
     html += tabular.cycles.addEditForm();
     html += "<button type='submit' class='btn btn-primary' onclick='tabular.cycles.editSubmit("+i+")'>Submit</button>";
@@ -128,9 +134,8 @@ tabular.cycles.edit = (i) => {
     $("#end").val(airplan.data.events.cycles[i].end.toLocalTimeString());
 }
 
-tabular.cycles.editSubmit = (i) => {
-    let cycle = airplan.data.events.cycles[i]
-    cycle = tabular.cycles.readForm();
+tabular.cycles.editSubmit = (id) => {
+    let cycle = tabular.cycles.readForm();
     // if valid cycle, update data object, log, close modal, redraw table.
     if (tabular.cycles.validate(cycle)) {
         // Update the cycle in the data object.
@@ -209,17 +214,16 @@ tabular.sorties.draw = () => {
     html += "<tbody>";
     events.squadrons.forEach((sqdrn, i) => {
         console.log("Sorties for: "+sqdrn.name);
-        events.sorties.filter(sortie=>sortie.squadron == sqdrn.name).forEach((sortie, ii) => {
-            console.log("  Sortie: "+ii+" "+sortie);
+        Object.entries(events.sorties).filter(([id,sortie])=>sortie.squadron == sqdrn.name).forEach(([id,sortie]) => {
+            console.log("  Sortie: "+id+" "+sortie);
             html += "<tr>";
             html += "<td class='align-middle'>"+sortie.squadron+"</td>";
             html += "<td class='align-middle'>"+sortie.start.toHHMM()+"</td>";
             html += "<td class='align-middle'>"+sortie.end.toHHMM()+"</td>";
-            let cycle = getCycle(sortie);
-            html += "<td class='align-middle'>"+cycle+sqdrn.letter+(ii+1)+"</td>";
+            html += "<td class='align-middle'>"+getMissionNumber(id)+"</td>";
             html += "<td class='align-middle'><div class='btn-group'>"
-            html +=   "<button class='btn btn-sm btn-secondary' onclick='tabular.sorties.edit("+sortie.id+")'>Edit</button>"
-            html +=   "<button class='btn btn-sm btn-danger'    onclick=tabular.sorties.delete("+sortie.id+") >X</button>"
+            html +=   "<button class='btn btn-sm btn-secondary' onclick=tabular.sorties.edit('"+id+"')>Edit</button>"
+            html +=   "<button class='btn btn-sm btn-danger'    onclick=tabular.sorties.delete('"+id+"') >X</button>"
             html += "</div></td>";
             html += "</tr>";
         })
@@ -240,8 +244,8 @@ tabular.sorties.addEditForm = () => {
     html += "</div>";
     // Start Time
     html += "<div class='form-group row align-items-center'>";
-    html += "<label for='startTime' class='col-12 col-md-3 text-left text-md-right'>Start Time</label>";
-    html += "<input type='datetime-local' class='col form-control' id='startTime' placeholder='0000'>";
+    html += "<label for='start' class='col-12 col-md-3 text-left text-md-right'>Start Time</label>";
+    html += "<input type='datetime-local' class='col form-control' id='start' placeholder='0000'>";
     html += "</div>";
     // Start Condition
     html += "<div class='form-group row align-items-center'>";
@@ -255,8 +259,8 @@ tabular.sorties.addEditForm = () => {
     html += "</div>";
     // End time
     html += "<div class='form-group row align-items-center end-time'>";
-    html += "<label for='endTime' class='col-12 col-md-3 text-left text-md-right'>End Time</label>";
-    html += "<input type='datetime-local' class='col form-control' id='endTime' placeholder='0000'>";
+    html += "<label for='end' class='col-12 col-md-3 text-left text-md-right'>End Time</label>";
+    html += "<input type='datetime-local' class='col form-control' id='end' placeholder='0000'>";
     html += "</div>";
     // End Condition
     html += "<div class='form-group row align-items-center'>";
@@ -287,9 +291,9 @@ tabular.sorties.add = () => {
 tabular.sorties.readForm = function() {
     let sortie = new Object;
     sortie.squadron =                  $("#squadron").val();
-    sortie.start = new Date(Date.parse($( "#startTime" ).val()));
+    sortie.start = new Date(Date.parse($( "#start" ).val()));
     sortie.startCondition =            $( "#startCondition" ).val();
-    sortie.end   = new Date(Date.parse($( "#endTime" ).val()));
+    sortie.end   = new Date(Date.parse($( "#end" ).val()));
     sortie.endCondition =              $( "#endCondition" ).val();
     sortie.annotation =                $( "#annotation" ).val();
     return sortie
@@ -297,47 +301,77 @@ tabular.sorties.readForm = function() {
 
 // Callback on the "Submit" button in the "Add Sortie" modal.
 tabular.sorties.addSubmit = () => {
-    let sortie = tabular.sorties.readForm()
-    sortie.id = +airplan.data.events.sorties[airplan.data.events.sorties.length-1].id+1;
-    if (tabular.sorties.validate(sortie)) {
-        airplan.data.events.sorties.push(sortie);
-        console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.annotation);
-        tabular.processSubmit()    }
+    tabular.sorties.editSubmit(uuidv4())
+    // let sortie = tabular.sorties.readForm()
+    // if (tabular.sorties.validate(sortie)) {
+    //     airplan.data.events.sorties[uuidv4()] = sortie;
+    //     console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.annotation);
+    //     tabular.processSubmit()    
+    // }
 }
 
-tabular.sorties.edit = (i) => {
-    console.log("Editing sortie "+i);
+tabular.sorties.edit = (id) => {
+    console.log("Editing sortie "+id);
     var html = "<h3>Edit Sortie</h3>";
     html += tabular.sorties.addEditForm();
-    html += "<button type='submit' class='btn btn-primary' onclick='tabular.sorties.editSubmit("+i+")'>Submit</button>";
+    html += "<button type='submit' class='btn btn-primary' onclick=tabular.sorties.editSubmit('"+id+"')>Submit</button>";
     openModal(html);
-    $("#squadron").val(airplan.data.events.sorties[i].squadron);
-    $("#startTime").val(airplan.data.events.sorties[i].start.toLocalTimeString());
-    $("#startCondition").val(airplan.data.events.sorties[i].startCondition);
-    $("#endTime").val(airplan.data.events.sorties[i].end.toLocalTimeString());
-    $("#endCondition").val(airplan.data.events.sorties[i].endCondition);
-    $("#annotation").val(airplan.data.events.sorties[i].annotation);
+    $("#squadron").val(airplan.data.events.sorties[id].squadron);
+    $("#start").val(airplan.data.events.sorties[id].start.toLocalTimeString());
+    $("#startCondition").val(airplan.data.events.sorties[id].startCondition);
+    $("#end").val(airplan.data.events.sorties[id].end.toLocalTimeString());
+    $("#endCondition").val(airplan.data.events.sorties[id].endCondition);
+    $("#annotation").val(airplan.data.events.sorties[id].annotation);
 }
 
-tabular.sorties.editSubmit = (i) => {
-    console.log("processing edit of sortie "+i);
-    let sortie = airplan.data.events.sorties[i]
-    sortie = tabular.sorties.readForm()
-    console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.annotation);
+tabular.sorties.editSubmit = (id) => {
+    console.log("processing edit of sortie "+id);
+    let sortie = tabular.sorties.readForm()
     if (tabular.sorties.validate(sortie)) {
-        airplan.data.events.sorties[i] = sortie;
+        airplan.data.events.sorties[id] = sortie;
         console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.annotation);
-        tabular.processSubmit()    }
+        tabular.processSubmit()
+    }
 }
 
-tabular.sorties.validate = (sortie) => {
-    return true
+tabular.sorties.validate = ({squadron,start,startCondition,end,endCondition,annotation}) => {
+    let valid = {squadron: true,start: true,startCondition: true,end: true,endCondition: true,annotation: true};
+    $squadron =         $( "#squadron" );
+    $start =            $( "#start" );
+    $startCondition =   $( "#startCondition" );
+    $end   =            $( "#end" );
+    $endCondition =     $( "#endCondition" );
+    $annotation =       $( "#annotation" );
+    if (squadron == "") {
+        highlightInvalidInput($squadron);
+        valid.squadron = false;
+    }
+    if (start == "Invalid Date" || start == null) {
+        highlightInvalidInput($start);
+        valid.start = false;
+    }
+    if (end == "Invalid Date" || end == null) {
+        highlightInvalidInput($end);
+        valid.end = false;
+    }
+    if (start > end) {
+        highlightInvalidInput($start);
+        highlightInvalidInput($end);
+        valid.start = false;
+        valid.end = false;
+    }
+    if (annotation == "") {
+        highlightInvalidInput($annotation);
+        valid.annotation = false;
+    }
+    // if all valid, return true
+    return Object.values(valid).reduce((a,b) => a && b, true);
 }
 
-tabular.cycles.delete = (i) => {
-    // Todo: delete cycle
+tabular.cycles.delete = (id) => {
+    delete airplan.data.events.cycles[id];
 }
 
-tabular.sorties.delete = (i) => {
-    // Todo: delete sortie
+tabular.sorties.delete = (id) => {
+    delete airplan.data.events.sorties[id];
 }
