@@ -59,13 +59,13 @@ fitStageIntoParentContainer = function({stage, sceneHeight, sceneWidth}) {
 }
 window.addEventListener('resize', fitStageIntoParentContainer);
 
-drawBoundingBox = function(c,{stroke='black',strokeWidth='1',name, fillEnabled='false', fill=''}={}){
+drawBoundingBox = function(c,{stroke='black',strokeWidth=1, name='box', fillEnabled='false', fill='',opacity=1,zIndex=0}={}){
   let x=0,y=0
   if (c.children.length) {
     x = c.children.map(c=>c.x()-c.offsetX()).reduce((prev,curr)=>Math.min(prev,curr),0)
     y = c.children.map(c=>c.y()-c.offsetY()).reduce((prev,curr)=>Math.min(prev,curr),0)
   }
-  c.add(new Konva.Rect({
+  let box = new Konva.Rect({
     x: x,
     y: y,
     width: c.width(),
@@ -75,8 +75,11 @@ drawBoundingBox = function(c,{stroke='black',strokeWidth='1',name, fillEnabled='
     name: name,
     fillEnabled: fillEnabled,
     fill: fill,
-  }))
-  return c
+    opacity: opacity,
+  })
+  c.add(box)
+  box.zIndex(zIndex)
+  return box
 }
 
 time2pixels = function(h,p) {
@@ -159,14 +162,14 @@ g.makeHeader = function(p) {
   header.add(header.title);
   header.add(header.time);
   header = fitHeightToChildren(header,{padY:this.m})
-  drawBoundingBox(header)
+  // drawBoundingBox(header)
   let bottomLine = new Konva.Line({
     points: [0, header.height(), header.width(), header.height()],
     stroke: 'black',
     strokeWidth: 1,
     name: 'header.line'
   });
-  // header.add(bottomLine);
+  header.add(bottomLine);
   // header.draw()
   return header
 }
@@ -200,11 +203,26 @@ g.makeSlap = function(p) {
   });
   slapData.offsetX(-1*(slapLabel.width()+config.textOptions.body.padding));  
   // Add to Group
-  slap.add(slapLabel);
-  slap.add(slapData);
-  // slap.draw()
+  slap.add(slapLabel, slapData);
   slap = fitSizeToChildren(slap)
-  // drawBoundingBox(slap,{stroke:'green'})
+  drawBoundingBox(slap,{name:'boundary',strokeWidth:0})
+  slap.on('click', function () {
+    openModal(g.editSlapForm())
+    $('#sunrise').val(airplan.data.header.slap.sunrise.toLocalTimeString())
+    $('#sunset').val(airplan.data.header.slap.sunset.toLocalTimeString())
+    $('#moonrise').val(airplan.data.header.slap.moonrise.toLocalTimeString())
+    $('#moonset').val(airplan.data.header.slap.moonset.toLocalTimeString())
+    $('#moonphase').val(airplan.data.header.slap.moonphase)
+  });
+  slap.on('mouseover', function () {
+    box = this.findOne('.boundary')
+    box.setAttrs({cornerRadius: 8,opacity:.9,stroke:'green',strokeWidth:5, shadowBlur: 10, shadowColor: 'black', offset:{x:.1*box.width()/2,y:.1*box.height()/2},scale: {x:1.1,y:1.1},})
+    g.stage.container().style.cursor = 'pointer'
+  })
+  slap.on('mouseout',function() {
+    this.findOne('.boundary').setAttrs({opacity:0,strokeWidth:0, shadowBlur: 0, offset:{x:0,y:0}, scale: {x:1,y:1}})
+    g.stage.container().style.cursor = 'default'
+  })
   return slap
 }
 
@@ -216,7 +234,7 @@ g.makeTitle = function(p) {
   })
   // Title Text
   var titleText = new Konva.Text({
-    text: 'AIR PLAN',
+    text: airplan.data.header.title,
     fontSize: config.textOptions.title.fontSize,
     fontFamily: config.textOptions.title.fontFamily,
     align: config.textOptions.title.align,
@@ -225,7 +243,7 @@ g.makeTitle = function(p) {
   // Subtitle Text
   var subTitleText = new Konva.Text({
     y: titleText.height() + config.textOptions.subtitle.padding,
-    text: 'CQ Day 1',
+    text: airplan.data.date.toDateString(),
     fontSize: config.textOptions.subtitle.fontSize,
     fontFamily: config.textOptions.subtitle.fontFamily,
     align: config.textOptions.subtitle.align,
@@ -236,8 +254,21 @@ g.makeTitle = function(p) {
   title.add(subTitleText);
   title.children.forEach(c=>{c.offsetX(c.width()/2)})
   title = fitSizeToChildren(title)
-  // drawBoundingBox(title,{stroke:'green'})
-  // title.draw()
+  drawBoundingBox(title,{strokeWidth:0,name:'boundary'})
+  title.on('click', function(e) {
+    openModal(g.editTitleForm())
+    $('#title').val(airplan.data.header.title)
+    $('#date').val(airplan.data.date.toYYYYMMDD())
+  })
+  title.on('mouseover', function () {
+    box = this.findOne('.boundary')
+    box.setAttrs({cornerRadius: 8,opacity:.9,stroke:'green',strokeWidth:5, shadowBlur: 10, shadowColor: 'black', offset:{x:.1*box.width()/2,y:.1*box.height()/2},scale: {x:1.1,y:1.1},})
+    g.stage.container().style.cursor = 'pointer'
+  })
+  title.on('mouseout',function() {
+    this.findOne('.boundary').setAttrs({opacity:0,strokeWidth:0, shadowBlur: 0, offset:{x:0,y:0}, scale: {x:1,y:1}})
+    g.stage.container().style.cursor = 'default'
+  })
   return title
 }
 
@@ -275,8 +306,23 @@ g.makeTime = function(p) {
   time.add(timeData);
   time = fitSizeToChildren(time);
   time.offsetX(time.width())
-  // drawBoundingBox(time,{stroke:'green'})
-  // time.draw()
+  drawBoundingBox(time,{strokeWidth:0,name:'boundary'})
+  time.on('click', function(e) {
+    openModal(g.editTimeForm())
+    $('#fq').val(airplan.data.header.time.flightquarters.toLocalTimeString())
+    $('#hq').val(airplan.data.header.time.heloquarters.toLocalTimeString())
+    $('#variation').val(airplan.data.header.time.variation)
+    $('#timezone').val(airplan.data.header.time.timezone)
+  })
+  time.on('mouseover', function () {
+    box = this.findOne('.boundary')
+    box.setAttrs({cornerRadius: 8,opacity:.9,stroke:'green',strokeWidth:5, shadowBlur: 10, shadowColor: 'black', offset:{x:.1*box.width()/2,y:.1*box.height()/2},scale: {x:1.1,y:1.1},})
+    g.stage.container().style.cursor = 'pointer'
+  })
+  time.on('mouseout',function() {
+    this.findOne('.boundary').setAttrs({opacity:0,strokeWidth:0, shadowBlur: 0, offset:{x:0,y:0}, scale: {x:1,y:1}})
+    g.stage.container().style.cursor = 'default'
+  })
   return time
 }
 
@@ -331,8 +377,35 @@ g.makeTimeline = function(p){
     height: timeline.height(),
     name: 'timeline.timebox'
   })
-  // drawBoundingBox(timeline.timebox)
+  drawBoundingBox(timeline.timebox, {strokeWidth:0,name:'boundary'})
   timeline.add(timeline.timebox)
+  timeline.timebox.on('click', function () {
+    openModal(g.editTimelineForm())
+    $('#start').val(airplan.data.events.start.toLocalTimeString())
+    $('#end').val(airplan.data.events.end.toLocalTimeString())
+  })
+  timeline.timebox.on('mouseover', function () {
+    box = this.findOne('.boundary')
+    box.setAttrs({cornerRadius: 8,opacity:.9,stroke:'green',strokeWidth:5, shadowBlur: 10, shadowColor: 'black'})
+    g.stage.container().style.cursor = 'pointer'
+  })
+  timeline.timebox.on('mouseout',function() {
+    this.findOne('.boundary').setAttrs({opacity:0,strokeWidth:0, shadowBlur: 0, offset:{x:0,y:0}, scale: {x:1,y:1}})
+    g.stage.container().style.cursor = 'default'
+  })
+  timeline.timebox.add( new Konva.Text({
+    x: 0,
+    y: timeline.timebox.height(),
+    text: '\u21A6'+airplan.data.events.start.toHHMM(),
+  }))
+  let endTime = new Konva.Text({
+    x: timeline.timebox.width(),
+    y: timeline.timebox.height(),
+    text: airplan.data.events.end.toHHMM()+'\u21A4',
+  })
+  endTime.offsetX(endTime.width())
+  timeline.timebox.add(endTime)
+  // Sunrise
   timeline.timebox.add( new Konva.Arc({
     x: time2pixels(airplan.data.header.slap.sunrise,timeline.timebox),
     y: 20,
@@ -344,7 +417,6 @@ g.makeTimeline = function(p){
     strokeWidth: 1,
     name: 'sunrise.icon'
   }))
-  
   timeline.find('.sunrise.icon').forEach((s)=>{
     timeline.timebox.add( new Konva.Text({
       x: s.x(),
@@ -608,101 +680,235 @@ g.makeHotPumpCrewSwap = function(x,y,p) {
 }
 g.makeCondition.hpcs = g.makeHotPumpCrewSwap
 
-g.makeEventsOld = function(p) {
-  // Define Events group, starting at the bottom left of the header, full width, height of remaining printable area
-  // add it to print area
-  let events = new Konva.Group({
-    x: 0,
-    y: offsetY,
-    width: width,
-    height: height,
-    name: 'events',
-  })
+// g.makeEventsOld = function(p) {
+//   // Define Events group, starting at the bottom left of the header, full width, height of remaining printable area
+//   // add it to print area
+//   let events = new Konva.Group({
+//     x: 0,
+//     y: offsetY,
+//     width: width,
+//     height: height,
+//     name: 'events',
+//   })
 
-  // Define the event groups: timeline, squadron, cycle totals
-  // Add the timeline group to the events group
-  events.timeline = new Konva.Group({
-    x: 0,
-    y: 0,
-    width: events.width(),
-    height: 40,
-    name: 'timeline',
-  })
-  // Add the cycle totals group to the events group, offsetY to anchor at bottom left corner
-  events.cycleTotals = new Konva.Group({
-    x: 0,
-    y: events.height(),
-    width: events.width(),
-    height: 20,
-    name: 'cycleTotals',
-  })
-  events.cycleTotals.offsetY(events.cycleTotals.height())
-  // Add the squadron group to the events group
-  events.squadronArea = new Konva.Group({
-    x: 0,
-    y: g.stage.find('.timeline')[0].height(),
-    width: events.width(),
-    height: events.height()-events.timeline.height()-events.cycleTotals.height(),
-    name: 'squadronArea',
-  })
-  return events;
+//   // Define the event groups: timeline, squadron, cycle totals
+//   // Add the timeline group to the events group
+//   events.timeline = new Konva.Group({
+//     x: 0,
+//     y: 0,
+//     width: events.width(),
+//     height: 40,
+//     name: 'timeline',
+//   })
+//   // Add the cycle totals group to the events group, offsetY to anchor at bottom left corner
+//   events.cycleTotals = new Konva.Group({
+//     x: 0,
+//     y: events.height(),
+//     width: events.width(),
+//     height: 20,
+//     name: 'cycleTotals',
+//   })
+//   events.cycleTotals.offsetY(events.cycleTotals.height())
+//   // Add the squadron group to the events group
+//   events.squadronArea = new Konva.Group({
+//     x: 0,
+//     y: g.stage.find('.timeline')[0].height(),
+//     width: events.width(),
+//     height: events.height()-events.timeline.height()-events.cycleTotals.height(),
+//     name: 'squadronArea',
+//   })
+//   return events;
+// }
+
+// g.addSquadrons = () => {
+//   g.squadronLayer = new Konva.Layer();
+//   let leftColWidth = 100;
+//   let squadronYPos = 140;
+//   let squadronHeight = sceneHeight-squadronYPos-g.m
+  
+//   let squadronBoundingBox = new Konva.Line({
+//     x: g.m,
+//     y: squadronYPos,
+//     points: [0, 0, leftColWidth, 0, leftColWidth, squadronHeight],
+//     stroke: 'black',
+//     strokeWidth: 1,
+//     // fillEnabled: false,
+//   })
+
+//   let squadronHeader = new Konva.Text({
+//     x: squadronBoundingBox.x()+squadronBoundingBox.width()/2,
+//     y: squadronBoundingBox.y(),
+//     text: 'squadron'.toUpperCase(),
+//     fontSize: config.textOptions.body.fontSize,
+//     fontFamily: config.textOptions.body.fontFamily,
+//     fontStyle: 'bold',
+//     align: 'left',
+//   })
+//   squadronHeader.offsetX((squadronHeader.width()/2))
+//   squadronHeader.offsetY(squadronHeader.height());
+
+//   let squadronData = airplan.data.events.squadrons.forEach((squadron, index, arr) => {
+//     let n = arr.length;
+//     let height = squadronBoundingBox.height()/n;
+
+//     // Draw a line across the top of each squadron (except the first one, its topline is the bounding box)
+//     if (index!=0) {
+//       let line = new Konva.Line({
+//         points: [squadronBoundingBox.x(), squadronBoundingBox.y()+height*index, squadronBoundingBox.x()+squadronBoundingBox.width(), squadronBoundingBox.y()+height*index],
+//         stroke: 'black',
+//         strokeWidth: 1,
+//       })
+//       g.squadronLayer.add(line);
+//     }
+    
+//     // Draw the squadron text block
+//     let text = new Konva.Text({
+//       text: [squadron.name , squadron.cs , squadron.tms , squadron.modex].join('\n').toUpperCase(),
+//       x: squadronBoundingBox.x()+squadronBoundingBox.width()/2,
+//       y: squadronBoundingBox.y()+height*index + height/2,
+//       align: 'center',
+//     })
+//     text.offsetX(text.width()/2)
+//     text.offsetY(text.height()/2)
+//     g.squadronLayer.add(text);
+//   })
+  
+//   g.squadronLayer.add(squadronHeader);
+//   g.squadronLayer.add(squadronBoundingBox);
+//   g.squadronLayer.draw();
+//   g.stage.add(g.squadronLayer);
+// }
+
+g.editTitleForm = function () {
+    let html = "<h3>Edit Title</h3>";
+    html += "<div class='form-group row align-items-center'>";
+    html += "<label for='title' class='col-12 col-md-2 text-left text-md-right'>Title</label>";
+    html += "<input type='text' class='col form-control mr-5' id='title' placeholder='Air Plan' required>";
+    html += "</div>"
+    // Start time
+    html += "<div class='form-group row align-items-center'>";
+    html += "<label for='date' class='col-12 col-md-2 text-left text-md-right'>Date</label>";
+    html += "<input type='date' pattern='[0-9]{4}-[0-9]{2}-[0-9]{2}T00:00' class='col form-control mr-5' id='date' placeholder='Date'>";
+    html += "</div>";
+    html += "<button type='submit' class='btn btn-primary' onclick='g.updateTitle()'>Update</button>";
+    return html
 }
 
-g.addSquadrons = () => {
-  g.squadronLayer = new Konva.Layer();
-  let leftColWidth = 100;
-  let squadronYPos = 140;
-  let squadronHeight = sceneHeight-squadronYPos-g.m
-  
-  let squadronBoundingBox = new Konva.Line({
-    x: g.m,
-    y: squadronYPos,
-    points: [0, 0, leftColWidth, 0, leftColWidth, squadronHeight],
-    stroke: 'black',
-    strokeWidth: 1,
-    // fillEnabled: false,
-  })
+g.updateTitle = function () {
+  let title = $('#title').val();
+  let date = $('#date').val()+"T00:00";
+  airplan.data.header.title = title
+  airplan.data.date = new Date(date)
+  closeModal()
+  refresh()
+}
 
-  let squadronHeader = new Konva.Text({
-    x: squadronBoundingBox.x()+squadronBoundingBox.width()/2,
-    y: squadronBoundingBox.y(),
-    text: 'squadron'.toUpperCase(),
-    fontSize: config.textOptions.body.fontSize,
-    fontFamily: config.textOptions.body.fontFamily,
-    fontStyle: 'bold',
-    align: 'left',
-  })
-  squadronHeader.offsetX((squadronHeader.width()/2))
-  squadronHeader.offsetY(squadronHeader.height());
+g.editTimeForm = function(){
+  let html = "<h3>Edit Times and Variation</h3>";
+  // flight quarters time
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='fq' class='col-12 col-md-2 text-left text-md-right'>Flight Quarters</label>";
+  html += "<input type='datetime-local' class='col form-control mr-5' id='fq' required>";
+  html += "</div>"
+  // helo quarters time
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='hq' class='col-12 col-md-2 text-left text-md-right'>Helo Quarters</label>";
+  html += "<input type='datetime-local' class='col form-control mr-5' id='hq'>";
+  html += "</div>";
+  // Magnetic Variation
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='variation' class='col-12 col-md-2 text-left text-md-right'>Mag Var (\u00B0E/W)</label>";
+  html += "<input type='text' class='col form-control mr-5' id='variation'>";
+  html += "</div>";
+  // Magnetic Variation
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='timezone' class='col-12 col-md-2 text-left text-md-right'>Time Zone (\u00B1offset)</label>";
+  html += "<input type='text' class='col form-control mr-5' id='timezone'>";
+  html += "</div>";
+  html += "<button type='submit' class='btn btn-primary' onclick='g.updateTime()'>Update</button>";
+  return html
+}
 
-  let squadronData = airplan.data.events.squadrons.forEach((squadron, index, arr) => {
-    let n = arr.length;
-    let height = squadronBoundingBox.height()/n;
+g.updateTime = function () {
+  let fq = new Date($('#fq').val())
+  let hq = new Date($('#hq').val())
+  let variation = $('#variation').val()
+  let timezone = $('#timezone').val()
+  airplan.data.header.time.flightquarters = fq
+  airplan.data.header.time.heloquarters = hq
+  airplan.data.header.time.variation = variation
+  airplan.data.header.time.timezone = timezone
+  closeModal()
+  refresh()
+}
 
-    // Draw a line across the top of each squadron (except the first one, its topline is the bounding box)
-    if (index!=0) {
-      let line = new Konva.Line({
-        points: [squadronBoundingBox.x(), squadronBoundingBox.y()+height*index, squadronBoundingBox.x()+squadronBoundingBox.width(), squadronBoundingBox.y()+height*index],
-        stroke: 'black',
-        strokeWidth: 1,
-      })
-      g.squadronLayer.add(line);
-    }
-    
-    // Draw the squadron text block
-    let text = new Konva.Text({
-      text: [squadron.name , squadron.cs , squadron.tms , squadron.modex].join('\n').toUpperCase(),
-      x: squadronBoundingBox.x()+squadronBoundingBox.width()/2,
-      y: squadronBoundingBox.y()+height*index + height/2,
-      align: 'center',
-    })
-    text.offsetX(text.width()/2)
-    text.offsetY(text.height()/2)
-    g.squadronLayer.add(text);
-  })
-  
-  g.squadronLayer.add(squadronHeader);
-  g.squadronLayer.add(squadronBoundingBox);
-  g.squadronLayer.draw();
-  g.stage.add(g.squadronLayer);
+g.editSlapForm = function () {
+  let html = "<h3>Edit SLAP Data</h3>";
+  // Sunrise
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='sunrise' class='col-12 col-md-2 text-left text-md-right'>Sunrise</label>";
+  html += "<input type='datetime-local' class='col form-control mr-5' id='sunrise' required>";
+  html += "</div>"
+  // Sunset
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='sunset' class='col-12 col-md-2 text-left text-md-right'>Sunset</label>";
+  html += "<input type='datetime-local' class='col form-control mr-5' id='sunset'>";
+  html += "</div>";
+  // Moonrise
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='moonrise' class='col-12 col-md-2 text-left text-md-right'>Moonrise</label>";
+  html += "<input type='datetime-local' class='col form-control mr-5' id='moonrise' required>";
+  html += "</div>"
+  // Moonset
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='moonset' class='col-12 col-md-2 text-left text-md-right'>Moonset</label>";
+  html += "<input type='datetime-local' class='col form-control mr-5' id='moonset'>";
+  html += "</div>";
+  // Moonphase
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='moonphase' class='col-12 col-md-2 text-left text-md-right'>Moonphase (%)</label>";
+  html += "<input type='text' class='col form-control mr-5' id='moonphase'>";
+  html += "</div>";
+  html += "<button type='submit' class='btn btn-primary' onclick='g.updateSlap()'>Update</button>";
+  return html
+}
+
+g.updateSlap = function () {
+  // read the form
+  let sunrise = new Date($('#sunrise').val())
+  let sunset = new Date($('#sunset').val())
+  let moonrise = new Date($('#moonrise').val())
+  let moonset = new Date($('#moonset').val())
+  let moonphase = $('#moonphase').val()
+  // update the data
+  airplan.data.header.slap.sunrise = sunrise
+  airplan.data.header.slap.sunset = sunset
+  airplan.data.header.slap.moonrise = moonrise
+  airplan.data.header.slap.moonset = moonset
+  airplan.data.header.slap.moonphase = moonphase
+  closeModal()
+  refresh()
+}
+
+g.editTimelineForm = function () {
+  let html = "<h3>Edit SLAP Data</h3>";
+  // Sunrise
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='start' class='col-12 col-md-2 text-left text-md-right'>Start of Day</label>";
+  html += "<input type='datetime-local' class='col form-control mr-5' id='start' required>";
+  html += "</div>"
+  // Sunset
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='end' class='col-12 col-md-2 text-left text-md-right'>End of Day</label>";
+  html += "<input type='datetime-local' class='col form-control mr-5' id='end'>";
+  html += "</div>";
+  html += "<button type='submit' class='btn btn-primary' onclick='g.updateTimeline()'>Update</button>";
+  return html
+}
+
+g.updateTimeline = function () {
+  airplan.data.events.start = new Date($('#start').val())
+  airplan.data.events.end = new Date($('#end').val())
+  closeModal()
+  refresh()
 }
