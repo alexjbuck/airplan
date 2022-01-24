@@ -52,7 +52,7 @@ tabular.cycles = new Object;
 tabular.cycles.draw = () => {
     var cycles = airplan.data.events.cycles;//or wherever the data is stored, may need to change how we loop over it
     var html = "<h3>Cycle List</h3>";
-    html += "<button class='btn btn-primary btn-block mb-2' onclick='tabular.cycles.add()'>Add Cycle</button>";
+    html += "<button class='btn btn-primary btn-block mb-2' onclick=tabular.cycles.add()>Add Cycle</button>";
     html += "<table class='table table-striped table-hover table-sm text-center'>";
     html += "<thead><tr>";
     html += "<th class='col-3'>Cycle</th>";
@@ -80,17 +80,17 @@ tabular.cycles.addEditForm = () => {
     // Cycle Number
     let html = "<div class='form-group row align-items-center'>";
     html += "<label for='number' class='col-12 col-md-2 text-left text-md-right'>Cycle #</label>";
-    html += "<input type='number' class='col form-control' id='number' placeholder='Cycle Number' required>";
+    html += "<input type='number' class='col form-control mr-5' id='number' placeholder='Cycle Number' required>";
     html += "</div>"
     // Start time
     html += "<div class='form-group row align-items-center'>";
     html += "<label for='start' class='col-12 col-md-2 text-left text-md-right'>Start</label>";
-    html += "<input type='datetime-local' class='col form-control' id='start' placeholder='Start'>";
+    html += "<input type='datetime-local' class='col form-control mr-5' id='start' placeholder='Start'>";
     html += "</div>";
     // End time
     html += "<div class='form-group row align-items-center'>";
     html += "<label for='end' class='col-12 col-md-2 text-left text-md-right'>End</label>";
-    html += "<input type='datetime-local' class='col form-control' id='end' placeholder='End'>";
+    html += "<input type='datetime-local' class='col form-control mr-5' id='end' placeholder='End'>";
     html += "</div>";
     return html
 }
@@ -107,7 +107,7 @@ tabular.cycles.readForm = () => {
 tabular.cycles.add = () => {
     var html = "<h3>Add Cycle</h3>";
     html += tabular.cycles.addEditForm();
-    html += "<button type='submit' class='btn btn-primary' onclick='tabular.cycles.addSubmit()'>Submit</button>";
+    html += "<button type='submit' class='btn btn-primary' onclick=tabular.cycles.addSubmit()>Submit</button>";
     openModal(html);
 }
 
@@ -127,7 +127,7 @@ tabular.cycles.addSubmit = () => {
 tabular.cycles.edit = (id) => {
     var html = "<h3>Edit Cycle</h3>";
     html += tabular.cycles.addEditForm();
-    html += "<button type='submit' class='btn btn-primary' onclick='tabular.cycles.editSubmit('"+id+"')'>Submit</button>";
+    html += "<button type='submit' class='btn btn-primary' onclick=tabular.cycles.editSubmit('"+id+"')>Submit</button>";
     openModal(html);
     $("#number").val(airplan.data.events.cycles[id].number);
     $("#start").val(airplan.data.events.cycles[id].start.toLocalTimeString());
@@ -140,7 +140,7 @@ tabular.cycles.editSubmit = (id) => {
     if (tabular.cycles.validate(cycle)) {
         // Update the cycle in the data object.
         console.log("Updated Cycle: ",cycle.number, cycle.start, cycle.end);
-        airplan.data.events.cycles[i] = cycle;
+        airplan.data.events.cycles[id] = cycle;
         tabular.processSubmit()
     }
 }
@@ -202,7 +202,7 @@ tabular.sorties = new Object;
 tabular.sorties.draw = () => {
     var events = airplan.data.events;//or wherever the data is stored, may need to change how we loop over it
     var html = "<h3>Sortie List</h3>";
-    html += "<button class='btn btn-primary btn-block mb-2' onclick='tabular.sorties.add()'>Add Sortie</button>";
+    html += "<button class='btn btn-primary btn-block mb-2' onclick=tabular.sorties.add()>Add Sortie</button>";
     html += "<table class='table table-striped table-hover table-sm text-center'>";
     html += "<thead><tr>"
     html += "<th class='col-3'>Sqdrn</th>"
@@ -236,7 +236,7 @@ tabular.sorties.addEditForm = () => {
     // Squadron dropdown
     let html = "<div class='form-group row align-items-center'>";
     html += "<label for='squadron' class='col-12 col-md-3 text-left text-md-right'>Squadron</label>";
-    html += "<select class='col form-control' id='squadron'>";
+    html += "<select class='col form-control mr-5' id='squadron'>";
     airplan.data.events.squadrons.forEach((sqdrn, i) => {
         html += "<option value='"+sqdrn.name+"'>"+sqdrn.name+"</option>";
     })
@@ -245,12 +245,12 @@ tabular.sorties.addEditForm = () => {
     // Start Time
     html += "<div class='form-group row align-items-center'>";
     html += "<label for='start' class='col-12 col-md-3 text-left text-md-right'>Start Time</label>";
-    html += "<input type='datetime-local' class='col form-control' id='start' placeholder='0000'>";
+    html += "<input type='datetime-local' class='col form-control mr-5' id='start' placeholder='0000'>";
     html += "</div>";
     // Start Condition
     html += "<div class='form-group row align-items-center'>";
     html += "<label for='startCondition' class='col-12 col-md-3 text-left text-md-right'>Start Condition</label>";
-    html += "<select type='text' class='col form-control' id='startCondition' placeholder='Start Condition'>";
+    html += "<select type='text' class='col form-control mr-5' id='startCondition' placeholder='Start Condition'>";
         html += "<option value='pull'>Pull</option>";
         html += "<option value='flyOn'>Fly On</option>";
         html += "<option value='hp'>Hot Pump</option>";
@@ -260,12 +260,12 @@ tabular.sorties.addEditForm = () => {
     // End time
     html += "<div class='form-group row align-items-center end-time'>";
     html += "<label for='end' class='col-12 col-md-3 text-left text-md-right'>End Time</label>";
-    html += "<input type='datetime-local' class='col form-control' id='end' placeholder='0000'>";
+    html += "<input type='datetime-local' class='col form-control mr-5' id='end' placeholder='0000'>";
     html += "</div>";
     // End Condition
     html += "<div class='form-group row align-items-center'>";
     html += "<label for='endCondition' class='col-12 col-md-3 text-left text-md-right'>End Condition</label>";
-    html += "<select type='text' class='col form-control' id='endCondition' placeholder='End Condition'>";
+    html += "<select type='text' class='col form-control mr-5' id='endCondition' placeholder='End Condition'>";
         html += "<option value='stuff'>Stuff</option>";
         html += "<option value='flyOff'>Fly Off</option>";
         html += "<option value='hp'>Hot Pump</option>";
@@ -275,7 +275,7 @@ tabular.sorties.addEditForm = () => {
     // Annotation
     html += "<div class='form-group row align-items-center'>";
     html += "<label for='annotation' class='col-12 col-md-3 text-left text-md-right'>Annotation</label>";
-    html += "<input type='text' class='col form-control' id='annotation' placeholder='Mission'>";
+    html += "<input type='text' class='col form-control mr-5' id='annotation' placeholder='Mission'>";
     html += "</div>";
     return html;
 }
@@ -284,7 +284,7 @@ tabular.sorties.addEditForm = () => {
 tabular.sorties.add = () => {
     var html = "<h3>Add Sortie</h3>";
     html += tabular.sorties.addEditForm();
-    html += "<button type='submit' class='btn btn-primary' onclick='tabular.sorties.addSubmit()'>Submit</button>";
+    html += "<button type='submit' class='btn btn-primary' onclick=tabular.sorties.addSubmit()>Submit</button>";
     openModal(html);
 }
 
