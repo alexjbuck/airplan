@@ -3,10 +3,7 @@ var airplan = new Object;
 airplan.data = {
     "date": new Date(),
     "header": {
-        "title": {
-            "title": "Airplan Title",
-            "subtitle": "Subtitle"
-        },
+        "title": "Airplan Title",
         "slap": {
             "sunrise": new Date(1642675800000),
             "sunset": new Date(1642724400000),
@@ -91,8 +88,8 @@ airplan.data = {
                 "number": 2
             }
         },
-        "start": 1642692600000, // Thu Jan 20 2022 10:30:00 GMT-0500 (Eastern Standard Time)
-        "end": 1642717800000, // Thu Jan 20 2022 17:30:00 GMT-0500 (Eastern Standard Time)
+        "start": new Date (1642692600000), // Thu Jan 20 2022 10:30:00 GMT-0500 (Eastern Standard Time)
+        "end": new Date (1642717800000), // Thu Jan 20 2022 17:30:00 GMT-0500 (Eastern Standard Time)
     }
 } 
         
