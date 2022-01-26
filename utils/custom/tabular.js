@@ -60,7 +60,8 @@ tabular.cycles.draw = () => {
     html += "<th class='col-3'>End</th>";
     html += "<th class='col-3'></th></thead>";
     html += "<tbody>";
-    Object.entries(cycles).forEach(([id,cycle]) => {
+    Object.entries(cycles).sort((a,b)=>a[1].start-b[1].start).forEach(([id,cycle],i) => {
+        cycle.number = parseInt(i+1);
         html += "<tr>";
         html += "<td class='align-middle'>" + cycle.number + "</td>";
         html += "<td class='align-middle'>" + cycle.start.toHHMM() + "</td>";
@@ -77,11 +78,12 @@ tabular.cycles.draw = () => {
 }
 
 tabular.cycles.addEditForm = () => {
+    let html = ""
     // Cycle Number
-    let html = "<div class='form-group row align-items-center'>";
-    html += "<label for='number' class='col-12 col-md-2 text-left text-md-right'>Cycle #</label>";
-    html += "<input type='number' class='col form-control mr-5' id='number' placeholder='Cycle Number' required>";
-    html += "</div>"
+    // let html = "<div class='form-group row align-items-center'>";
+    // html += "<label for='number' class='col-12 col-md-2 text-left text-md-right'>Cycle #</label>";
+    // html += "<input type='number' class='col form-control mr-5' id='number' placeholder='Cycle Number' required disabled>";
+    // html += "</div>"
     // Start time
     html += "<div class='form-group row align-items-center'>";
     html += "<label for='start' class='col-12 col-md-2 text-left text-md-right'>Start</label>";
@@ -96,7 +98,8 @@ tabular.cycles.addEditForm = () => {
 }
 
 tabular.cycles.readForm = () => {
-    let number    = $( "#number" ).val();
+    // let number    = $( "#number" ).val();
+    let number = Object.keys(airplan.data.events.cycles).length + 1;
     let start     = new Date(Date.parse($('#start').val()));
     let end       = new Date(Date.parse($( '#end' ).val()));
     return {number: number, start: start, end: end}
@@ -109,6 +112,14 @@ tabular.cycles.add = () => {
     html += tabular.cycles.addEditForm();
     html += "<button type='submit' class='btn btn-primary' onclick=tabular.cycles.addSubmit()>Submit</button>";
     openModal(html);
+    $("#number").val(Object.keys(airplan.data.events.cycles).length+1);
+    let d = new Date(new Date(airplan.data.date.valueOf()).setHours(9,0,0,0));
+    let startD = Object.values(airplan.data.events.cycles).reduce((p,c)=>p.end > c.end ? p : c,{end:d});
+    let start = startD.end.getHours()
+    let end = start + 1
+
+    $("#start").val(new Date(new Date().setHours(start,0)).toLocalTimeString());
+    $("#end").val(new Date(new Date().setHours(end,0)).toLocalTimeString());
 }
 
 // Callback on the "Submit" button in the "Add Cycle" modal.
@@ -368,10 +379,12 @@ tabular.sorties.validate = ({squadron,start,startCondition,end,endCondition,anno
     return Object.values(valid).reduce((a,b) => a && b, true);
 }
 
-tabular.cycles.delete = (id) => {
-    delete airplan.data.events.cycles[id];
+tabular.cycles.delete = function(id) {
+    let del = async () => delete airplan.data.events.cycles[id];
+    del().then(refresh())
 }
 
-tabular.sorties.delete = (id) => {
-    delete airplan.data.events.sorties[id];
+tabular.sorties.delete = function(id) {
+    let del = async () => delete airplan.data.events.sorties[id];
+    del().then(refresh())
 }
