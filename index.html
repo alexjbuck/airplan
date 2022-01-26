@@ -1,4 +1,4 @@
-<!-- <!doctype html> -->
+<!doctype html>
 <html>
     <head>
         <title>Airplan</title>
@@ -22,7 +22,7 @@
     <script src="utils/libraries/jspdf.umd.min.js"></script>
 
     <!--custom js-->
-    <script src="utils/custom/airplan.js"></script>
+    <script src="utils/custom/BlankAirplan.js"></script>
     <script src="utils/custom/tabular.js"></script>
     <script src="utils/custom/graphical.js"></script>
     <script src="utils/custom/menu.js"></script>
@@ -30,14 +30,14 @@
     
     <body>
         <!-- <div class="row h-100"> -->
-        <div class='row h-100 w-100'>
-          <div id="graphical" class=" col-8 h-100">
+        <div class='row h-100 w-100 mx-0'>
+          <div id="graphical" class="col-md-8 col-12">
             <div id="graphical-stage" width="100%" height="100%"></div>
             <div id="menu" class='p-2'>
             </div>
           </div>
           <!-- border border-primary border-start -->
-          <div id="tabular" class=" h-100 col-4">
+          <div id="tabular" class=" col-md-4 col-12">
             <div id="tabular-cycles">
                 cycles tabular area
             </div>
@@ -60,6 +60,7 @@
             </div>
     </body>
     <script>
+        airplan = new BlankAirplan();
         refresh = function() {
             tabular.draw();
             g.draw();
