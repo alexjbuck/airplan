@@ -61,15 +61,33 @@ window.addEventListener('resize', fitStageIntoParentContainer);
 
 drawBoundingBox = function(c,{stroke='black',strokeWidth=1, name='box', fillEnabled='false', fill='',opacity=1,zIndex=0}={}){
   let x=0,y=0
-  if (c.children.length) {
-    x = c.children.map(c=>c.x()-c.offsetX()).reduce((prev,curr)=>Math.min(prev,curr),0)
-    y = c.children.map(c=>c.y()-c.offsetY()).reduce((prev,curr)=>Math.min(prev,curr),0)
+  if (c.nodeType == 'Shape') {
+    x = c.x()
+    y = c.y()
+  } else if (c.nodeType == 'Group') {
+    if (c.children.length) {
+      x = c.children.map(c=>c.x()-c.offsetX()).reduce((prev,curr)=>Math.min(prev,curr),0)
+      y = c.children.map(c=>c.y()-c.offsetY()).reduce((prev,curr)=>Math.min(prev,curr),0)
+    }
   }
-  let box = new Konva.Rect({
+  let minSize = 50
+  let width = c.width()
+  let offsetX = c.offsetX()
+  if (width < minSize) {
+    width = minSize
+    offsetX = minSize/2    
+  }
+  let height = c.height()
+  let offsetY = c.offsetY()
+  if (height < minSize) {
+    height = minSize
+    offsetY = minSize/2
+  }
+let box = new Konva.Rect({
     x: x,
     y: y,
-    width: c.width(),
-    height: c.height(),
+    width: width,
+    height: height,
     stroke: stroke,
     strokeWidth: strokeWidth,
     name: name,
@@ -77,10 +95,42 @@ drawBoundingBox = function(c,{stroke='black',strokeWidth=1, name='box', fillEnab
     fill: fill,
     opacity: opacity,
   })
-  c.add(box)
-  box.zIndex(zIndex)
+  if (c.nodeType == 'Shape') {
+    box.offsetX(offsetX)
+    box.offsetY(offsetY)
+  }
   return box
 }
+
+// blurChildren = function(p, {shadowBlur}={shadowBlur:10}) {
+//   if (p.children){
+//     p.children.forEach(c=>{
+//       blurChildren(c,{shadowBlur})
+//     })
+//   } else {
+//     p.setAttrs({shadowBlur:shadowBlur, shadowColor:'black',})
+//   }
+// }
+
+// unBlurChildren = function(p) {
+//   blurChildren(p, {shadowBlur:0})
+// }
+
+HighlightBox = function(c,{stroke='#0275d8',strokeWidth=2, name='highlight', fillEnabled='false', fill='', opacity=0, zIndex=0, toolTip=''}={}){
+  let box = drawBoundingBox(c,{stroke:stroke, strokeWidth:strokeWidth, name:name, fillEnabled:fillEnabled, fill:fill, opacity:opacity, zIndex:zIndex})
+  box.on('mouseenter touchstart pointerdown', function () {
+    box.setAttrs({cornerRadius:0, opacity:.8, stroke:stroke, strokeWidth:strokeWidth, shadowBlur:10, shadowColor:'black',})
+    g.stage.container().style.cursor = 'pointer'
+
+  })
+  box.on('mouseleave touchend pointerup',function() {
+    box.setAttrs({opacity:0})
+    g.stage.container().style.cursor = 'default'
+
+  })
+  return box
+}
+
 
 time2pixels = function(h,p) {
   let pixels = (h.valueOf()-airplan.data.events.start.valueOf()) * p.width()/(airplan.data.events.end.valueOf()-airplan.data.events.start.valueOf())
@@ -97,55 +147,57 @@ var g = {
   // Also forces aspect ratio to be 11:8.5, which is the ratio of the paper size.
   sceneWidth: 1100,
   sceneHeight: 850,
-
-  draw: function() {
-    this.makeStage();
-    fitStageIntoParentContainer(this);
-    // console.log('Make Stage');
-  },
-
-  makeStage: function() {
-    console.log('Make Stage')
-    let stage = new Konva.Stage({
-      container: 'graphical-stage',   // id of container <div>
-      width: this.sceneWidth,
-      height: this.sceneHeight,
-      name: 'stage',
-    });
-    this.stage = stage;
-    stage.pageLayer = this.makePageLayer(stage);
-    stage.add(stage.pageLayer)
-    // drawBoundingBox(stage.pageLayer,{stroke:'red',strokeWidth:5,name:'pageLayerBoundary'})
-    return stage;
-  },
-  // Page area is the whole page, then add it to stage, draw it, and add a red bounding box
-  makePageLayer: function(p) {
-    console.log('Make Page Layer')
-    let pageLayer = new Konva.Layer({
-      name: 'pageLayer',
-    });
-    pageLayer.printArea = this.makePrintArea(pageLayer);
-    pageLayer.add(pageLayer.printArea);
-    return pageLayer;
-  },
-  // Print Area is the printable area, inset by a margin of g.m on all sides, add it to stage, and draw it
-  makePrintArea: function(p) {
-    console.log('Make Print Area')
-    let printArea = new Konva.Group({
-      x: this.m,
-      y: this.m,  
-      width: this.sceneWidth-2*this.m,
-      height: this.sceneHeight-2*this.m,
-      name: 'printArea',
-    })
-    drawBoundingBox(printArea,{name:'printAreaBoundary'})
-    printArea.header = this.makeHeader(printArea);
-    printArea.events = this.makeEvents(printArea);
-    printArea.add(printArea.header);
-    printArea.add(printArea.events);
-    return printArea;
-  },
 }
+
+g.draw = function() {
+  this.makeStage();
+  fitStageIntoParentContainer(this);
+}
+
+g.makeStage = function() {
+  console.log('Make Stage')
+  let stage = new Konva.Stage({
+    container: 'graphical-stage',   // id of container <div>
+    width: this.sceneWidth,
+    height: this.sceneHeight,
+    name: 'stage',
+  });
+  this.stage = stage;
+  stage.pageLayer = this.makePageLayer(stage);
+  stage.add(stage.pageLayer)  
+  return stage;
+}
+
+// Page area is the whole page, then add it to stage, draw it, and add a red bounding box
+g.makePageLayer = function(p) {
+  console.log('Make Page Layer')
+  let pageLayer = new Konva.Layer({
+    name: 'pageLayer',
+  });
+  pageLayer.printArea = this.makePrintArea(pageLayer);
+  pageLayer.add(pageLayer.printArea);
+  return pageLayer;
+}
+
+// Print Area is the printable area, inset by a margin of g.m on all sides, add it to stage, and draw it
+g.makePrintArea = function(p) {
+  console.log('Make Print Area')
+  let printArea = new Konva.Group({
+    x: this.m,
+    y: this.m,  
+    width: this.sceneWidth-2*this.m,
+    height: this.sceneHeight-2*this.m,
+    name: 'printArea',
+  })
+  printArea.add( drawBoundingBox(printArea,{name:'printAreahighlight'}) )
+  
+  printArea.header = this.makeHeader(printArea);
+  printArea.events = this.makeEvents(printArea);
+  printArea.add(printArea.header);
+  printArea.add(printArea.events);
+  return printArea;
+}
+
 g.makeHeader = function(p) {
   console.log('Make Header')
   let header = new Konva.Group({
@@ -162,7 +214,6 @@ g.makeHeader = function(p) {
   header.add(header.title);
   header.add(header.time);
   header = fitHeightToChildren(header,{padY:this.m})
-  // drawBoundingBox(header)
   let bottomLine = new Konva.Line({
     points: [0, header.height(), header.width(), header.height()],
     stroke: 'black',
@@ -176,9 +227,9 @@ g.makeHeader = function(p) {
 
 g.makeSlap = function(p) {
   let slap = new Konva.Group({
-      x: config.textOptions.body.padding,
-      y: config.textOptions.body.padding,
-      name: 'slap',
+    x: config.textOptions.body.padding,
+    y: config.textOptions.body.padding,
+    name: 'slap',
   })
   // Label Text
   var slapLabel = new Konva.Text({
@@ -205,8 +256,8 @@ g.makeSlap = function(p) {
   // Add to Group
   slap.add(slapLabel, slapData);
   slap = fitSizeToChildren(slap)
-  drawBoundingBox(slap,{name:'boundary',strokeWidth:0})
-  slap.on('click', function () {
+  slap.add( HighlightBox(slap) )
+  slap.on('click tap', function () {
     openModal(g.editSlapForm())
     $('#sunrise').val(airplan.data.header.slap.sunrise.toLocalTimeString())
     $('#sunset').val(airplan.data.header.slap.sunset.toLocalTimeString())
@@ -214,15 +265,6 @@ g.makeSlap = function(p) {
     $('#moonset').val(airplan.data.header.slap.moonset.toLocalTimeString())
     $('#moonphase').val(airplan.data.header.slap.moonphase)
   });
-  slap.on('mouseover', function () {
-    box = this.findOne('.boundary')
-    box.setAttrs({cornerRadius: 8,opacity:.9,stroke:'green',strokeWidth:5, shadowBlur: 10, shadowColor: 'black', offset:{x:.1*box.width()/2,y:.1*box.height()/2},scale: {x:1.1,y:1.1},})
-    g.stage.container().style.cursor = 'pointer'
-  })
-  slap.on('mouseout',function() {
-    this.findOne('.boundary').setAttrs({opacity:0,strokeWidth:0, shadowBlur: 0, offset:{x:0,y:0}, scale: {x:1,y:1}})
-    g.stage.container().style.cursor = 'default'
-  })
   return slap
 }
 
@@ -250,24 +292,14 @@ g.makeTitle = function(p) {
     name: 'title.subtitle',
   });
   // Add to Group
-  title.add(titleText);
-  title.add(subTitleText);
+  title.add(titleText,subTitleText);
   title.children.forEach(c=>{c.offsetX(c.width()/2)})
   title = fitSizeToChildren(title)
-  drawBoundingBox(title,{strokeWidth:0,name:'boundary'})
-  title.on('click', function(e) {
+  title.add( HighlightBox(title) )
+  title.on('click tap', function(e) {
     openModal(g.editTitleForm())
     $('#title').val(airplan.data.header.title)
     $('#date').val(airplan.data.date.toYYYYMMDD())
-  })
-  title.on('mouseover', function () {
-    box = this.findOne('.boundary')
-    box.setAttrs({cornerRadius: 8,opacity:.9,stroke:'green',strokeWidth:5, shadowBlur: 10, shadowColor: 'black', offset:{x:.1*box.width()/2,y:.1*box.height()/2},scale: {x:1.1,y:1.1},})
-    g.stage.container().style.cursor = 'pointer'
-  })
-  title.on('mouseout',function() {
-    this.findOne('.boundary').setAttrs({opacity:0,strokeWidth:0, shadowBlur: 0, offset:{x:0,y:0}, scale: {x:1,y:1}})
-    g.stage.container().style.cursor = 'default'
   })
   return title
 }
@@ -302,26 +334,16 @@ g.makeTime = function(p) {
     name: 'time.data',
   });
   // Add to Group
-  time.add(timeLabel);
-  time.add(timeData);
+  time.add(timeLabel,timeData);
   time = fitSizeToChildren(time);
   time.offsetX(time.width())
-  drawBoundingBox(time,{strokeWidth:0,name:'boundary'})
-  time.on('click', function(e) {
+  time.add( HighlightBox(time) )
+  time.on('click tap', function(e) {
     openModal(g.editTimeForm())
     $('#fq').val(airplan.data.header.time.flightquarters.toLocalTimeString())
     $('#hq').val(airplan.data.header.time.heloquarters.toLocalTimeString())
     $('#variation').val(airplan.data.header.time.variation)
     $('#timezone').val(airplan.data.header.time.timezone)
-  })
-  time.on('mouseover', function () {
-    box = this.findOne('.boundary')
-    box.setAttrs({cornerRadius: 8,opacity:.9,stroke:'green',strokeWidth:5, shadowBlur: 10, shadowColor: 'black', offset:{x:.1*box.width()/2,y:.1*box.height()/2},scale: {x:1.1,y:1.1},})
-    g.stage.container().style.cursor = 'pointer'
-  })
-  time.on('mouseout',function() {
-    this.findOne('.boundary').setAttrs({opacity:0,strokeWidth:0, shadowBlur: 0, offset:{x:0,y:0}, scale: {x:1,y:1}})
-    g.stage.container().style.cursor = 'default'
   })
   return time
 }
@@ -338,14 +360,13 @@ g.makeEvents = function(p) {
   events.leftColWidth = 100
   events.rightColWidth = 50
   this.time2pixels = (events.width()-events.leftColWidth-events.rightColWidth)/(airplan.data.events.end-airplan.data.events.start)
-
+  
   events.timeline = this.makeTimeline(events)
   events.cycleTotals = this.makeCycleTotals(events)
   events.squadrons = this.makeSquadrons(events)
   events.add(events.timeline)
   events.add(events.cycleTotals)
   events.add(events.squadrons)
-  // drawBoundingBox(events,{stroke:'blue',strokeWidth:'5'})
   return events
 }
 
@@ -358,7 +379,6 @@ g.makeTimeline = function(p){
     height:40,
     name: 'timeline'
   })
-  // drawBoundingBox(timeline,{stroke:'red', fillEnabled:true, fill: 'red'})
   timeline.add( new Konva.Line({
     points: [0,timeline.height()/2,timeline.width(),timeline.height()/2],
     stroke: 'black',
@@ -377,34 +397,27 @@ g.makeTimeline = function(p){
     height: timeline.height(),
     name: 'timeline.timebox'
   })
-  drawBoundingBox(timeline.timebox, {strokeWidth:0,name:'boundary'})
   timeline.add(timeline.timebox)
-  timeline.timebox.on('click', function () {
+  timeline.timebox.on('click tap', function () {
     openModal(g.editTimelineForm())
     $('#start').val(airplan.data.events.start.toLocalTimeString())
     $('#end').val(airplan.data.events.end.toLocalTimeString())
   })
-  timeline.timebox.on('mouseover', function () {
-    box = this.findOne('.boundary')
-    box.setAttrs({cornerRadius: 8,opacity:.9,stroke:'green',strokeWidth:5, shadowBlur: 10, shadowColor: 'black'})
-    g.stage.container().style.cursor = 'pointer'
-  })
-  timeline.timebox.on('mouseout',function() {
-    this.findOne('.boundary').setAttrs({opacity:0,strokeWidth:0, shadowBlur: 0, offset:{x:0,y:0}, scale: {x:1,y:1}})
-    g.stage.container().style.cursor = 'default'
-  })
-  timeline.timebox.add( new Konva.Text({
+ 
+  let startTime = new Konva.Text({
     x: 0,
     y: timeline.timebox.height(),
     text: '\u21A6'+airplan.data.events.start.toHHMM(),
-  }))
+  })
   let endTime = new Konva.Text({
     x: timeline.timebox.width(),
     y: timeline.timebox.height(),
     text: airplan.data.events.end.toHHMM()+'\u21A4',
   })
   endTime.offsetX(endTime.width())
-  timeline.timebox.add(endTime)
+  timeline.timebox.add(startTime,endTime)
+  timeline.timebox.add( HighlightBox(timeline.timebox) )
+
   // Sunrise
   timeline.timebox.add( new Konva.Arc({
     x: time2pixels(airplan.data.header.slap.sunrise,timeline.timebox),
@@ -425,8 +438,7 @@ g.makeTimeline = function(p){
       name: 'sunrise.text',
     }))
   })
-  
-  // This is sunset
+  // Sunset
   timeline.timebox.add( new Konva.Arc({
     x: time2pixels(airplan.data.header.slap.sunset,timeline.timebox),
     y: 20,
@@ -448,10 +460,9 @@ g.makeTimeline = function(p){
     }))
   })
   
-
   // Iterate over all cycles.
   Object.values(airplan.data.events.cycles).forEach((cycle)=>{
-    // This is a cycle start line
+    // Cycle start line
     let x = time2pixels(cycle.start,timeline.timebox)
     timeline.timebox.add( new Konva.Line({
       points: [x,timeline.height()  ,x,p.height()  ],
@@ -459,7 +470,25 @@ g.makeTimeline = function(p){
       strokeWidth: 1,
       name: 'cycle.start'
     }))
-    // This is the cycle label
+    // Cycle launch total
+    let launchLabel = new Konva.Text({
+      x: x,
+      y: p.height(),
+      text: "0",
+    })
+    launchLabel.offsetX(launchLabel.width()+g.m/2)
+    launchLabel.offsetY(launchLabel.height())
+    timeline.timebox.add(launchLabel)
+    // Cycle Start label
+    let startLabel = new Konva.Text({
+      x: x,
+      y: timeline.timebox.height(),
+      text: cycle.start.toHHMM(),
+    })
+    startLabel.offsetX(startLabel.width()/2)
+    startLabel.offsetY(startLabel.height())
+    timeline.timebox.add(startLabel)
+    // Cycle label
     x = time2pixels((cycle.start.valueOf()+cycle.end.valueOf())/2,timeline.timebox)
     let cycleText = new Konva.Text({
       x: x,
@@ -468,7 +497,7 @@ g.makeTimeline = function(p){
     })
     timeline.timebox.add(cycleText)
     cycleText.offsetY(cycleText.height())
-    // This is a cycle end line
+    // Cycle end line
     x = time2pixels(cycle.end,timeline.timebox)
     timeline.timebox.add( new Konva.Line({
       points: [x,timeline.height(),  x,p.height()  ],
@@ -476,8 +505,28 @@ g.makeTimeline = function(p){
       strokeWidth: 1,
       name: 'cycle.end'
     }))
+    // Cycle End label
+    let endLabel = new Konva.Text({
+      x: x,
+      y: timeline.timebox.height(),
+      text: cycle.end.toHHMM(),
+    })
+    endLabel.offsetX(endLabel.width()/2)
+    endLabel.offsetY(endLabel.height())
+    timeline.timebox.add(endLabel)
+    // Cycle return total
+    let returnLabel = new Konva.Text({
+      x: x,
+      y: p.height(),
+      text: "0",
+    })
+    returnLabel.offsetX(-g.m/2)
+    returnLabel.offsetY(returnLabel.height())
+    timeline.timebox.add(returnLabel)
   })
-
+  // Draw the highlight box on top of everything.
+  // We need to create it earlier so that it doesn't go around the cycle lines, just the timebox bar at the top.
+  timeline.findOne('.highlight').zIndex(timeline.timebox.children.length-1)
   return timeline
 }
 
@@ -487,7 +536,7 @@ g.makeCycleTotals = function(p){
     x: 0,
     y: p.height(),
     width: p.width(),
-    height: 40,
+    height: 20,
     name: 'cycleTotals'
   })
   cycleTotals.offsetY(cycleTotals.height())
@@ -529,7 +578,6 @@ g.makeSquadrons = function(p){
     squadrons.squadronGroups.push(group)
     squadrons.add(group)
   })
-  // drawBoundingBox(squadrons,{stroke:'black', fillEnabled:true, fill: 'orange'})
   return squadrons  
 }
 
@@ -576,7 +624,6 @@ g.makeSquadronGroup = function(s,i,p) {
   })
   groupText.offsetX(groupText.width()/2)
   groupText.offsetY(groupText.height()/2)
-  
   // squadron totals vertical line
   group.add( new Konva.Line({
     points: [group.width()-p.rightColWidth,0,  group.width()-p.rightColWidth,group.height()],
@@ -585,7 +632,12 @@ g.makeSquadronGroup = function(s,i,p) {
   }))
   group.add(letterText)
   group.add(groupText)
-
+  let box = HighlightBox(groupText)
+  box.on('click tap',()=>{
+    menu.editSquadron(i)
+  })
+  group.add(box)
+  
   // Squadron Sorties
   let sortieGroup = new Konva.Group({
     x: p.leftColWidth,
@@ -680,125 +732,46 @@ g.makeHotPumpCrewSwap = function(x,y,p) {
 }
 g.makeCondition.hpcs = g.makeHotPumpCrewSwap
 
-// g.makeEventsOld = function(p) {
-//   // Define Events group, starting at the bottom left of the header, full width, height of remaining printable area
-//   // add it to print area
-//   let events = new Konva.Group({
-//     x: 0,
-//     y: offsetY,
-//     width: width,
-//     height: height,
-//     name: 'events',
-//   })
-
-//   // Define the event groups: timeline, squadron, cycle totals
-//   // Add the timeline group to the events group
-//   events.timeline = new Konva.Group({
-//     x: 0,
-//     y: 0,
-//     width: events.width(),
-//     height: 40,
-//     name: 'timeline',
-//   })
-//   // Add the cycle totals group to the events group, offsetY to anchor at bottom left corner
-//   events.cycleTotals = new Konva.Group({
-//     x: 0,
-//     y: events.height(),
-//     width: events.width(),
-//     height: 20,
-//     name: 'cycleTotals',
-//   })
-//   events.cycleTotals.offsetY(events.cycleTotals.height())
-//   // Add the squadron group to the events group
-//   events.squadronArea = new Konva.Group({
-//     x: 0,
-//     y: g.stage.find('.timeline')[0].height(),
-//     width: events.width(),
-//     height: events.height()-events.timeline.height()-events.cycleTotals.height(),
-//     name: 'squadronArea',
-//   })
-//   return events;
-// }
-
-// g.addSquadrons = () => {
-//   g.squadronLayer = new Konva.Layer();
-//   let leftColWidth = 100;
-//   let squadronYPos = 140;
-//   let squadronHeight = sceneHeight-squadronYPos-g.m
-  
-//   let squadronBoundingBox = new Konva.Line({
-//     x: g.m,
-//     y: squadronYPos,
-//     points: [0, 0, leftColWidth, 0, leftColWidth, squadronHeight],
-//     stroke: 'black',
-//     strokeWidth: 1,
-//     // fillEnabled: false,
-//   })
-
-//   let squadronHeader = new Konva.Text({
-//     x: squadronBoundingBox.x()+squadronBoundingBox.width()/2,
-//     y: squadronBoundingBox.y(),
-//     text: 'squadron'.toUpperCase(),
-//     fontSize: config.textOptions.body.fontSize,
-//     fontFamily: config.textOptions.body.fontFamily,
-//     fontStyle: 'bold',
-//     align: 'left',
-//   })
-//   squadronHeader.offsetX((squadronHeader.width()/2))
-//   squadronHeader.offsetY(squadronHeader.height());
-
-//   let squadronData = airplan.data.events.squadrons.forEach((squadron, index, arr) => {
-//     let n = arr.length;
-//     let height = squadronBoundingBox.height()/n;
-
-//     // Draw a line across the top of each squadron (except the first one, its topline is the bounding box)
-//     if (index!=0) {
-//       let line = new Konva.Line({
-//         points: [squadronBoundingBox.x(), squadronBoundingBox.y()+height*index, squadronBoundingBox.x()+squadronBoundingBox.width(), squadronBoundingBox.y()+height*index],
-//         stroke: 'black',
-//         strokeWidth: 1,
-//       })
-//       g.squadronLayer.add(line);
-//     }
-    
-//     // Draw the squadron text block
-//     let text = new Konva.Text({
-//       text: [squadron.name , squadron.cs , squadron.tms , squadron.modex].join('\n').toUpperCase(),
-//       x: squadronBoundingBox.x()+squadronBoundingBox.width()/2,
-//       y: squadronBoundingBox.y()+height*index + height/2,
-//       align: 'center',
-//     })
-//     text.offsetX(text.width()/2)
-//     text.offsetY(text.height()/2)
-//     g.squadronLayer.add(text);
-//   })
-  
-//   g.squadronLayer.add(squadronHeader);
-//   g.squadronLayer.add(squadronBoundingBox);
-//   g.squadronLayer.draw();
-//   g.stage.add(g.squadronLayer);
-// }
-
 g.editTitleForm = function () {
-    let html = "<h3>Edit Title</h3>";
-    html += "<div class='form-group row align-items-center'>";
-    html += "<label for='title' class='col-12 col-md-2 text-left text-md-right'>Title</label>";
-    html += "<input type='text' class='col form-control mr-5' id='title' placeholder='Air Plan' required>";
-    html += "</div>"
-    // Start time
-    html += "<div class='form-group row align-items-center'>";
-    html += "<label for='date' class='col-12 col-md-2 text-left text-md-right'>Date</label>";
-    html += "<input type='date' pattern='[0-9]{4}-[0-9]{2}-[0-9]{2}T00:00' class='col form-control mr-5' id='date' placeholder='Date'>";
-    html += "</div>";
-    html += "<button type='submit' class='btn btn-primary' onclick='g.updateTitle()'>Update</button>";
-    return html
+  let html = "<h3>Edit Title & Date</h3>";
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='title' class='col-12 col-md-2 text-left text-md-right'>Title</label>";
+  html += "<input type='text' class='col form-control mr-5' id='title' placeholder='Air Plan' required>";
+  html += "</div>"
+  // Start time
+  html += "<div class='form-group row align-items-center'>";
+  html += "<label for='date' class='col-12 col-md-2 text-left text-md-right'>Date</label>";
+  html += "<input type='date' pattern='[0-9]{4}-[0-9]{2}-[0-9]{2}T00:00' class='col form-control mr-5' id='date' placeholder='Date'>";
+  html += "</div>";
+  html += "<button type='submit' class='btn btn-primary' onclick='g.updateTitle()'>Update</button>";
+  return html
 }
 
 g.updateTitle = function () {
   let title = $('#title').val();
   let date = $('#date').val()+"T00:00";
+  let od = airplan.data.date.getDate()
   airplan.data.header.title = title
   airplan.data.date = new Date(date)
+  let d = airplan.data.date.getDate()
+  let delta = d - od
+  airplan.data.header.slap.sunrise.setDate(       airplan.data.header.slap.sunrise.getDate() + delta)
+  airplan.data.header.slap.sunset.setDate(        airplan.data.header.slap.sunset.getDate() + delta)
+  airplan.data.header.slap.moonrise.setDate(      airplan.data.header.slap.moonrise.getDate() + delta)
+  airplan.data.header.slap.moonset.setDate(       airplan.data.header.slap.moonset.getDate() + delta)
+  airplan.data.header.time.flightquarters.setDate(airplan.data.header.time.flightquarters.getDate() + delta)
+  airplan.data.header.time.heloquarters.setDate(  airplan.data.header.time.heloquarters.getDate() + delta)
+  airplan.data.events.start.setDate(              airplan.data.events.start.getDate() + delta)
+  airplan.data.events.end.setDate(                airplan.data.events.end.getDate() + delta)
+  Object.values(airplan.data.events.sorties).forEach(s=>{
+    s.start.setDate(s.start.getDate() + delta)
+    s.end.setDate(s.end.getDate() + delta)
+  })
+  Object.values(airplan.data.events.cycles).forEach(c=>{
+    c.start.setDate(c.start.getDate() + delta)
+    c.end.setDate(c.end.getDate() + delta)
+  })
+
   closeModal()
   refresh()
 }
@@ -891,7 +864,7 @@ g.updateSlap = function () {
 }
 
 g.editTimelineForm = function () {
-  let html = "<h3>Edit SLAP Data</h3>";
+  let html = "<h3>Edit Start & End of Day</h3>";
   // Sunrise
   html += "<div class='form-group row align-items-center'>";
   html += "<label for='start' class='col-12 col-md-2 text-left text-md-right'>Start of Day</label>";
