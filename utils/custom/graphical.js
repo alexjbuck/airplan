@@ -83,7 +83,7 @@ drawBoundingBox = function(c,{stroke='black',strokeWidth=1, name='box', fillEnab
     height = minSize
     offsetY = minSize/2
   }
-let box = new Konva.Rect({
+  let box = new Konva.Rect({
     x: x,
     y: y,
     width: width,
@@ -121,12 +121,12 @@ HighlightBox = function(c,{stroke='#0275d8',strokeWidth=2, name='highlight', fil
   box.on('mouseenter touchstart pointerdown', function () {
     box.setAttrs({cornerRadius:0, opacity:.8, stroke:stroke, strokeWidth:strokeWidth, shadowBlur:10, shadowColor:'black',})
     g.stage.container().style.cursor = 'pointer'
-
+    
   })
   box.on('mouseleave touchend pointerup',function() {
     box.setAttrs({opacity:0})
     g.stage.container().style.cursor = 'default'
-
+    
   })
   return box
 }
@@ -403,7 +403,7 @@ g.makeTimeline = function(p){
     $('#start').val(airplan.data.events.start.toLocalTimeString())
     $('#end').val(airplan.data.events.end.toLocalTimeString())
   })
- 
+  
   let startTime = new Konva.Text({
     x: 0,
     y: timeline.timebox.height(),
@@ -417,7 +417,7 @@ g.makeTimeline = function(p){
   endTime.offsetX(endTime.width())
   timeline.timebox.add(startTime,endTime)
   timeline.timebox.add( HighlightBox(timeline.timebox) )
-
+  
   // Sunrise
   timeline.timebox.add( new Konva.Arc({
     x: time2pixels(airplan.data.header.slap.sunrise,timeline.timebox),
@@ -581,7 +581,7 @@ g.makeSquadrons = function(p){
   return squadrons  
 }
 
-g.makeSquadronGroup = function(s,i,p) {
+g.makeSquadronGroup = function(sq,i,p) {
   let n = airplan.data.events.squadrons.length
   let squadronHeight = p.height()/n
   let group = new Konva.Group({
@@ -608,7 +608,7 @@ g.makeSquadronGroup = function(s,i,p) {
   let letterText = new Konva.Text({
     x: p.leftColWidth-letterWidth/2,
     y: group.height()/2,
-    text: s.letter,
+    text: sq.letter,
     align: 'center',
     name: 'squadron.letter'
   })
@@ -618,7 +618,7 @@ g.makeSquadronGroup = function(s,i,p) {
   let groupText = new Konva.Text({
     x: (p.leftColWidth-letterWidth)/2,
     y: group.height()/2,
-    text: [s.name, s.cs, s.tms, s.modex].join('\n').toUpperCase(),
+    text: [sq.name, sq.cs, sq.tms, sq.modex].join('\n').toUpperCase(),
     align: 'center',
     name: 'squadron.name'
   })
@@ -646,27 +646,43 @@ g.makeSquadronGroup = function(s,i,p) {
     height: group.height(),
     name: 'sortie.group',
   })
-  console.log("Sorties for "+s.name)
-  let sorties = Object.values(airplan.data.events.sorties).filter(sortie=>sortie.squadron==s.name)
+  console.log("Sorties for "+sq.name)
+  let sorties = Object.values(airplan.data.events.sorties).filter(sortie=>sortie.squadron==sq.name)
+  // let sortieCycles = sorties.map(sortie=>getCycle(sortie))
+  // let sortieCycleCount = []
+  // sortieCycles.forEach(cycle=>{
+  //   if(sortieCycleCount[cycle]){
+  //     sortieCycleCount[cycle]++
+  //   } else {
+  //     sortieCycleCount[cycle] = 1
+  //   }
+  // })
   let ns = sorties.length
   let h = group.height()/(ns+2)
-  sorties.forEach((s,i)=>{
-    let x1 = time2pixels(s.start,sortieGroup)
-    let x2 = time2pixels(s.end,sortieGroup)
-    let y = h*(i+1)
-    sortieGroup.add( new Konva.Line({
-      points: [x1,y,x2,y],
-      stroke: 'black',
-      strokeWidth: 1,
-      name: 'sortie.line'
-    }))
-    sortieGroup.add( new Konva.Text({
-      x: x1+5,
-      y: y-15,
-      text: s.annotation,
-    }))
-    this.makeCondition[s.startCondition](x1,y,sortieGroup)
-    this.makeCondition[s.endCondition](x2,y,sortieGroup)
+  let cycles = Object.values(airplan.data.events.cycles).map(cycle=>cycle.number)
+  cycles.push(0,cycles.length+1)
+  cycles.sort((a,b)=>a-b).forEach(c=>{
+    sorties.filter(s=>getCycle(s)==c).forEach((s,i)=>{
+      let x1 = time2pixels(s.start,sortieGroup)
+      let x2 = time2pixels(s.end,sortieGroup)
+      let y = h*(i+1)
+      // Sortie line
+      sortieGroup.add( new Konva.Line({
+        points: [x1,y,x2,y],
+        stroke: 'black',
+        strokeWidth: 1,
+        name: 'sortie.line'
+      }))
+      // Sortie Annotation
+      sortieGroup.add( new Konva.Text({
+        x: x1+5,
+        y: y-15,
+        text: s.event + " " + s.annotation,
+      }))
+      // Draw the start and end conditions
+      this.makeCondition[s.startCondition](x1,y,sortieGroup)
+      this.makeCondition[s.endCondition](x2,y,sortieGroup)
+    })
   })
   group.add(sortieGroup)
   group.sortieGroup = sortieGroup
@@ -771,7 +787,7 @@ g.updateTitle = function () {
     c.start.setDate(c.start.getDate() + delta)
     c.end.setDate(c.end.getDate() + delta)
   })
-
+  
   closeModal()
   refresh()
 }

@@ -21,28 +21,7 @@ highlightInvalidInput = ($object) => {
     });
 }
 
-// Returns the cycle number for a sortie based on launch time.
-getCycle = ({start}) => {
-    if (typeof start == "undefined" || start == null) {
-        return "-"
-    }
-    let cycles = airplan.data.events.cycles;
-    if (start < cycles[0].start) {
-        // If the start is before the first cycle, it's cycle 0.
-        return 0;
-    } else if (start > cycles[cycles.length-1].end) {
-        // If the start is after the last cycle, it's the last cycle + 1 (which is the length+1).
-        return cycles.length+1;
-    } else {
-        // Otherwise, it's the first cycle that starts before and ends after the start.
-        let cycle = cycles.filter(c => c.start <= start && c.end > start).reduce((p,c)=>p).number
-        return cycle ? cycle : '-'
-    }
-}
 
-getMissionNumber = (sortie) => {
-    return '1A1'
-}
 
 
 //
@@ -225,13 +204,13 @@ tabular.sorties.draw = () => {
     html += "<tbody>";
     events.squadrons.forEach((sqdrn, i) => {
         console.log("Sorties for: "+sqdrn.name);
-        Object.entries(events.sorties).filter(([id,sortie])=>sortie.squadron == sqdrn.name).forEach(([id,sortie]) => {
+        Object.entries(events.sorties).filter(([id,sortie])=>sortie.squadron == sqdrn.name).sort(([id1,a],[id2,b])=>a.start-b.start).forEach(([id,sortie]) => {
             console.log("  Sortie: "+id+" "+sortie);
             html += "<tr>";
             html += "<td class='align-middle'>"+sortie.squadron+"</td>";
             html += "<td class='align-middle'>"+sortie.start.toHHMM()+"</td>";
             html += "<td class='align-middle'>"+sortie.end.toHHMM()+"</td>";
-            html += "<td class='align-middle'>"+getMissionNumber(id)+"</td>";
+            html += "<td class='align-middle'>"+sortie.event+"</td>";
             html += "<td class='align-middle'><div class='btn-group'>"
             html +=   "<button class='btn btn-sm btn-secondary' onclick=tabular.sorties.edit('"+id+"')>Edit</button>"
             html +=   "<button class='btn btn-sm btn-danger'    onclick=tabular.sorties.delete('"+id+"') >X</button>"
@@ -344,6 +323,8 @@ tabular.sorties.editSubmit = (id) => {
     let sortie = tabular.sorties.readForm()
     if (tabular.sorties.validate(sortie)) {
         airplan.data.events.sorties[id] = sortie;
+        sortie.event=0+airplan.data.events.squadrons.find(sq=>sq.name==sortie.squadron).letter+1;
+        assignEvents();
         console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.annotation);
         tabular.processSubmit()
     }

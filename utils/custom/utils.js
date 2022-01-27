@@ -25,8 +25,47 @@ Date.prototype.toHHMM = function() {
 }
 
 function uuidv4() {
-    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-    );
-  }
-  
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16) );
+}
+
+// Returns the cycle number for a sortie based on launch time.
+getCycle = ({start}) => {
+    if (typeof start == "undefined" || start == null) {
+        return "-"
+    }
+    let cycles = airplan.data.events.cycles;
+    let sorted = Object.values(cycles).sort((a,b)=>a.start-b.start)
+    if (sorted.length<1) {
+        return 0
+    }
+    if (start < sorted[0].start) {
+        // If the start is before the first cycle, it's cycle 0.
+        return 0;
+    } else if (start >= sorted[sorted.length-1].end) {
+        // If the start is after the last cycle, it's the last cycle + 1 (which is the length+1).
+        return sorted.length+1;
+    } else {
+        // Otherwise, it's the first cycle that starts before and ends after the start.
+        let cycle = sorted.find(c => c.start <= start && c.end > start).number
+        return cycle ? cycle : '-'
+    }
+}
+
+getSquadron = ({squadron}) => {
+    return Object.values(airplan.data.events.squadrons).find(s => s.name == squadron)
+}
+
+assignEvents = () => {
+    // Assign an event code to each sortie. The code is defined as the cycle number, followed by the squadron letter, followed by the sortie number for that squadron within that cycle.
+    let counts = []
+    Object.values(airplan.data.events.sorties).sort((a,b)=>a.start-b.start).forEach(s=>{
+        let cycle = getCycle(s)
+        let letter = getSquadron(s).letter
+        if (counts[cycle] == undefined) {
+            counts[cycle] = 1
+        } else {
+            counts[cycle] += 1
+        }
+        s.event = cycle+letter+counts[cycle]
+    })
+}
