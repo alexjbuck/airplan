@@ -1,18 +1,19 @@
 var menu = new Object
 
 menu.draw = function() {
-    var html = "<div class='btn-group mr-5'>";
+    var html = "<div class='btn-group py-2 mr-5'>";
     html += "<button class='btn btn-outline-success btn' onclick='menu.addSquadron()'>+</button>";
     html += "<button class='btn btn-outline-danger btn' onclick='menu.deleteBottomSquadron()'>\u2212</button>";
     html += "</div>";
-    html += "<div class='btn-group'>";
-    html += "<button id='reset-stage' class='btn btn-outline-danger btn' onclick='menu.reset()'>New Airplan</button>"
-    html += "<button id='refresh-stage' class='btn btn-outline-primary btn' onclick='refresh()'>Refresh</button>"
-    html += "<label type='file' id='load' class='btn btn-outline-primary btn my-0'>Load<input type='file' id='filepath' hidden onchange='menu.load(event)'></label>"
-    html += "<button id='save' class='btn btn-outline-primary btn' onclick='menu.save()'>Save</button>"
-    html += "<button id='print' class='btn btn-outline-primary btn' onclick='menu.print()'>Export PDF</button>"
+    html += "<button id='help' class='btn btn-warning py-2 mr-5' onclick='menu.help()'>Help</button>"
+    html += "<div class='btn-group py-2 mr-5'>";
+    html += "<button id='reset-stage' class='btn btn-outline-danger' onclick='menu.reset()'>New Airplan</button>"
+    html += "<button id='refresh-stage' class='btn btn-outline-primary' onclick='refresh()'>Refresh</button>"
+    html += "<label type='file' id='load' class='btn btn-outline-primary my-0'>Load<input type='file' id='filepath' hidden onchange='menu.load(event)'></label>"
+    html += "<button id='save' class='btn btn-outline-primary' onclick='menu.save()'>Save</button>"
+    html += "<button id='print' class='btn btn-outline-primary' onclick='menu.print()'>Export PDF</button>"
     html += "</div>"
-    html += "<div class='btn-group'>";
+
     $('#menu').html(html)
 }
 menu.load = function(e) {
