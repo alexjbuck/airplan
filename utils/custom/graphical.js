@@ -64,7 +64,7 @@ fitStageIntoParentContainer = function({stage, sceneHeight, sceneWidth}) {
 }
 window.addEventListener('resize', fitStageIntoParentContainer);
 
-drawBoundingBox = function(c,{stroke='black',strokeWidth=1, name='box', fillEnabled='false', fill='',opacity=1,zIndex=0, minSize=10}={}){
+drawBoundingBox = function(c,{stroke='black',strokeWidth=1, name='box', fillEnabled='false', fill='',opacity=1,zIndex=0, minSize=15}={}){
   let x=0,y=0
   if (c.nodeType == 'Shape') {
     x = c.x()
@@ -80,13 +80,13 @@ drawBoundingBox = function(c,{stroke='black',strokeWidth=1, name='box', fillEnab
   let offsetX = c.offsetX()
   if (width < minSize) {
     width = minSize
-    offsetX = minSize/2    
+    offsetX = (minSize-width)/2    
   }
   let height = c.height()
   let offsetY = c.offsetY()
   if (height < minSize) {
     height = minSize
-    offsetY = minSize/2
+    offsetY = (minSize-height)/2
   }
   let box = new Konva.Rect({
     x: x,
@@ -121,17 +121,17 @@ drawBoundingBox = function(c,{stroke='black',strokeWidth=1, name='box', fillEnab
 //   blurChildren(p, {shadowBlur:0})
 // }
 
-HighlightBox = function(c,{stroke='#0275d8',strokeWidth=2, name='highlight', fillEnabled='false', fill='', opacity=0, zIndex=0, toolTip=''}={}){
-  let box = drawBoundingBox(c,{stroke:stroke, strokeWidth:strokeWidth, name:name, fillEnabled:fillEnabled, fill:fill, opacity:opacity, zIndex:zIndex})
+HighlightBox = function(c,{stroke='#0275d8',strokeWidth=2, name='highlight', fillEnabled='false', fill='', opacity=0, zIndex=0, minSize=10}={},){
+  let box = drawBoundingBox(c,{stroke:stroke, strokeWidth:strokeWidth, name:name, fillEnabled:fillEnabled, fill:fill, opacity:opacity, zIndex:zIndex, minSize:minSize})
+
   box.on('mouseenter touchstart pointerdown', function () {
     box.setAttrs({cornerRadius:0, opacity:.8, stroke:stroke, strokeWidth:strokeWidth, shadowBlur:10, shadowColor:'black',})
     g.stage.container().style.cursor = 'pointer'
-    
   })
+  
   box.on('mouseleave touchend pointerup',function() {
     box.setAttrs({opacity:0})
     g.stage.container().style.cursor = 'default'
-    
   })
   return box
 }
@@ -676,7 +676,7 @@ g.makeSquadronGroup = function(sq,i,p) {
         text: s.event + " " + s.annotation,
         fontSize: config.anno.fontSize,
       })
-      let box = HighlightBox(annotation)
+      let box = HighlightBox(annotation,{minSize:0})
       sortieGroup.add(annotation,box)
       box.on('click', ()=>{
         tabular.sorties.edit(s.id)
