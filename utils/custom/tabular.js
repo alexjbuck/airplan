@@ -93,25 +93,17 @@ tabular.cycles.add = () => {
     openModal(html);
     $("#number").val(Object.keys(airplan.data.events.cycles).length+1);
     let d = new Date(new Date(airplan.data.date.valueOf()).setHours(9,0,0,0));
-    let startD = Object.values(airplan.data.events.cycles).reduce((p,c)=>p.end > c.end ? p : c,{end:d});
-    let start = startD.end.getHours()
-    let end = start + 1
-
-    $("#start").val( new Date( new Date( airplan.data.date.valueOf() ).setHours(start,0,0,0) ).toLocalTimeString() );
-    $("#end").val(   new Date( new Date( airplan.data.date.valueOf() ).setHours(end,0,0,0)   ).toLocalTimeString() );
+    let startTime = Object.values(airplan.data.events.cycles).reduce((p,c)=>p.end > c.end ? p : c,{end:d}).end;
+    let endTime = new Date(startTime.valueOf())
+    let end = startTime.getHours() + 1
+    $("#start").val( startTime.toLocalTimeString() )
+    endTime.setHours(end)
+    $("#end").val(   endTime.toLocalTimeString() )
 }
 
 // Callback on the "Submit" button in the "Add Cycle" modal.
 tabular.cycles.addSubmit = () => {
     tabular.cycles.editSubmit(uuidv4());
-    // let cycle = tabular.cycles.readForm();
-    // // if valid cycle, push to data object, log, close modal, redraw table.
-    // if (tabular.cycles.validate(cycle)) {
-    //     // Push the new cycle to the data object.
-    //     console.log("New Cycle: ",cycle.number, cycle.start, cycle.end);
-    //     airplan.data.events.cycles.push(cycle);
-    //     tabular.processSubmit()
-    // }
 }
 
 tabular.cycles.edit = (id) => {
@@ -280,6 +272,7 @@ tabular.sorties.add = () => {
     d.setHours(0,0,0,0);
     $("#start").val(d.toLocalTimeString());
     $("#end").val(d.toLocalTimeString());
+    $("#annotation").val("_");
 }
 
 tabular.sorties.readForm = function() {
@@ -321,6 +314,7 @@ tabular.sorties.edit = (id) => {
 tabular.sorties.editSubmit = (id) => {
     console.log("processing edit of sortie "+id);
     let sortie = tabular.sorties.readForm()
+    sortie.id = id;
     if (tabular.sorties.validate(sortie)) {
         airplan.data.events.sorties[id] = sortie;
         sortie.event=0+airplan.data.events.squadrons.find(sq=>sq.name==sortie.squadron).letter+1;
