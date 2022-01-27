@@ -59,7 +59,7 @@ fitStageIntoParentContainer = function({stage, sceneHeight, sceneWidth}) {
 }
 window.addEventListener('resize', fitStageIntoParentContainer);
 
-drawBoundingBox = function(c,{stroke='black',strokeWidth=1, name='box', fillEnabled='false', fill='',opacity=1,zIndex=0}={}){
+drawBoundingBox = function(c,{stroke='black',strokeWidth=1, name='box', fillEnabled='false', fill='',opacity=1,zIndex=0, minSize=10}={}){
   let x=0,y=0
   if (c.nodeType == 'Shape') {
     x = c.x()
@@ -70,7 +70,7 @@ drawBoundingBox = function(c,{stroke='black',strokeWidth=1, name='box', fillEnab
       y = c.children.map(c=>c.y()-c.offsetY()).reduce((prev,curr)=>Math.min(prev,curr),0)
     }
   }
-  let minSize = 50
+  
   let width = c.width()
   let offsetX = c.offsetX()
   if (width < minSize) {
@@ -479,7 +479,7 @@ g.makeTimeline = function(p){
     launchLabel.offsetX(launchLabel.width()+g.m/2)
     launchLabel.offsetY(launchLabel.height())
     timeline.timebox.add(launchLabel)
-    // Cycle Start label
+    // Cycle Start Time
     let startLabel = new Konva.Text({
       x: x,
       y: timeline.timebox.height(),
@@ -648,19 +648,10 @@ g.makeSquadronGroup = function(sq,i,p) {
   })
   console.log("Sorties for "+sq.name)
   let sorties = Object.values(airplan.data.events.sorties).filter(sortie=>sortie.squadron==sq.name)
-  // let sortieCycles = sorties.map(sortie=>getCycle(sortie))
-  // let sortieCycleCount = []
-  // sortieCycles.forEach(cycle=>{
-  //   if(sortieCycleCount[cycle]){
-  //     sortieCycleCount[cycle]++
-  //   } else {
-  //     sortieCycleCount[cycle] = 1
-  //   }
-  // })
   let ns = sorties.length
   let h = group.height()/(ns+2)
   let cycles = Object.values(airplan.data.events.cycles).map(cycle=>cycle.number)
-  cycles.push(0,cycles.length+1)
+  cycles.push(0,cycles.length+1) // Add the "before" and "after" cycles
   cycles.sort((a,b)=>a-b).forEach(c=>{
     sorties.filter(s=>getCycle(s)==c).forEach((s,i)=>{
       let x1 = time2pixels(s.start,sortieGroup)
@@ -674,11 +665,16 @@ g.makeSquadronGroup = function(sq,i,p) {
         name: 'sortie.line'
       }))
       // Sortie Annotation
-      sortieGroup.add( new Konva.Text({
+      let annotation = new Konva.Text({
         x: x1+5,
         y: y-15,
         text: s.event + " " + s.annotation,
-      }))
+      })
+      let box = HighlightBox(annotation)
+      sortieGroup.add(annotation,box)
+      box.on('click', ()=>{
+        tabular.sorties.edit(s.id)
+      })
       // Draw the start and end conditions
       this.makeCondition[s.startCondition](x1,y,sortieGroup)
       this.makeCondition[s.endCondition](x2,y,sortieGroup)
