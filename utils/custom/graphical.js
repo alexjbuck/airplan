@@ -1,5 +1,5 @@
 let config = new Object();
-config.textOptions = {
+config = {
   body: {
     fontFamily: 'sans-serif',
     fontSize: 14,
@@ -10,6 +10,11 @@ config.textOptions = {
     fontSize: 36,
     padding: 10,
     align: 'center',
+  },
+  anno: {
+    fontFamily: 'sans-serif',
+    fontSize: 8,
+    padding: 0,
   },
   subtitle: {
     fontFamily: 'sans-serif',
@@ -227,16 +232,16 @@ g.makeHeader = function(p) {
 
 g.makeSlap = function(p) {
   let slap = new Konva.Group({
-    x: config.textOptions.body.padding,
-    y: config.textOptions.body.padding,
+    x: config.body.padding,
+    y: config.body.padding,
     name: 'slap',
   })
   // Label Text
   var slapLabel = new Konva.Text({
     text: Object.keys(airplan.data.header.slap).join('\n').toUpperCase(),
-    fontSize: config.textOptions.body.fontSize,
+    fontSize: config.body.fontSize,
     align: 'left',
-    fontFamily: config.textOptions.body.fontFamily,
+    fontFamily: config.body.fontFamily,
     name: 'slap.label',
   });
   // SLAP Data
@@ -252,7 +257,7 @@ g.makeSlap = function(p) {
     fontFamily: slapLabel.fontFamily(),
     name: 'slap.data',
   });
-  slapData.offsetX(-1*(slapLabel.width()+config.textOptions.body.padding));  
+  slapData.offsetX(-1*(slapLabel.width()+config.body.padding));  
   // Add to Group
   slap.add(slapLabel, slapData);
   slap = fitSizeToChildren(slap)
@@ -271,24 +276,24 @@ g.makeSlap = function(p) {
 g.makeTitle = function(p) {
   let title = new Konva.Group({
     x: p.width()/2,
-    y: config.textOptions.body.padding,
+    y: config.body.padding,
     name: 'title',
   })
   // Title Text
   var titleText = new Konva.Text({
     text: airplan.data.header.title,
-    fontSize: config.textOptions.title.fontSize,
-    fontFamily: config.textOptions.title.fontFamily,
-    align: config.textOptions.title.align,
+    fontSize: config.title.fontSize,
+    fontFamily: config.title.fontFamily,
+    align: config.title.align,
     name: 'title.title',
   });
   // Subtitle Text
   var subTitleText = new Konva.Text({
-    y: titleText.height() + config.textOptions.subtitle.padding,
+    y: titleText.height() + config.subtitle.padding,
     text: airplan.data.date.toDateString(),
-    fontSize: config.textOptions.subtitle.fontSize,
-    fontFamily: config.textOptions.subtitle.fontFamily,
-    align: config.textOptions.subtitle.align,
+    fontSize: config.subtitle.fontSize,
+    fontFamily: config.subtitle.fontFamily,
+    align: config.subtitle.align,
     name: 'title.subtitle',
   });
   // Add to Group
@@ -306,21 +311,21 @@ g.makeTitle = function(p) {
 
 g.makeTime = function(p) {
   let time = new Konva.Group({
-    x: p.width()-config.textOptions.body.padding,
-    y: config.textOptions.body.padding,
+    x: p.width()-config.body.padding,
+    y: config.body.padding,
     name: 'time',
   })
   // Time Label
   let timeLabel = new Konva.Text({
     text: ['flight quarters:','Helo quarters:','Mag Var:','Time Zone:'].join('\n').toUpperCase(),
-    fontSize: config.textOptions.body.fontSize,
-    fontFamily: config.textOptions.body.fontFamily,
+    fontSize: config.body.fontSize,
+    fontFamily: config.body.fontFamily,
     align: 'right',
     name: 'time.label',
   });
   // Time Data
   let timeData = new Konva.Text({
-    x: timeLabel.width()+config.textOptions.body.padding,
+    x: timeLabel.width()+config.body.padding,
     text: ['flightquarters','heloquarters','variation','timezone'].map((k)=>{
       let v = airplan.data.header.time[k]
       if(typeof(v)=='object'){
@@ -666,9 +671,10 @@ g.makeSquadronGroup = function(sq,i,p) {
       }))
       // Sortie Annotation
       let annotation = new Konva.Text({
-        x: x1+5,
-        y: y-15,
+        x: x1,
+        y: y-10,
         text: s.event + " " + s.annotation,
+        fontSize: config.anno.fontSize,
       })
       let box = HighlightBox(annotation)
       sortieGroup.add(annotation,box)
