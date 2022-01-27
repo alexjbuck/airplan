@@ -118,8 +118,8 @@ tabular.cycles.add = () => {
     let start = startD.end.getHours()
     let end = start + 1
 
-    $("#start").val(new Date(new Date().setHours(start,0)).toLocalTimeString());
-    $("#end").val(new Date(new Date().setHours(end,0)).toLocalTimeString());
+    $("#start").val( new Date( new Date( airplan.data.date.valueOf() ).setHours(start,0,0,0) ).toLocalTimeString() );
+    $("#end").val(   new Date( new Date( airplan.data.date.valueOf() ).setHours(end,0,0,0)   ).toLocalTimeString() );
 }
 
 // Callback on the "Submit" button in the "Add Cycle" modal.
@@ -297,6 +297,10 @@ tabular.sorties.add = () => {
     html += tabular.sorties.addEditForm();
     html += "<button type='submit' class='btn btn-primary' onclick=tabular.sorties.addSubmit()>Submit</button>";
     openModal(html);
+    let d = new Date(airplan.data.date);
+    d.setHours(0,0,0,0);
+    $("#start").val(d.toLocalTimeString());
+    $("#end").val(d.toLocalTimeString());
 }
 
 tabular.sorties.readForm = function() {
