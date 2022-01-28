@@ -57,15 +57,15 @@ getSquadron = ({squadron}) => {
 
 assignEvents = () => {
     // Assign an event code to each sortie. The code is defined as the cycle number, followed by the squadron letter, followed by the sortie number for that squadron within that cycle.
-    let counts = []
+    let counts = {}
     Object.values(airplan.data.events.sorties).sort((a,b)=>a.start-b.start).forEach(s=>{
         let cycle = getCycle(s)
         let letter = getSquadron(s).letter
-        if (counts[cycle] == undefined) {
-            counts[cycle] = 1
+        if (counts[[cycle,letter]] == undefined) {
+            counts[[cycle,letter]] = 1
         } else {
-            counts[cycle] += 1
+            counts[[cycle,letter]] += 1
         }
-        s.event = cycle+letter+counts[cycle]
+        s.event = cycle+letter+counts[[cycle,letter]]
     })
 }
