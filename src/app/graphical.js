@@ -1,28 +1,3 @@
-let config = new Object();
-config = {
-  body: {
-    fontFamily: 'sans-serif',
-    fontSize: 14,
-    padding: 10,
-  },
-  title: {
-    fontFamily: 'Calibri',
-    fontSize: 36,
-    padding: 10,
-    align: 'center',
-  },
-  anno: {
-    fontFamily: 'sans-serif',
-    fontSize: 8,
-    padding: 0,
-  },
-  subtitle: {
-    fontFamily: 'sans-serif',
-    fontSize: 18,
-    padding: 10,
-    align: 'center',
-  },
-}
 // {padX=0,padY=0}={} allows for default values of padX and padY. 
 // If a param object isn't passed, the ={} is needed to not thrown an error on destructuring
 fitWidthToChildren = function(p,{padX=0,padY=0}={}) {
@@ -53,7 +28,7 @@ fitStageIntoParentContainer = function({stage, sceneHeight, sceneWidth}) {
     sceneHeight = g.sceneHeight;
     sceneWidth = g.sceneWidth;
   }
-  var container = document.querySelector('#graphical-stage');
+  var container = document.querySelector('#graphic-stage');
   // now we need to fit stage into parent container
   var containerWidth = container.offsetWidth;
   // but we also make the full scene visible so we need to scale all objects on canvas
@@ -64,48 +39,7 @@ fitStageIntoParentContainer = function({stage, sceneHeight, sceneWidth}) {
 }
 window.addEventListener('resize', fitStageIntoParentContainer);
 
-drawBoundingBox = function(c,{stroke='black',strokeWidth=1, name='box', fillEnabled='false', fill='',opacity=1,zIndex=0, minSize=15}={}){
-  let x=0,y=0
-  if (c.nodeType == 'Shape') {
-    x = c.x()
-    y = c.y()
-  } else if (c.nodeType == 'Group') {
-    if (c.children.length) {
-      x = c.children.map(c=>c.x()-c.offsetX()).reduce((prev,curr)=>Math.min(prev,curr),0)
-      y = c.children.map(c=>c.y()-c.offsetY()).reduce((prev,curr)=>Math.min(prev,curr),0)
-    }
-  }
-  
-  let width = c.width()
-  let offsetX = c.offsetX()
-  if (width < minSize) {
-    width = minSize
-    offsetX = (minSize-width)/2    
-  }
-  let height = c.height()
-  let offsetY = c.offsetY()
-  if (height < minSize) {
-    height = minSize
-    offsetY = (minSize-height)/2
-  }
-  let box = new Konva.Rect({
-    x: x,
-    y: y,
-    width: width,
-    height: height,
-    stroke: stroke,
-    strokeWidth: strokeWidth,
-    name: name,
-    fillEnabled: fillEnabled,
-    fill: fill,
-    opacity: opacity,
-  })
-  if (c.nodeType == 'Shape') {
-    box.offsetX(offsetX)
-    box.offsetY(offsetY)
-  }
-  return box
-}
+
 
 // blurChildren = function(p, {shadowBlur}={shadowBlur:10}) {
 //   if (p.children){
@@ -138,7 +72,7 @@ HighlightBox = function(c,{stroke='#0275d8',strokeWidth=2, name='highlight', fil
 
 
 time2pixels = function(h,p) {
-  let pixels = (h.valueOf()-airplan.data.events.start.valueOf()) * p.width()/(airplan.data.events.end.valueOf()-airplan.data.events.start.valueOf())
+  let pixels = (h.valueOf()-airplan.start.valueOf()) * p.width()/(airplan.end.valueOf()-airplan.start.valueOf())
   pixels = pixels<0 ? 0 : pixels
   pixels = pixels>p.width() ? p.width(): pixels
   return pixels
@@ -162,7 +96,7 @@ g.draw = function() {
 g.makeStage = function() {
   console.log('Make Stage')
   let stage = new Konva.Stage({
-    container: 'graphical-stage',   // id of container <div>
+    container: 'graphic-stage',   // id of container <div>
     width: this.sceneWidth,
     height: this.sceneHeight,
     name: 'stage',
@@ -238,7 +172,7 @@ g.makeSlap = function(p) {
   })
   // Label Text
   var slapLabel = new Konva.Text({
-    text: Object.keys(airplan.data.header.slap).join('\n').toUpperCase(),
+    text: Object.keys(airplan.slap).join('\n').toUpperCase(),
     fontSize: config.body.fontSize,
     align: 'left',
     fontFamily: config.body.fontFamily,
@@ -246,7 +180,7 @@ g.makeSlap = function(p) {
   });
   // SLAP Data
   var slapData = new Konva.Text({
-    text: Object.values(airplan.data.header.slap).map((v)=>{
+    text: Object.values(airplan.slap).map((v)=>{
       if(typeof(v)=='object'){
         return v.toHHMM()
       } else {
@@ -264,11 +198,11 @@ g.makeSlap = function(p) {
   slap.add( HighlightBox(slap) )
   slap.on('click tap', function () {
     openModal(g.editSlapForm())
-    $('#sunrise').val(airplan.data.header.slap.sunrise.toLocalTimeString())
-    $('#sunset').val(airplan.data.header.slap.sunset.toLocalTimeString())
-    $('#moonrise').val(airplan.data.header.slap.moonrise.toLocalTimeString())
-    $('#moonset').val(airplan.data.header.slap.moonset.toLocalTimeString())
-    $('#moonphase').val(airplan.data.header.slap.moonphase)
+    $('#sunrise').val(airplan.slap.sunrise.toLocalTimeString())
+    $('#sunset').val(airplan.slap.sunset.toLocalTimeString())
+    $('#moonrise').val(airplan.slap.moonrise.toLocalTimeString())
+    $('#moonset').val(airplan.slap.moonset.toLocalTimeString())
+    $('#moonphase').val(airplan.slap.moonphase)
   });
   return slap
 }
@@ -281,7 +215,7 @@ g.makeTitle = function(p) {
   })
   // Title Text
   var titleText = new Konva.Text({
-    text: airplan.data.header.title,
+    text: airplan.title,
     fontSize: config.title.fontSize,
     fontFamily: config.title.fontFamily,
     align: config.title.align,
@@ -290,7 +224,7 @@ g.makeTitle = function(p) {
   // Subtitle Text
   var subTitleText = new Konva.Text({
     y: titleText.height() + config.subtitle.padding,
-    text: airplan.data.date.toDateString(),
+    text: airplan.date.toDateString(),
     fontSize: config.subtitle.fontSize,
     fontFamily: config.subtitle.fontFamily,
     align: config.subtitle.align,
@@ -303,8 +237,8 @@ g.makeTitle = function(p) {
   title.add( HighlightBox(title) )
   title.on('click tap', function(e) {
     openModal(g.editTitleForm())
-    $('#title').val(airplan.data.header.title)
-    $('#date').val(airplan.data.date.toYYYYMMDD())
+    $('#title').val(airplan.title)
+    $('#date').val(airplan.date.toYYYYMMDD())
   })
   return title
 }
@@ -327,7 +261,7 @@ g.makeTime = function(p) {
   let timeData = new Konva.Text({
     x: timeLabel.width()+config.body.padding,
     text: ['flightquarters','heloquarters','variation','timezone'].map((k)=>{
-      let v = airplan.data.header.time[k]
+      let v = airplan[k]
       if(typeof(v)=='object'){
         return v.toHHMM()
       } else {
@@ -345,10 +279,10 @@ g.makeTime = function(p) {
   time.add( HighlightBox(time) )
   time.on('click tap', function(e) {
     openModal(g.editTimeForm())
-    $('#fq').val(airplan.data.header.time.flightquarters.toLocalTimeString())
-    $('#hq').val(airplan.data.header.time.heloquarters.toLocalTimeString())
-    $('#variation').val(airplan.data.header.time.variation)
-    $('#timezone').val(airplan.data.header.time.timezone)
+    $('#fq').val(airplan.flightquarters.toLocalTimeString())
+    $('#hq').val(airplan.heloquarters.toLocalTimeString())
+    $('#variation').val(airplan.variation)
+    $('#timezone').val(airplan.timezone)
   })
   return time
 }
@@ -364,7 +298,7 @@ g.makeEvents = function(p) {
   })
   events.leftColWidth = 100
   events.rightColWidth = 50
-  this.time2pixels = (events.width()-events.leftColWidth-events.rightColWidth)/(airplan.data.events.end-airplan.data.events.start)
+  this.time2pixels = (events.width()-events.leftColWidth-events.rightColWidth)/(airplan.end-airplan.start)
   
   events.timeline = this.makeTimeline(events)
   events.cycleTotals = this.makeCycleTotals(events)
@@ -405,19 +339,19 @@ g.makeTimeline = function(p){
   timeline.add(timeline.timebox)
   timeline.timebox.on('click tap', function () {
     openModal(g.editTimelineForm())
-    $('#start').val(airplan.data.events.start.toLocalTimeString())
-    $('#end').val(airplan.data.events.end.toLocalTimeString())
+    $('#start').val(airplan.start.toLocalTimeString())
+    $('#end').val(airplan.end.toLocalTimeString())
   })
   
   let startTime = new Konva.Text({
     x: 0,
     y: timeline.timebox.height(),
-    text: '\u21A6'+airplan.data.events.start.toHHMM(),
+    text: '\u21A6'+airplan.start.toHHMM(),
   })
   let endTime = new Konva.Text({
     x: timeline.timebox.width(),
     y: timeline.timebox.height(),
-    text: airplan.data.events.end.toHHMM()+'\u21A4',
+    text: airplan.end.toHHMM()+'\u21A4',
   })
   endTime.offsetX(endTime.width())
   timeline.timebox.add(startTime,endTime)
@@ -425,7 +359,7 @@ g.makeTimeline = function(p){
   
   // Sunrise
   timeline.timebox.add( new Konva.Arc({
-    x: time2pixels(airplan.data.header.slap.sunrise,timeline.timebox),
+    x: time2pixels(airplan.slap.sunrise,timeline.timebox),
     y: 20,
     innerRadius: 0,
     outerRadius: 15,
@@ -439,13 +373,13 @@ g.makeTimeline = function(p){
     timeline.timebox.add( new Konva.Text({
       x: s.x(),
       y: s.y(),
-      text: airplan.data.header.slap.sunrise.toHHMM(),
+      text: airplan.slap.sunrise.toHHMM(),
       name: 'sunrise.text',
     }))
   })
   // Sunset
   timeline.timebox.add( new Konva.Arc({
-    x: time2pixels(airplan.data.header.slap.sunset,timeline.timebox),
+    x: time2pixels(airplan.slap.sunset,timeline.timebox),
     y: 20,
     innerRadius: 0,
     outerRadius: 15,
@@ -460,13 +394,13 @@ g.makeTimeline = function(p){
     timeline.timebox.add( new Konva.Text({
       x: s.x(),
       y: s.y(),
-      text: airplan.data.header.slap.sunset.toHHMM(),
+      text: airplan.slap.sunset.toHHMM(),
       name: 'sunrise.text',
     }))
   })
   
   // Iterate over all cycles.
-  Object.values(airplan.data.events.cycles).forEach((cycle)=>{
+  Object.values(airplan.cycles).forEach((cycle)=>{
     // Cycle start line
     let x = time2pixels(cycle.start,timeline.timebox)
     timeline.timebox.add( new Konva.Line({
@@ -578,7 +512,7 @@ g.makeSquadrons = function(p){
   squadrons.rightColWidth = p.rightColWidth
   squadrons.squadronGroups = []
   // --------- Loop over all squadrons ---------
-  airplan.data.events.squadrons.forEach((s,i)=>{
+  Object.values(airplan.squadrons).forEach((s,i)=>{
     let group = this.makeSquadronGroup(s,i,squadrons)
     squadrons.squadronGroups.push(group)
     squadrons.add(group)
@@ -587,7 +521,7 @@ g.makeSquadrons = function(p){
 }
 
 g.makeSquadronGroup = function(sq,i,p) {
-  let n = airplan.data.events.squadrons.length
+  let n = Object.values(airplan.squadrons).length
   let squadronHeight = p.height()/n
   let group = new Konva.Group({
     x:0,
@@ -652,10 +586,10 @@ g.makeSquadronGroup = function(sq,i,p) {
     name: 'sortie.group',
   })
   console.log("Sorties for "+sq.name)
-  let sorties = Object.values(airplan.data.events.sorties).filter(sortie=>sortie.squadron==sq.name)
+  let sorties = Object.values(airplan.sorties).filter(sortie=>sortie.squadron==sq.name)
   let ns = sorties.length
   let h = group.height()/(ns+2)
-  let cycles = Object.values(airplan.data.events.cycles).map(cycle=>cycle.number)
+  let cycles = Object.values(airplan.cycles).map(cycle=>cycle.number)
   cycles.push(0,cycles.length+1) // Add the "before" and "after" cycles
   cycles.sort((a,b)=>a-b).forEach(c=>{
     sorties.filter(s=>getCycle(s)==c).forEach((s,i)=>{
@@ -669,15 +603,15 @@ g.makeSquadronGroup = function(sq,i,p) {
         strokeWidth: 1,
         name: 'sortie.line'
       }))
-      // Sortie Annotation
-      let annotation = new Konva.Text({
+      // Sortie note
+      let note = new Konva.Text({
         x: x1,
         y: y-10,
-        text: s.event + " " + s.annotation,
+        text: s.event + " " + s.note,
         fontSize: config.anno.fontSize,
       })
-      let box = HighlightBox(annotation,{minSize:0})
-      sortieGroup.add(annotation,box)
+      let box = HighlightBox(note,{minSize:0})
+      sortieGroup.add(note,box)
       box.on('click', ()=>{
         tabular.sorties.edit(s.id)
       })
@@ -768,24 +702,24 @@ g.editTitleForm = function () {
 g.updateTitle = function () {
   let title = $('#title').val();
   let date = $('#date').val()+"T00:00";
-  let od = airplan.data.date.getDate()
-  airplan.data.header.title = title
-  airplan.data.date = new Date(date)
-  let d = airplan.data.date.getDate()
+  let od = airplan.date.getDate()
+  airplan.title = title
+  airplan.date = new Date(date)
+  let d = airplan.date.getDate()
   let delta = d - od
-  airplan.data.header.slap.sunrise.setDate(       airplan.data.header.slap.sunrise.getDate() + delta)
-  airplan.data.header.slap.sunset.setDate(        airplan.data.header.slap.sunset.getDate() + delta)
-  airplan.data.header.slap.moonrise.setDate(      airplan.data.header.slap.moonrise.getDate() + delta)
-  airplan.data.header.slap.moonset.setDate(       airplan.data.header.slap.moonset.getDate() + delta)
-  airplan.data.header.time.flightquarters.setDate(airplan.data.header.time.flightquarters.getDate() + delta)
-  airplan.data.header.time.heloquarters.setDate(  airplan.data.header.time.heloquarters.getDate() + delta)
-  airplan.data.events.start.setDate(              airplan.data.events.start.getDate() + delta)
-  airplan.data.events.end.setDate(                airplan.data.events.end.getDate() + delta)
-  Object.values(airplan.data.events.sorties).forEach(s=>{
+  airplan.slap.sunrise.setDate(       airplan.slap.sunrise.getDate() + delta)
+  airplan.slap.sunset.setDate(        airplan.slap.sunset.getDate() + delta)
+  airplan.slap.moonrise.setDate(      airplan.slap.moonrise.getDate() + delta)
+  airplan.slap.moonset.setDate(       airplan.slap.moonset.getDate() + delta)
+  airplan.flightquarters.setDate(airplan.flightquarters.getDate() + delta)
+  airplan.heloquarters.setDate(  airplan.heloquarters.getDate() + delta)
+  airplan.start.setDate(              airplan.start.getDate() + delta)
+  airplan.end.setDate(                airplan.end.getDate() + delta)
+  Object.values(airplan.sorties).forEach(s=>{
     s.start.setDate(s.start.getDate() + delta)
     s.end.setDate(s.end.getDate() + delta)
   })
-  Object.values(airplan.data.events.cycles).forEach(c=>{
+  Object.values(airplan.cycles).forEach(c=>{
     c.start.setDate(c.start.getDate() + delta)
     c.end.setDate(c.end.getDate() + delta)
   })
@@ -825,10 +759,10 @@ g.updateTime = function () {
   let hq = new Date($('#hq').val())
   let variation = $('#variation').val()
   let timezone = $('#timezone').val()
-  airplan.data.header.time.flightquarters = fq
-  airplan.data.header.time.heloquarters = hq
-  airplan.data.header.time.variation = variation
-  airplan.data.header.time.timezone = timezone
+  airplan.flightquarters = fq
+  airplan.heloquarters = hq
+  airplan.variation = variation
+  airplan.timezone = timezone
   closeModal()
   refresh()
 }
@@ -872,11 +806,11 @@ g.updateSlap = function () {
   let moonset = new Date($('#moonset').val())
   let moonphase = $('#moonphase').val()
   // update the data
-  airplan.data.header.slap.sunrise = sunrise
-  airplan.data.header.slap.sunset = sunset
-  airplan.data.header.slap.moonrise = moonrise
-  airplan.data.header.slap.moonset = moonset
-  airplan.data.header.slap.moonphase = moonphase
+  airplan.slap.sunrise = sunrise
+  airplan.slap.sunset = sunset
+  airplan.slap.moonrise = moonrise
+  airplan.slap.moonset = moonset
+  airplan.slap.moonphase = moonphase
   closeModal()
   refresh()
 }
@@ -898,8 +832,8 @@ g.editTimelineForm = function () {
 }
 
 g.updateTimeline = function () {
-  airplan.data.events.start = new Date($('#start').val())
-  airplan.data.events.end = new Date($('#end').val())
+  airplan.start = new Date($('#start').val())
+  airplan.end = new Date($('#end').val())
   closeModal()
   refresh()
 }

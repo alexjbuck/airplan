@@ -1,5 +1,6 @@
 var tabular = new Object;
 
+
 // Process add or edit submits
 tabular.processSubmit = function() {
     closeModal()
@@ -21,15 +22,11 @@ highlightInvalidInput = ($object) => {
     });
 }
 
-
-
-
 //
 //  Cycles Table
 // 
 tabular.cycles = new Object;
 tabular.cycles.draw = () => {
-    var cycles = airplan.data.events.cycles;//or wherever the data is stored, may need to change how we loop over it
     var html = "<h3>Cycle List</h3>";
     html += "<button class='btn btn-primary btn-block mb-2' onclick=tabular.cycles.add()>Add Cycle</button>";
     html += "<table class='table table-striped table-hover table-sm text-center'>";
@@ -39,7 +36,7 @@ tabular.cycles.draw = () => {
     html += "<th class='col-3'>End</th>";
     html += "<th class='col-3'></th></thead>";
     html += "<tbody>";
-    Object.entries(cycles).sort((a,b)=>a[1].start-b[1].start).forEach(([id,cycle],i) => {
+    Object.entries(airplan.cycles).sort((a,b)=>a[1].start-b[1].start).forEach(([id,cycle],i) => {
         cycle.number = parseInt(i+1);
         html += "<tr>";
         html += "<td class='align-middle'>" + cycle.number + "</td>";
@@ -78,7 +75,7 @@ tabular.cycles.addEditForm = () => {
 
 tabular.cycles.readForm = () => {
     // let number    = $( "#number" ).val();
-    let number = Object.keys(airplan.data.events.cycles).length + 1;
+    let number = Object.keys(airplan.cycles).length + 1;
     let start     = new Date(Date.parse($('#start').val()));
     let end       = new Date(Date.parse($( '#end' ).val()));
     return {number: number, start: start, end: end}
@@ -91,9 +88,9 @@ tabular.cycles.add = () => {
     html += tabular.cycles.addEditForm();
     html += "<button type='submit' class='btn btn-primary' onclick=tabular.cycles.addSubmit()>Submit</button>";
     openModal(html);
-    $("#number").val(Object.keys(airplan.data.events.cycles).length+1);
-    let d = new Date(new Date(airplan.data.date.valueOf()).setHours(9,0,0,0));
-    let startTime = Object.values(airplan.data.events.cycles).reduce((p,c)=>p.end > c.end ? p : c,{end:d}).end;
+    $("#number").val(Object.keys(airplan.cycles).length+1);
+    let d = new Date(new Date(airplan.date.valueOf()).setHours(9,0,0,0));
+    let startTime = Object.values(airplan.cycles).reduce((p,c)=>p.end > c.end ? p : c,{end:d}).end;
     let endTime = new Date(startTime.valueOf())
     let end = startTime.getHours() + 1
     $("#start").val( startTime.toLocalTimeString() )
@@ -111,9 +108,9 @@ tabular.cycles.edit = (id) => {
     html += tabular.cycles.addEditForm();
     html += "<button type='submit' class='btn btn-primary' onclick=tabular.cycles.editSubmit('"+id+"')>Submit</button>";
     openModal(html);
-    $("#number").val(airplan.data.events.cycles[id].number);
-    $("#start").val(airplan.data.events.cycles[id].start.toLocalTimeString());
-    $("#end").val(airplan.data.events.cycles[id].end.toLocalTimeString());
+    $("#number").val(airplan.cycles[id].number);
+    $("#start").val(airplan.cycles[id].start.toLocalTimeString());
+    $("#end").val(airplan.cycles[id].end.toLocalTimeString());
 }
 
 tabular.cycles.editSubmit = (id) => {
@@ -122,7 +119,7 @@ tabular.cycles.editSubmit = (id) => {
     if (tabular.cycles.validate(cycle)) {
         // Update the cycle in the data object.
         console.log("Updated Cycle: ",cycle.number, cycle.start, cycle.end);
-        airplan.data.events.cycles[id] = cycle;
+        airplan.cycles[id] = cycle;
         tabular.processSubmit()
     }
 }
@@ -149,7 +146,7 @@ tabular.cycles.validate = ({number,start,end}) => {
         valid.end = false;
     }
     // Check if the cycle number is unique.
-    // if (airplan.data.events.cycles.filter(c => c.number == number).length > 0) {
+    // if (airplan.cycles.filter(c => c.number == number).length > 0) {
     //     alert("Cycle number must be unique.");
     //     valid.number = false;
     // }
@@ -182,7 +179,6 @@ tabular.cycles.validate = ({number,start,end}) => {
 // 
 tabular.sorties = new Object;
 tabular.sorties.draw = () => {
-    var events = airplan.data.events;//or wherever the data is stored, may need to change how we loop over it
     var html = "<h3>Sortie List</h3>";
     html += "<button class='btn btn-primary btn-block mb-2' onclick=tabular.sorties.add()>Add Sortie</button>";
     html += "<table class='table table-striped table-hover table-sm text-center'>";
@@ -194,9 +190,9 @@ tabular.sorties.draw = () => {
     html += "<th class='col-3'></th>";
     html += "</tr></thead>";
     html += "<tbody>";
-    events.squadrons.forEach((sqdrn, i) => {
+    Object.values(airplan.squadrons).forEach((sqdrn, i) => {
         console.log("Sorties for: "+sqdrn.name);
-        Object.entries(events.sorties).filter(([id,sortie])=>sortie.squadron == sqdrn.name).sort(([id1,a],[id2,b])=>a.start-b.start).forEach(([id,sortie]) => {
+        Object.entries(airplan.sorties).filter(([id,sortie])=>sortie.squadron == sqdrn.name).sort(([id1,a],[id2,b])=>a.start-b.start).forEach(([id,sortie]) => {
             console.log("  Sortie: "+id+" "+sortie);
             html += "<tr>";
             html += "<td class='align-middle'>"+sortie.squadron+"</td>";
@@ -219,7 +215,7 @@ tabular.sorties.addEditForm = () => {
     let html = "<div class='form-group row align-items-center'>";
     html += "<label for='squadron' class='col-12 col-md-3 text-left text-md-right'>Squadron</label>";
     html += "<select class='col form-control mr-5' id='squadron'>";
-    airplan.data.events.squadrons.forEach((sqdrn, i) => {
+    Object.values(airplan.squadrons).forEach((sqdrn, i) => {
         html += "<option value='"+sqdrn.name+"'>"+sqdrn.name+"</option>";
     })
     html += "</select>";
@@ -254,10 +250,10 @@ tabular.sorties.addEditForm = () => {
         html += "<option value='hpcs'>Hot Pump & Crew Swap</option>";
     html += "</select>";
     html += "</div>";
-    // Annotation
+    // note
     html += "<div class='form-group row align-items-center'>";
-    html += "<label for='annotation' class='col-12 col-md-3 text-left text-md-right'>Annotation</label>";
-    html += "<input type='text' class='col form-control mr-5' id='annotation' placeholder='Mission'>";
+    html += "<label for='note' class='col-12 col-md-3 text-left text-md-right'>note</label>";
+    html += "<input type='text' class='col form-control mr-5' id='note' placeholder='Mission'>";
     html += "</div>";
     return html;
 }
@@ -268,22 +264,22 @@ tabular.sorties.add = () => {
     html += tabular.sorties.addEditForm();
     html += "<button type='submit' class='btn btn-primary' onclick=tabular.sorties.addSubmit()>Submit</button>";
     openModal(html);
-    let d = new Date(airplan.data.date);
+    let d = new Date(airplan.date);
     d.setHours(0,0,0,0);
     $("#start").val(d.toLocalTimeString());
     $("#end").val(d.toLocalTimeString());
-    $("#annotation").val("_");
+    $("#note").val("_");
 }
 
 tabular.sorties.readForm = function() {
-    let sortie = new Object;
+    let sortie = new Sortie();
     sortie.squadron =                  $("#squadron").val();
     sortie.start = new Date(Date.parse($( "#start" ).val()));
     sortie.startCondition =            $( "#startCondition" ).val();
     sortie.end   = new Date(Date.parse($( "#end" ).val()));
     sortie.endCondition =              $( "#endCondition" ).val();
-    sortie.annotation =                $( "#annotation" ).val();
-    return sortie
+    sortie.note =                $( "#note" ).val();
+    return new Sortie
 }
 
 // Callback on the "Submit" button in the "Add Sortie" modal.
@@ -291,8 +287,8 @@ tabular.sorties.addSubmit = () => {
     tabular.sorties.editSubmit(uuidv4())
     // let sortie = tabular.sorties.readForm()
     // if (tabular.sorties.validate(sortie)) {
-    //     airplan.data.events.sorties[uuidv4()] = sortie;
-    //     console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.annotation);
+    //     airplan.sorties[uuidv4()] = sortie;
+    //     console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.note);
     //     tabular.processSubmit()    
     // }
 }
@@ -303,12 +299,12 @@ tabular.sorties.edit = (id) => {
     html += tabular.sorties.addEditForm();
     html += "<button type='submit' class='btn btn-primary' onclick=tabular.sorties.editSubmit('"+id+"')>Submit</button>";
     openModal(html);
-    $("#squadron").val(airplan.data.events.sorties[id].squadron);
-    $("#start").val(airplan.data.events.sorties[id].start.toLocalTimeString());
-    $("#startCondition").val(airplan.data.events.sorties[id].startCondition);
-    $("#end").val(airplan.data.events.sorties[id].end.toLocalTimeString());
-    $("#endCondition").val(airplan.data.events.sorties[id].endCondition);
-    $("#annotation").val(airplan.data.events.sorties[id].annotation);
+    $("#squadron").val(airplan.sorties[id].squadron);
+    $("#start").val(airplan.sorties[id].start.toLocalTimeString());
+    $("#startCondition").val(airplan.sorties[id].startCondition);
+    $("#end").val(airplan.sorties[id].end.toLocalTimeString());
+    $("#endCondition").val(airplan.sorties[id].endCondition);
+    $("#note").val(airplan.sorties[id].note);
 }
 
 tabular.sorties.editSubmit = (id) => {
@@ -316,22 +312,22 @@ tabular.sorties.editSubmit = (id) => {
     let sortie = tabular.sorties.readForm()
     sortie.id = id;
     if (tabular.sorties.validate(sortie)) {
-        airplan.data.events.sorties[id] = sortie;
-        sortie.event=0+airplan.data.events.squadrons.find(sq=>sq.name==sortie.squadron).letter+1;
+        airplan.sorties[id] = sortie;
+        sortie.event=0+airplan.squadrons.find(sq=>sq.name==sortie.squadron).letter+1;
         assignEvents();
-        console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.annotation);
+        console.log(sortie.start, sortie.startCondition, sortie.end, sortie.endCondition, sortie.note);
         tabular.processSubmit()
     }
 }
 
-tabular.sorties.validate = ({squadron,start,startCondition,end,endCondition,annotation}) => {
-    let valid = {squadron: true,start: true,startCondition: true,end: true,endCondition: true,annotation: true};
+tabular.sorties.validate = ({squadron,start,startCondition,end,endCondition,note}) => {
+    let valid = {squadron: true,start: true,startCondition: true,end: true,endCondition: true,note: true};
     $squadron =         $( "#squadron" );
     $start =            $( "#start" );
     $startCondition =   $( "#startCondition" );
     $end   =            $( "#end" );
     $endCondition =     $( "#endCondition" );
-    $annotation =       $( "#annotation" );
+    $note =       $( "#note" );
     if (squadron == "") {
         highlightInvalidInput($squadron);
         valid.squadron = false;
@@ -350,20 +346,20 @@ tabular.sorties.validate = ({squadron,start,startCondition,end,endCondition,anno
         valid.start = false;
         valid.end = false;
     }
-    if (annotation == "") {
-        highlightInvalidInput($annotation);
-        valid.annotation = false;
+    if (note == "") {
+        highlightInvalidInput($note);
+        valid.note = false;
     }
     // if all valid, return true
     return Object.values(valid).reduce((a,b) => a && b, true);
 }
 
 tabular.cycles.delete = function(id) {
-    let del = async () => delete airplan.data.events.cycles[id];
+    let del = async () => delete airplan.cycles[id];
     del().then(refresh())
 }
 
 tabular.sorties.delete = function(id) {
-    let del = async () => delete airplan.data.events.sorties[id];
+    let del = async () => delete airplan.sorties[id];
     del().then(refresh())
 }

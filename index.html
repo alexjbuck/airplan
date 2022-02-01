@@ -2,89 +2,54 @@
 <html>
 <head>
     <title>Airplan</title>
+
+    <!-- CSS Libraries -->
+    <link rel="stylesheet" href="src/css/font-awesome-all.min.css">
+    <link rel="stylesheet" href="src/css/bootstrap.min.css">
+    <link rel="stylesheet" href="src/css/modal.css">
+    <!-- JS Libraries -->
+    <script src="src/libraries/jquery.js"></script>
+    <script src="src/libraries/bootstrap.bundle.min.js"></script>
+    <script src="src/libraries/fileSaver.min.js"></script>
+    <script src="src/libraries/konva.min.js"></script>
+    <script src="src/libraries/jspdf.umd.min.js"></script>
 </head>
-<!-- Need to bring all these into libraries eventually -->
-
-<!--libraries-->
-<link rel="stylesheet" href="utils/libraries/bootstrap.min.css">
-<link rel="stylesheet" href="utils/libraries/modal.css">
-<script src="utils/libraries/bootstrap.bundle.min.js"></script>
-<script src="utils/libraries/jquery.js"></script>
-<script src="utils/libraries/fileSaver.min.js"></script>
-<script src="utils/libraries/konva.min.js"></script>
-<script src="utils/libraries/jspdf.umd.min.js"></script>
-
-<!--custom js-->
-<script src="utils/custom/blankAirplan.js"></script>
-<script src="utils/custom/tabular.js"></script>
-<script src="utils/custom/graphical.js"></script>
-<script src="utils/custom/menu.js"></script>
-<script src="utils/custom/utils.js"></script>
-
 <body>
-    <!-- <div class="row h-100"> -->
-        <div class='row h-100 w-100 mx-0'>
-            <div id="graphical" class="col-xl-8 col-md-8 col-12">
-                <div id="graphical-stage" width="100%" height="100%"></div>
-                <div id="menu" class='px-2'>
-                </div>
-                <!-- submit feedback button, mailto alexjbuck+airplan@gmail.com -->
-                <button id="submit-feedback" class="btn btn-success mx-2 my-2" onclick="location.href='mailto:alexander.j.buck@navy.mil?subject=Airplan feedback&body=Three things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:'">Provide Feedback</button>
-            </div>
-            <!-- border border-primary border-start -->
-            <div id="tabular" class=" col-md-4 col-12">
-                <div id="tabular-cycles">
-                    cycles tabular area
-                </div>
-                <div id="tabular-sorties">
-                    sorties tabular area
-                </div>
-            </div>
+    <!-- Main View (Graphical + Tabular) -->
+    <div id='view' class='row h-100 w-100 m-0'>
+        <div id="graphic" class="col-md-8 col-12 pl-0">
+            <div id="graphic-stage" width="100%" height="100%"></div>
+            <div id="menu" class='px-2'></div>
+            <!-- submit feedback button, mailto alexander.j.buck@navy.mil -->
+        </div>
+        <div id="list" class="col-md-4 col-12 pr-0">
+            <div id="list-cycles"></div>
+            <div id="list-sorties"></div>
         </div>
     </div>
     
     <!-- The Modal -->
     <div id="myModal" class="modal">
-        
         <!-- Modal content -->
         <div class="modal-content">
             <span id="closeSpan" class="close">&times;</span>
             <div id="modalContent" >Some text in the Modal..</div>
         </div>
-        
     </div>
+
+    <!-- App Source -->
+    <script src="src/app/modal.js"></script>
+    <script src="src/app/blankAirplan.js"></script>
+    <script src="src/app/Archetypes.js"></script>
+    <script src="src/app/Airplan.js"></script>
+    <script src="src/app/Cycle.js"></script>
+    <script src="src/app/Line.js"></script>
+    <script src="src/app/Sortie.js"></script>
+    <script src="src/app/Squadron.js"></script>
+    <!-- <script src="src/app/tabular.js"></script>
+    <script src="src/app/graphical.js"></script>
+    <script src="src/app/menu.js"></script> -->
+    <script src="src/app/utils.js"></script>
+    <script src="src/app/main.js"></script>
 </body>
-<script>
-    airplan = new BlankAirplan();
-    refresh = function() {
-        tabular.draw();
-        g.draw();
-        menu.draw()
-    }
-    refresh()
-    
-    // When the user clicks on the button, open the modal
-    var openModal = function(content) {
-        $("#modalContent").html(content)
-        document.getElementById("myModal").style.display = "block";
-    }
-    
-    var closeModal = function() {
-        document.getElementById("myModal").style.display = "none";
-    }
-    
-    // When the user clicks on <span> (x), close the modal
-    document.getElementById("closeSpan").onclick = function() {
-        document.getElementById("myModal").style.display = "none";
-    }
-        
-    // When the user clicks anywhere outside of the modal, close it
-    window.onmousedown = function(event) {
-        if (event.target == document.getElementById("myModal")) {
-            document.getElementById("myModal").style.display = "none";
-        }
-    }
-    </script>
-    
-    
-    </html>
+</html>

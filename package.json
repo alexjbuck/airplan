@@ -18,7 +18,8 @@
       "jspdf": "^2.5.0",
       "file-saver": "^2.0.4",
       "bootstrap": "^4.0.0",
-      "konva": "^8.3.2"
+      "konva": "^8.3.2",
+      "fontawesome": "^5.15.4"
     }
 
 }  
