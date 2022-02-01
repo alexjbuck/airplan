@@ -112,7 +112,7 @@ class View {
         <button id='help' class='btn btn-warning' onclick='this.help()'>Help</button>
         </div> -->
         <div class='btn-group btn-group-sm mr-3'>
-        <button id='reset-stage'   class='btn btn-outline-danger' onclick='this.reset()'>New Airplan</button>
+        <button id='reset-stage'   class='btn btn-outline-danger' data-toggle='tooltip' data-placement='top' title='Reset Airplan' onclick='this.reset()'><i class='fas fa-dumpster-fire'></i></button>
         <button id='refresh-stage' class='btn btn-outline-primary' data-toggle='tooltip' data-placement='top' title='Refresh' onclick='refresh()'><i class='fas fa-sync'></i></button>
         <label  id='load' type='file'  class='btn btn-outline-primary my-0' data-toggle='tooltip' data-placement='top' title='Load'><i class="fas fa-folder-open" aria-hidden="true"></i><input type='file' id='filepath' hidden onchange='this.load(event)'></label>
         <button id='save'  class='btn btn-outline-primary' data-toggle='tooltip' data-placement='top' title='Save' onclick='this.save()'><i class='fas fa-save'></i></button>
