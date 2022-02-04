@@ -2,21 +2,24 @@ class Model {
     constructor() {
         this.init()
     }
-        
+    
+    /**
+     * @method init Initializes the model with default values.
+     */
     init() {
         this._date           = new Date( new Date().setHours(0) )
         this._start          = new Date( new Date().setHours(8,0) )
         this._end            = new Date( new Date().setHours(18,0) )
         this.title           = "Check it out Title";
-        this._sunrise        = new Date( new Date().setHours(6,30) )
-        this._sunset         = new Date( new Date().setHours(19,0) )
-        this._moonrise       = new Date( new Date().setHours(20) )
-        this._moonset        = new Date( new Date().setHours(2) )
+        this._sunrise        = new Date( new Date().setHours(6,46) )
+        this._sunset         = new Date( new Date().setHours(19,29) )
+        this._moonrise       = new Date( new Date().setHours(10,8) )
+        this._moonset        = new Date( new Date().setHours(4,20) )
         this.moonphase       = "__%";
         this._flightquarters = new Date( new Date() )
         this._heloquarters   = new Date( new Date() )
-        this.variation      = "__";
-        this.timezone       = "__";
+        this.variation      = "__E/W";
+        this.timezone       = "__(+/-)";
         this.lines          = {};
         this.sorties        = {}
         this.squadrons      = {};
@@ -92,6 +95,12 @@ class Model {
         this.heloquarters   = data._heloquarters
         this.variation       = data.variation
         this.timezone        = data.timezone
+        /**
+         * The parent value needs to be reassigned to each object because it is stripped
+         * from the JSON. It is stripped because it causes a circular reference.
+         * Object.assign preserves all the properties of the json object, without calling the 
+         * constructor. That means ID values are preserved.
+         */
         Object.values(data.lines).forEach(l=>{
             this.lines[l.ID] = Object.assign(new Line, l)
             this.lines[l.ID].parent = this;

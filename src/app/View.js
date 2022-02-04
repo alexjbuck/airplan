@@ -19,32 +19,27 @@ class View {
 
     bindMenuAddPlaceholderSquadron(handler){
         this.menu.squadron.add.on('click', event=>{
-            event.preventDefault()
             handler()
         })
     }
     bindMenuRemoveSquadron(handler){
         this.menu.squadron.rem.on('click', event=>{
-            event.preventDefault()
             handler()
         })
     }
     bindMenuReset(handler){
         this.menu.file.reset.on('click', event=>{
-            event.preventDefault()
             handler()
         })
     }
     bindMenuRefresh(handler){
         this.menu.file.refresh.on('click', event=>{
-            event.preventDefault()
             handler()
         })
     }
     bindMenuLoad(handler){
         this.menu.file.load.on('change', event=>{
             if(event.target.files[0]!=''){
-                event.preventDefault()
                 handler(event.target.files[0])
             }
         })
@@ -54,12 +49,13 @@ class View {
     }
     bindMenuSave(handler){
         this.menu.file.save.on('click', event=>{
-            event.preventDefault()
             handler()
         })
     }
     bindMenuExport(handler){
-
+        this.menu.file.export.on('click', event=>{
+            handler()
+        })
     }
     bindMenuHelp(handler){
 
@@ -95,18 +91,19 @@ class View {
     drawMenu = () => {
         this.menu = {squadron:{},file:{},info:{}}
         var html =`
-        <div class='btn-group btn-group-sm menu-group'>
+        <h3>Menu</h3>
+        <div class='btn-group menu-group'>
             <button id='add-squadron' class='btn btn-outline-primary add-squadron' data-toggle='tooltip' data-placement='top' title='Add Squadron'>   <i class='fas fa-plus'> </i></button>
             <button id='rem-squadron' class='btn btn-outline-danger rem-squadron'  data-toggle='tooltip' data-placement='top' title='Remove Squadron'><i class='fas fa-minus'></i></button>
         </div>
-        <div class='btn-group btn-group-sm menu-group'>
-            <button id='reset'     class='btn btn-outline-danger'       data-toggle='tooltip' data-placement='top' title='Burn it Down!'><i class='fas fa-dumpster-fire'> </i></button>
-            <button id='refresh'   class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Refresh'>      <i class='fas fa-sync'>          </i></button>
-            <label  id='load'      class='btn btn-outline-primary my-0' data-toggle='tooltip' data-placement='top' title='Load'>         <i class='fas fa-folder-open'>   </i><input type='file' id='filepath' hidden></label>
-            <button id='save'      class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Save'>         <i class='fas fa-save'>          </i></button>
-            <button id='print'     class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Export PDF'>   <i class='fas fa-file-pdf'>      </i></button>
+        <div class='btn-group menu-group'>
+            <button id='reset'   class='btn btn-outline-danger'       data-toggle='tooltip' data-placement='top' title='Burn it Down!'><i class='fas fa-dumpster-fire'> </i></button>
+            <button id='refresh' class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Refresh'>      <i class='fas fa-sync'>          </i></button>
+            <label  id='load'    class='btn btn-outline-primary my-0' data-toggle='tooltip' data-placement='top' title='Load'>         <i class='fas fa-folder-open'>   </i><input type='file' id='filepath' hidden></label>
+            <button id='save'    class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Save'>         <i class='fas fa-save'>          </i></button>
+            <button id='export'  class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Export PDF'>   <i class='fas fa-file-pdf'>      </i></button>
         </div>
-        <div class='btn-group btn-group-sm menu-group'>
+        <div class='btn-group menu-group'>
             <button id="help"            class='btn btn-outline-warning'      data-toggle='tooltip' data-placement='top' title='Help'>         <i class='fas fa-question-circle'></i></button>
             <button id="feedback" class='btn btn-outline-success' data-toggle='tooltip' data-placement='top' title='Thank you!'        onclick='location.href="mailto:alexander.j.buck@navy.mil?subject=Airplan feedback&body=Three things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:%0d%0a%0d%0aThank You!"'>Feedback</button>
         </div>
@@ -118,7 +115,7 @@ class View {
         this.menu.file.refresh = $('#refresh')
         this.menu.file.load = $('#load')
         this.menu.file.save = $('#save')
-        this.menu.file.print = $('#print')
+        this.menu.file.export = $('#export')
         this.menu.info.help = $('#help')
         this.menu.info.feedback = $('#feedback')
     }

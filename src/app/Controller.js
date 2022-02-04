@@ -35,6 +35,7 @@ class Controller {
         this.view.bindMenuRefresh(this.handleRefresh)
         this.view.bindMenuLoad(this.handleLoadFile)
         this.view.bindMenuSave(this.handleSaveFile)
+        this.view.bindMenuExport(this.handleExportFile)
         this.onAirplanChanged();
     }
     
@@ -67,6 +68,16 @@ class Controller {
     handleSaveFile = () => {
         let file = new Blob([JSON.stringify(this.airplan,getCircularReplacer())], {type: "application/json"})
         saveAs(file,this.airplan.date.toYYYYMMDD()+".json")
+    }
+
+    handleExportFile = () => {
+        let w = 11
+        let h = 8.5
+        let m = .01
+        var pdf = new jspdf.jsPDF('l', 'in', [8.5, 11]);
+        let imgData = this.view.stage.toDataURL({mimeType: 'image/png', quality: 1, pixelRatio: 3});
+        pdf.addImage(imgData, 'JPEG', m*w/2, m*h/2, w*(1-m), h*(1-m), undefined, 'FAST');
+        pdf.save('airplan_'+this.airplan.date.toYYYYMMDD()+'.pdf');    
     }
 
     handleRemoveSquadron = () => {
