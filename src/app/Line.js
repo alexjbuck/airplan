@@ -3,6 +3,12 @@ class Line extends Event {
         super(new Date(),new Date());
         this.squadronID = squadronID;
     }
+    static convert({squadronID, ID}) {
+        let line = new Line(squadronID);
+        line.ID = ID
+        return line
+    }
+
     /** @returns {Squadron} The squadron the line is assigned to. */
     get squadron() {
         if (this.parent) {

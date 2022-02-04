@@ -26,7 +26,7 @@ class Event {
     }
 
     get night() {
-        return this.end > airplan.slap.sunset || this.start < airplan.slap.sunrise;
+        return false
     }
     
 }

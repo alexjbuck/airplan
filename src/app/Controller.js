@@ -31,6 +31,10 @@ class Controller {
         this.airplan.bindOnChange(this.onAirplanChanged)
         this.view.bindMenuAddPlaceholderSquadron(this.handleAddPlaceholderSquadron)
         this.view.bindMenuRemoveSquadron(this.handleRemoveSquadron)
+        this.view.bindMenuReset(this.handleReset)
+        this.view.bindMenuRefresh(this.handleRefresh)
+        this.view.bindMenuLoad(this.handleLoadFile)
+        this.view.bindMenuSave(this.handleSaveFile)
         this.onAirplanChanged();
     }
     
@@ -41,6 +45,28 @@ class Controller {
 
     handleAddPlaceholderSquadron = () => {
         this.airplan.addSquadron('Squadron ' + (Object.keys(this.airplan.squadrons).length+1),'CS','TMS','MODEX')
+    }
+
+    handleReset = () => {
+        this.airplan.init()
+    }
+
+    handleRefresh = () => {
+        this.onAirplanChanged();
+    }
+
+    handleLoadFile = (file) => {
+        let reader = new FileReader();
+        reader.onload = (e) => {
+            let data = JSON.parse(e.target.result)
+            this.airplan.load(data)
+        }
+        reader.readAsText(file)
+    }
+
+    handleSaveFile = () => {
+        let file = new Blob([JSON.stringify(this.airplan,getCircularReplacer())], {type: "application/json"})
+        saveAs(file,this.airplan.date.toYYYYMMDD()+".json")
     }
 
     handleRemoveSquadron = () => {
@@ -62,7 +88,6 @@ class Controller {
     handleAddCycle = (start, end) => {
         this.airplan.addCycle(start, end)
     }
-
     
     openCycleForm = (airplan) => {
         let html = `
@@ -131,4 +156,3 @@ class Controller {
     }
     
 }
-

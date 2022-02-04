@@ -1,5 +1,9 @@
 class Model {
     constructor() {
+        this.init()
+    }
+        
+    init() {
         this._date           = new Date( new Date().setHours(0) )
         this._start          = new Date( new Date().setHours(8,0) )
         this._end            = new Date( new Date().setHours(18,0) )
@@ -18,6 +22,7 @@ class Model {
         this.squadrons      = {};
         this.cycles         = {};
         this.counts         = {};
+        this.onChange()
     }
     
     set date(date) {
@@ -59,7 +64,7 @@ class Model {
     /**
      * @callback onChange Stub for the local callback function for when the model changes.
      */
-    onChange = () => {}
+    onChange() {}
 
     /**
      * @method bindOnChange The hook exposed to the controller for when the model changes.
@@ -70,6 +75,40 @@ class Model {
             this.updateCounts()
             handler()
         }
+    }
+
+    load(data) {
+        this.init()
+        this.date           = data._date
+        this.start          = data._start
+        this.end            = data._end
+        this.title           = data.title
+        this.sunrise        = data._sunrise
+        this.sunset         = data._sunset
+        this.moonrise       = data._moonrise
+        this.moonset        = data._moonset
+        this.moonphase       = data.moonphase
+        this.flightquarters = data._flightquarters
+        this.heloquarters   = data._heloquarters
+        this.variation       = data.variation
+        this.timezone        = data.timezone
+        Object.values(data.lines).forEach(l=>{
+            this.lines[l.ID] = Object.assign(new Line, l)
+            this.lines[l.ID].parent = this;
+        })
+        Object.values(data.squadrons).forEach(s=>{
+            this.squadrons[s.ID] = Object.assign(new Squadron, s)
+            this.squadrons[s.ID].parent = this;
+        })
+        Object.values(data.cycles).forEach(c=>{
+            this.cycles[c.ID] = Object.assign(new Cycle, c)
+            this.cycles[c.ID].parent = this;
+        })
+        Object.values(data.sorties).forEach(s=>{
+            this.sorties[s.ID] = Object.assign(new Sortie, s)
+            this.sorties[s.ID].parent = this;
+        })
+        this.onChange()    
     }
     
     async removeSquadron(squadron) {

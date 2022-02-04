@@ -16,6 +16,11 @@ class Sortie extends Event {
         this.endCycleID = endCycleID;
     }
     static defaultDuration = 1;
+    static convert({lineID, start, end, startType, endType, note, startCycleID=null, endCycleID=null, ID}) {
+        let sortie = new Sortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID);
+        sortie.ID = ID
+        return sortie;
+    }
     
     /** @param {String} lineID */
     set line(line) {

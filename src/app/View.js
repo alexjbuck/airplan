@@ -30,16 +30,33 @@ class View {
         })
     }
     bindMenuReset(handler){
-
+        this.menu.file.reset.on('click', event=>{
+            event.preventDefault()
+            handler()
+        })
     }
     bindMenuRefresh(handler){
-
+        this.menu.file.refresh.on('click', event=>{
+            event.preventDefault()
+            handler()
+        })
     }
     bindMenuLoad(handler){
-
+        this.menu.file.load.on('change', event=>{
+            if(event.target.files[0]!=''){
+                event.preventDefault()
+                handler(event.target.files[0])
+            }
+        })
+        this.menu.file.load.on('click', event=>{
+            event.target.value=''
+        })
     }
     bindMenuSave(handler){
-
+        this.menu.file.save.on('click', event=>{
+            event.preventDefault()
+            handler()
+        })
     }
     bindMenuExport(handler){
 
@@ -85,7 +102,7 @@ class View {
         <div class='btn-group btn-group-sm menu-group'>
             <button id='reset'     class='btn btn-outline-danger'       data-toggle='tooltip' data-placement='top' title='Burn it Down!'><i class='fas fa-dumpster-fire'> </i></button>
             <button id='refresh'   class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Refresh'>      <i class='fas fa-sync'>          </i></button>
-            <label  id='load'      class='btn btn-outline-primary my-0' data-toggle='tooltip' data-placement='top' title='Load'>         <i class='fas fa-folder-open'>   </i><input type='file' id='filepath' hidden onchange='this.load(event)'></label>
+            <label  id='load'      class='btn btn-outline-primary my-0' data-toggle='tooltip' data-placement='top' title='Load'>         <i class='fas fa-folder-open'>   </i><input type='file' id='filepath' hidden></label>
             <button id='save'      class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Save'>         <i class='fas fa-save'>          </i></button>
             <button id='print'     class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Export PDF'>   <i class='fas fa-file-pdf'>      </i></button>
         </div>

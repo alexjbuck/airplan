@@ -7,6 +7,11 @@ class Cycle extends Event {
     constructor(start, end) { 
         super(start,end);
     }
+    static convert({start, end, ID}) {
+        let cycle = new Cycle(start,end);
+        cycle.ID = ID;
+        return cycle
+    }
 
     get number() {
         if (this.parent) {
