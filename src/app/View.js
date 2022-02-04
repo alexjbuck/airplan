@@ -22,11 +22,11 @@ class View {
         <div class='container'>
             <div class='row'>
                 <div class=''>
-                    <h3> Welcome to Bad Max! \u2708</h3>
+                    <h3> Bad Max airplan writer: \u2708</h3>
                     <h5>For when you don't have ADMACS <sup><small>(maybe even when you do! &#129315;)</small></sup></h5>
                 </div>
                 <div class='ml-auto'>
-                    <small>Version: 0.1.0</small>
+                    <small>Version: 0.2.0</small>
                 </div>
             </div>
         </div>
