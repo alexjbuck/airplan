@@ -41,6 +41,9 @@
             margin: 1em;
             font-size: 0.8em;
         }
+        .credit div {
+            margin-inline: 1em;
+        }
         @font-face {
             font-family: jarvis;
             src: url(src/webfonts/AvengeroDisassembledRegular-nRvd4.ttf);
@@ -70,9 +73,9 @@
             <div id="menu" class='menu'></div>
             <div id="cycles-list" class='cycles-col'></div>
             <div id="sorties-list" class='sorties-col'></div>
-            <div class='credit'>
-                <i>Credit: Alexander "Jarvis" Buck <a href=mailto:alexander.j.buck@navy.mil>alexander.j.buck</a>, Jan 2022.</i>
-                <i>Source code hosted on GitHub <a href=https://github.com/alexjbuck/airplan>here</a>
+            <div class='credit d-flex flex-wrap'>
+                <div><i>Credit: Alexander "Jarvis" Buck <a href=mailto:alexander.j.buck@navy.mil>alexander.j.buck</a>, Jan 2022.</i></div>
+                <div class='mr-auto'><i>Source code hosted on GitHub <a href=https://github.com/alexjbuck/airplan>here</a></i></div>
             </div>
         </div>
     </div>
