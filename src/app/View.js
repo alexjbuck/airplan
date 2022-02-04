@@ -22,7 +22,8 @@ class View {
         <div class='container'>
             <div class='row'>
                 <div class=''>
-                    <h3> Welcome to Airplan!</h3>
+                    <h3> Welcome to Bad Max! \u2708</h3>
+                    <h5>For when you don't have ADMACS <sup><small>(maybe even when you do! &#129315;)</small></sup></h5>
                 </div>
                 <div class='ml-auto'>
                     <small>Version: 0.1.0</small>
@@ -30,26 +31,28 @@ class View {
             </div>
         </div>
         <p>
-            This is a simple web app that allows you to view and edit your squadron's flight plans.
+            Writing airplan's in PowerPoint is a big bummer &#129324;.
+            Never again will you chained to dragging around little lines on the screen \u26D3.
+            This is a simple web app that allows you to view and edit your squadron's flight plans &#128203;.
             You can add new flights, edit existing flights, and delete flights.
-            You can also export your squadron's flight plans to PDF.
+            You can also export your squadron's flight plans to PDF <i class="far fa-file-pdf"></i>.
         </p>
         <i class="fas fa-exclamation-triangle"></i> Tips:
         <ul>
-            <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> in the top right corner to add a new squadron.</li>
+            <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> in the menu to add a new squadron.</li>
             <li>You can add cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
             <li>Next add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button.</li>
             <li>Sorties are added into a line by clicking "<i class='fas fa-plus'></i> Add Sortie" within a line in the list.</li>
             <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This will download a file that you can upload later to resume your progress.</li>
             <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
-            <li>View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the top right corner.</li>
+            <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
         </ul>
         <p>
             Play around, you can't break anything, and hopefully you find this app useful!
         </p>
         <p>
             Please provide feedback to <span class='jarvis'>JARVIS</span> at <a href=mailto:alexander.j.buck@gmail.com>alexander.j.buck@navy.mil</a> by
-            clicking the <span style="color:green">green</span> "Feedback" button in the top right corner.
+            clicking the <span style="color:green">green</span> "Feedback" button in the menu.
         </p>
         `
         openModal(html)
@@ -101,7 +104,8 @@ class View {
         })
     }
     bindMenuAddCycle(handler){
-
+        
+        
     }
     bindMenuRemoveCycle(handler){
 
@@ -181,11 +185,7 @@ class View {
             html += `<div class='col-xl col-md'>${cycle.start.toHHMM()} - ${cycle.end.toHHMM()}</div>`
             html += `</div>`
         })
-        // if (Object.values(airplan.cycles).length == 0) {
-        //     html += `<li class='list-group-item list-group-item-action'>No cycles</li>`
-        // } else {
-            html += `<li class='list-group-item list-group-item-action' onclick='this.addCycle()'><i class='fas fa-plus'></i> Add Cycle...</li>`
-        // }
+            html += `<li class='list-group-item list-group-item-action add-cycle'><i class='fas fa-plus'></i> Add Cycle...</li>`
         $('#cycles-list').html(html)
     }
     
