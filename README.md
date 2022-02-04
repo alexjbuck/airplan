@@ -21,4 +21,4 @@ Tips:
 
 Play around, you can't break anything, and hopefully you find this app useful!
 
-Please provide feedback to JARVIS at [mailto:alexander.j.buck@navy.mil](alexander.j.buck@navy.mil) by clicking the green "Feedback" button in the menu.
+Please provide feedback to JARVIS at [alexander.j.buck@navy.mil](mailto:alexander.j.buck@navy.mil) by clicking the green "Feedback" button in the menu.
