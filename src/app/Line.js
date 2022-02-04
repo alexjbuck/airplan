@@ -9,4 +9,19 @@ class Line extends Event {
             return this.parent.squadrons[this.squadronID];
         }
     }
+    get sorties() {
+        if (this.parent) {
+            return Object.values(this.parent.sorties).filter(s=>s.lineID == this.ID).sort((a,b)=>a.start-b.start);
+        }
+    }
+    get start() {
+        if (this.sorties.length > 0) {
+            return this.sorties[0].start;
+        }
+    }
+    get end() {
+        if (this.sorties.length > 0) {
+            return this.sorties[this.sorties.length-1].end;
+        }
+    }
 }

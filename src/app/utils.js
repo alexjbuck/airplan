@@ -25,9 +25,7 @@ config = {
 }
 
 refresh = function() {
-    tabular.draw();
-    g.draw();
-    menu.draw()
+
 }
 
 Date.prototype.toLocalTimeString = function() {
@@ -133,41 +131,44 @@ Konva.Node.prototype.fitToChildren = function({padX=0,padY=0}={}) {
     return this.fitWidthToChildren({padX,padY}).fitHeightToChildren({padX,padY})
 }
 
+
+// ^
 Konva.Node.prototype.anchorTopMiddle = function({padX=0,padY=0}={}) {
     return this.offsetX(this.width()/2).offsetY(-padY)
 }
-
+// <
 Konva.Node.prototype.anchorMiddleLeft = function({padX=0,padY=0}={}) {
     return this.offsetY(this.height()/2).offsetX(-padX)
 }
-
+// >
 Konva.Node.prototype.anchorMiddleRight = function({padX=0,padY=0}={}) {
     return this.offsetY(this.height()/2).offsetX(this.width()+padX)
 }
-
+// v
+Konva.Node.prototype.anchorBottomMiddle = function({padX=0,padY=0}={}) {
+    return this.offsetX(this.width()/2).offsetY(this.height()+padY)
+}
+// x
 Konva.Node.prototype.anchorCenter = function() {
     return this.offsetX(this.width()/2).offsetY(this.height()/2)
 }
-
+// `\
 Konva.Node.prototype.anchorTopLeft = function({padX=0,padY=0}={}) {
     return this.offsetX(-padX).offsetY(-padY)
 }
-
+// /`
 Konva.Node.prototype.anchorTopRight = function({padX=0,padY=0}={}) {
     return this.offsetX(this.width()+padX).offsetY(-padY)
 }
-
+// _/
 Konva.Node.prototype.anchorBottomLeft = function({padX=0,padY=0}={}) {
     return this.offsetY(this.height()+padY).offsetX(-padX)
 }
-
+// \_
 Konva.Node.prototype.anchorBottomRight = function({padX=0,padY=0}={}) {
     return this.offsetX(this.width()+padX).offsetY(this.height()+padY)
 }
 
-Konva.Node.prototype.anchorBottomMiddle = function({padX=0,padY=0}={}) {
-    return this.offsetX(this.width()/2).offsetY(this.height()+padY)
-}
 
 
 

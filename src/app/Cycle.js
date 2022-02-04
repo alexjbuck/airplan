@@ -36,30 +36,3 @@ class Cycle extends Event {
         return new Cycle(start,this.start)
     }
 }
-
-
-class CycleListView {
-    constructor($container) {
-        this.$container = $container;
-    }
-    draw() {
-        let html = `
-        <h3>Cycles</h3>
-        <button class='btn btn-primary btn-block' onclick=tabular.cycles.add()>Add Cycle</button>
-        <ul class='list-group'>`;
-        Object.values(airplan.cycles).sort((a,b)=>a.start-b.start).forEach(c=>{
-            html += `
-            <li class='list-group-item list-group-item-action align-middle'>
-                <b>#${c.number}</b>: <b>Start:</b> ${c.start.toHHMM()}\u0009<b>End:</b> ${c.end.toHHMM()}
-                <div class='btn-group float-right'>
-                <button class='btn'            onclick='tabular.cycles.edit("${c.ID}")'><i class='fas fa-bars fa-1x'></i></button>
-                <button class='btn btn-danger' onclick='airplan.cycles["${c.ID}"].del().then(refresh())'><i class='fas fa-trash-alt fa-1x'></i></button>
-                </div>
-            </li>`;
-        });
-        this.$container.html(html);
-    }
-    edit(id) {
-    }
-}
-

@@ -12,6 +12,8 @@ class Sortie extends Event {
         this.note = note;
         this.startOnCycle = startCycleID ? true : false;
         this.endOnCycle = endCycleID ? true : false;
+        this.startCycleID = startCycleID;
+        this.endCycleID = endCycleID;
     }
     static defaultDuration = 1;
     
@@ -29,20 +31,18 @@ class Sortie extends Event {
     /** @returns {Date} The start time. If this.startOnCycle, then its the start of the cycle. */
     get start() {
         if (this.startOnCycle && this.parent) {
-            this.start = this.parent.cycles[this.startCycleID].start;
+            this._start = this.parent.cycles[this.startCycleID].start;
         }
-        return this.start;
+        return this._start;
     }
-
 
     /** @returns {Date} The end time. If this.endOnCycle, then its the end of the cycle. */
     get end() {
         if (this.endOnCycle && this.parent) {
-            this.end = this.parent.cycles[this.endCycleID].end;
+            this._end = this.parent.cycles[this.endCycleID].end;
         }
-        return this.end;
+        return this._end;
     }
-
 
     /** The sortie squadron is set by the line its attached to.
      * @returns {Squadron} The squadron the sortie belongs to.
@@ -63,18 +63,22 @@ class Sortie extends Event {
         if (this.parent) {
             let sorted = Object.values(this.parent.cycles).sort((a,b)=>a.start-b.start);
             if (sorted.length<1) {
-                return 0;
+                return null;
             }
             if (this.start < sorted[0].start) {
                 // If the start is before the first cycle, it's cycle 0.
-                return 0;
+                return {number:0};
             } else if (this.start >= sorted[sorted.length-1].end) {
                 // If the start is after the last cycle, it's the last cycle + 1
-                return sorted.length+1;
+                return {number:sorted.length+1};
             } else {
                 // Otherwise, it's the first cycle that starts before and ends after the start.
                 let cycle = sorted.find(c => c.start <= this.start && c.end > this.start)
-                return cycle ? cycle : 0;
+                if (cycle == undefined) {
+                    console.log(cycle)
+                    1+1;
+                }
+                return cycle ? cycle : {number:0};
             }
         }
     }
@@ -84,7 +88,7 @@ class Sortie extends Event {
      * */
     get event() {
         if (this.parent) {
-            return this.cycle + this.line.squadron.letter + this.parent.counts[[this.cycle,this.line.squadron.letter]]
+            return this.cycle.number + this.line.squadron.letter + this.parent.counts[[this.cycle,this.line.squadron.letter]]
         }
     }
 

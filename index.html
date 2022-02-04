@@ -13,18 +13,66 @@
     <script src="src/libraries/fileSaver.min.js"></script>
     <script src="src/libraries/konva.min.js"></script>
     <script src="src/libraries/jspdf.umd.min.js"></script>
+
+    <!-- Custom CSS -->
+    <style>
+        .graphic-col {
+            padding: 0;
+            margin: 0;
+        }
+        .list-col {
+            height: 100vh;
+            overflow-y:scroll;
+            padding-top: 100px;
+            padding: 0;
+            padding-bottom: 2em;
+        }
+        .cycles-col {
+            margin-top: 1em;
+            margin-bottom: 1em;
+        }
+        .sorties-col {
+            margin-top: 1em;
+            margin-bottom: 1em;
+        }
+        .credit {
+            position: fixed;
+            bottom: 0;
+            margin: 1em;
+            font-size: 0.8em;
+        }
+        @font-face {
+            font-family: jarvis;
+            src: url(src/webfonts/AvengeroDisassembledRegular-nRvd4.ttf);
+        }
+        @font-face {
+            font-family: marvel;
+            src: url(src/webfonts/MarvelRegular-Dj83.ttf);
+        }
+        .jarvis {
+            font-family: jarvis;
+            font-size: xx-small;
+        }
+        .marvel {
+            font-family: marvel;
+            font-size: smaller;
+        }
+    </style>
 </head>
 <body>
     <!-- Main View (Graphical + Tabular) -->
     <div id='view' class='row h-100 w-100 m-0'>
-        <div id="graphic" class="col-md-8 col-12 pl-0">
+        <div id="graphic" class="col-md-8 col-12 graphic-col">
             <div id="graphic-stage" width="100%" height="100%"></div>
-            <div id="menu" class='px-2'></div>
             <!-- submit feedback button, mailto alexander.j.buck@navy.mil -->
         </div>
-        <div id="list" class="col-md-4 col-12 pr-0">
-            <div id="list-cycles"></div>
-            <div id="list-sorties"></div>
+        <div id="list" class="col-md-4 col-12 list-col">
+            <div id="menu" class='menu'></div>
+            <div id="cycles-list" class='cycles-col'></div>
+            <div id="sorties-list" class='sorties-col'></div>
+            <div class='credit'>
+                <i>Credit: Alexander Buck <a href=mailto:alexander.j.buck@navy.mil>alexander.j.buck</a>, Jan 2022</i>
+            </div>
         </div>
     </div>
     
@@ -32,24 +80,28 @@
     <div id="myModal" class="modal">
         <!-- Modal content -->
         <div class="modal-content">
-            <span id="closeSpan" class="close">&times;</span>
-            <div id="modalContent" >Some text in the Modal..</div>
+            <div class='ml-auto'>
+                <span id="closeSpan" class="close">&times;</span>
+            </div>
+            <div id="modalContent" ></div>
         </div>
     </div>
 
     <!-- App Source -->
     <script src="src/app/modal.js"></script>
-    <script src="src/app/blankAirplan.js"></script>
+    <script src="src/app/utils.js"></script>
     <script src="src/app/Archetypes.js"></script>
-    <script src="src/app/Airplan.js"></script>
+    <script src="src/app/Squadron.js"></script>
     <script src="src/app/Cycle.js"></script>
     <script src="src/app/Line.js"></script>
     <script src="src/app/Sortie.js"></script>
-    <script src="src/app/Squadron.js"></script>
-    <!-- <script src="src/app/tabular.js"></script>
-    <script src="src/app/graphical.js"></script>
-    <script src="src/app/menu.js"></script> -->
-    <script src="src/app/utils.js"></script>
-    <script src="src/app/main.js"></script>
+    <script src="src/app/Model.js"></script>
+    <script src="src/app/View.js"></script>
+    <script src="src/app/Controller.js"></script>
+    
+    <!-- Run App -->
+    <script>
+        let app = new Controller()
+    </script>
 </body>
 </html>

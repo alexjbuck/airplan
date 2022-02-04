@@ -346,7 +346,7 @@ g.makeTimeline = function(p){
   let startTime = new Konva.Text({
     x: 0,
     y: timeline.timebox.height(),
-    text: '\u21A6'+airplan.start.toHHMM(),
+    text: `\u21A6${airplan.start.toHHMM()}`,
   })
   let endTime = new Konva.Text({
     x: timeline.timebox.width(),
