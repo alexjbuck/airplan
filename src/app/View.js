@@ -39,11 +39,12 @@ class View {
         </p>
         <i class="fas fa-exclamation-triangle"></i> Tips:
         <ul>
-            <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> in the menu to add a new squadron.</li>
+            <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> or red <i style="color:red" class='fas fa-minus'></i> in the menu to add or remove a squadron.</li>
             <li>You can add cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
             <li>Next add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button.</li>
             <li>Sorties are added into a line by clicking "<i class='fas fa-plus'></i> Add Sortie" within a line in the list.</li>
             <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This will download a file that you can upload later to resume your progress.</li>
+            <li>Items on the display to the left open edit menu's if they have a <span class='blue-border'>blue border</span> when you hover over them.</li>
             <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
             <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
         </ul>
