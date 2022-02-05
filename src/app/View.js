@@ -17,48 +17,6 @@ class View {
         })          
     }
 
-    help() {
-        let html = `
-        <div class='container'>
-            <div class='row'>
-                <div class=''>
-                    <h3> Bad Max airplan writer: \u2708</h3>
-                    <h5>For when you don't have ADMACS <sup><small>(maybe even when you do! &#129315;)</small></sup></h5>
-                </div>
-                <div class='ml-auto'>
-                    <small>Version: 0.2.0</small>
-                </div>
-            </div>
-        </div>
-        <p>
-            Writing airplan's in PowerPoint is a big bummer &#129324;.
-            Never again will you chained to dragging around little lines on the screen \u26D3.
-            This is a simple web app that allows you to view and edit your squadron's flight plans &#128203;.
-            You can add new flights, edit existing flights, and delete flights.
-            You can also export your squadron's flight plans to PDF <i class="far fa-file-pdf"></i>.
-        </p>
-        <i class="fas fa-exclamation-triangle"></i> Tips:
-        <ul>
-            <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> or red <i style="color:red" class='fas fa-minus'></i> in the menu to add or remove a squadron.</li>
-            <li>You can add cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
-            <li>Next add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button.</li>
-            <li>Sorties are added into a line by clicking "<i class='fas fa-plus'></i> Add Sortie" within a line in the list.</li>
-            <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This will download a file that you can upload later to resume your progress.</li>
-            <li>Items on the display to the left open edit menu's if they have a <span class='blue-border'>blue border</span> when you hover over them.</li>
-            <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
-            <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
-        </ul>
-        <p>
-            Play around, you can't break anything, and hopefully you find this app useful!
-        </p>
-        <p>
-            Please provide feedback to <span class='jarvis'>JARVIS</span> at <a href=mailto:alexander.j.buck@gmail.com>alexander.j.buck@navy.mil</a> by
-            clicking the <span style="color:green">green</span> "Feedback" button in the menu.
-        </p>
-        `
-        openModal(html)
-    }
-
     bindMenuAddPlaceholderSquadron(handler){
         this.menu.squadron.add.on('click', event=>{
             handler()
@@ -104,9 +62,30 @@ class View {
             handler()
         })
     }
-    bindMenuAddCycle(handler){
-        
-        
+    bindAddCycleMenu(handler){
+        this.addCycleMenu.on('click', event=>{
+            handler()
+        })              
+    }
+    bindAddCycleSubmit(handler){
+        this.addCycleSubmit.on('click', event=>{
+            let start = Date.parse($('#start').val())
+            let end = Date.parse($('#end').val())
+            handler(start,end)
+            closeModal()
+        })
+    }
+    bindAddLineMenu(handler){
+        this.addLineMenu.on('click', event=>{
+            handler()
+        })
+    }
+    bindAddLineSubmit(handler){
+        this.addLineSubmit.on('click', event=>{
+            let squadronID = $('#squadron').val()
+            handler(squadronID)
+            closeModal()
+        })
     }
     bindMenuRemoveCycle(handler){
 
@@ -127,6 +106,91 @@ class View {
         
     }
 
+    /**
+     * @method help Draws the help modal dialog.
+     */
+    drawHelp() {
+        let html = `
+        <div class='container'>
+            <div class='row'>
+                <div class=''>
+                    <h3> Bad Max airplan writer: \u2708</h3>
+                    <h5>For when you don't have ADMACS <sup><small>(maybe even when you do! &#129315;)</small></sup></h5>
+                </div>
+                <div class='ml-auto'>
+                    <small>Version: 0.2.0</small>
+                </div>
+            </div>
+        </div>
+        <p>
+            Writing airplan's in PowerPoint is a big bummer &#129324;.
+            Never again will you chained to dragging around little lines on the screen \u26D3.
+            This is a simple web app that allows you to view and edit your squadron's flight plans &#128203;.
+            You can add new flights, edit existing flights, and delete flights.
+            You can also export your squadron's flight plans to PDF <i class="far fa-file-pdf"></i>.
+        </p>
+        <i class="fas fa-exclamation-triangle"></i> Tips:
+        <ul>
+            <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> or red <i style="color:red" class='fas fa-minus'></i> in the menu to add or remove a squadron.</li>
+            <li>You can add cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
+            <li>Next add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button.</li>
+            <li>Sorties are added into a line by clicking "<i class='fas fa-plus'></i> Add Sortie" within a line in the list.</li>
+            <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This will download a file that you can upload later to resume your progress.</li>
+            <li>Items on the display to the left open edit menu's if they have a <span class='blue-border'>blue border</span> when you hover over them.</li>
+            <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
+            <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
+        </ul>
+        <p>
+            Play around, you can't break anything, and hopefully you find this app useful!
+        </p>
+        <p>
+            Please provide feedback to <span class='jarvis'>JARVIS</span> at <a href=mailto:alexander.j.buck@gmail.com>alexander.j.buck@navy.mil</a> by
+            clicking the <span style="color:green">green</span> "Feedback" button in the menu.
+        </p>
+        `
+        openModal(html)
+    }
+
+    drawAddCycleMenu() {
+        let html = this.drawAddEditCycleMenu()
+        html += `
+        <button id='add-cycle-submit' type='submit' class='btn btn-primary'>Submit</button>
+        `
+        openModal(html)
+        this.addCycleSubmit = $('#add-cycle-submit')
+    }
+
+    drawAddEditCycleMenu() {
+        let html = `
+        <h3>Add Cycle</h3>
+        <div class='form-group row align-items-center'>
+            <label for='start' class='col-12 col-md-2 text-left text-md-right'>Start</label>
+            <input type='datetime-local' class='col form-control mr-5' id='start' placeholder='Start'>
+        </div>
+        <div class='form-group row align-items-center'>
+            <label for='end' class='col-12 col-md-2 text-left text-md-right'>End</label>
+            <input type='datetime-local' class='col form-control mr-5' id='end' placeholder='End'>
+        </div>
+        `
+        return html
+    }
+    drawAddLineMenu(squadrons) {
+        let html = `
+        <h3>Add Line</h3>
+        <div class='form-group row align-items-center'>
+            <label for='start' class='col-12 col-md-2 text-left text-md-right'>Squadron</label>
+            <select class='col form-control mr-5' id='squadron'>`
+        Object.values(squadrons).forEach((sqdrn, i) => {
+            html += "<option value='"+sqdrn.ID+"'>"+sqdrn.name+"</option>";
+        })
+        html += `
+            </select>
+        </div>
+        <button id='add-line-submit' type='submit' class='btn btn-primary'>Submit</button>
+        `
+        openModal(html)
+        this.addLineSubmit = $('#add-line-submit')
+    }
 
 
 
@@ -150,7 +214,7 @@ class View {
         </div>
         <div class='btn-group menu-group'>
             <button id="help"            class='btn btn-outline-warning'      data-toggle='tooltip' data-placement='top' title='Help'>         <i class='fas fa-question-circle'></i></button>
-            <button id="feedback" class='btn btn-outline-success' data-toggle='tooltip' data-placement='top' title='Thank you!'        onclick='location.href="mailto:alexander.j.buck@navy.mil?subject=Airplan feedback&body=Three things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:%0d%0a%0d%0aThank You!"'>Feedback</button>
+            <button id="feedback" class='btn btn-outline-success' data-toggle='tooltip' data-placement='top' title='Send Feedback'        onclick='location.href="mailto:alexander.j.buck@navy.mil?subject=Airplan feedback&body=Three things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:%0d%0a%0d%0aThank You!"'><i class="fas fa-bullhorn"></i></button>
         </div>
         `;
         $('#menu').html(html)
@@ -165,6 +229,10 @@ class View {
         this.menu.info.feedback = $('#feedback')
     }
     
+    /**
+     * @method drawList Wrapper around drawCycleList and drawSortieList
+     * @param {Model} airplan 
+     */
     drawList = (airplan) => {
         this.drawCycleList(airplan);
         this.drawSortieList(airplan);        
@@ -180,14 +248,15 @@ class View {
         <ul class='list-group'>`
         
         Object.values(airplan.cycles).forEach(cycle => {
-            html += `<li class='list-group-item list-group-item-action' onclick='this.cycleClicked(${cycle.ID})'>`
-            html += `<div class='row'>`
+            html += `<li class='list-group-item list-group-item-action'>`
+            html += `<div class='row cycle'>`
             html += `<div class='col-xl-3 col-md'><b>Cycle ${cycle.number}</b>:</div>`
             html += `<div class='col-xl col-md'>${cycle.start.toHHMM()} - ${cycle.end.toHHMM()}</div>`
             html += `</div>`
         })
-            html += `<li class='list-group-item list-group-item-action add-cycle'><i class='fas fa-plus'></i> Add Cycle...</li>`
+            html += `<li class='list-group-item list-group-item-action add-cycle-menu'><i class='fas fa-plus'></i> Add Cycle...</li>`
         $('#cycles-list').html(html)
+        this.addCycleMenu = $('.add-cycle-menu')
     }
     
     /**
@@ -195,39 +264,41 @@ class View {
      * @method drawSortieList populates the #sorties-view div view with sorties information
      */
     drawSortieList = (airplan) => {
-        let html =`<h3>Lines and Sorties</h3>`
-        html += `<div class='list-group'>`
+        let html =  `<h3>Lines and Sorties</h3>`
+        html +=     `<div class='list-group'>`
         Object.values(airplan.squadrons).forEach(squadron => {
             Object.values(airplan.lines).filter(line=>line.squadronID == squadron.ID).sort((a,b)=>a.start-b.start).forEach((line,i) => {
-                html += `<div class='list-group-item' onclick='this.squadronClicked(${squadron.ID})'>`
-                html += `<div class='row'>`
-                html += `<div class='col-xl-3 col-md-4'> <b>${squadron.name}</b> </div>`
-                html += `<div class='col-xl-5 col-md-8'> Aircraft Line ${i+1} </div>`
+                html += `<div class='list-group-item line'>`
+                html +=     `<div class='row'>`
+                html +=         `<div class='col-xl col-md-4'> <b>${squadron.name}</b> </div>`
+                html +=         `<div class='col-xl col-md-8'> Aircraft Line ${i+1} </div>`
                 if (line.sorties.length) {
-                html += `<div class='col-xl-4 col-md-6'><small>${line.start.toHHMM()}-${line.end.toHHMM()}</small></div>`
+                    html +=     `<div class='col-xl-4 col-md-6'><small>${line.start.toHHMM()}-${line.end.toHHMM()}</small></div>`
                 }
-                html += `</div>`
-                    html += `<div class='list-group list-group-flush'>`
-                    Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
-                        html += `
-                                <div class='list-group-item list-group-item-action px-5 py-1' onclick='this.cycleClicked(${sortie.ID})'>
+                html +=     `</div>`
+                html +=     `<div class='list-group list-group-flush'>`
+                Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
+                    html += `
+                                <div class='list-group-item list-group-item-action px-5 py-1 sortie'>
                                     <i class='fas fa-bars'></i>
                                     <small>Event: <b>${sortie.event}:</b> ${sortie.start.toHHMM()} - ${sortie.end.toHHMM()}
                                     <i class='fas fa-trash-alt'></i></small>
                                 </div>`
-                })
+            })
                         html += `
-                                <div class='list-group-item list-group-item-action px-5 py-1'><small><i class='fas fa-plus'>
-                                    </i> Add Sortie...</small>
+                                <div class='list-group-item list-group-item-action px-5 py-1 sortie add-sortie-menu'>
+                                    <small><i class='fas fa-plus'></i> Add Sortie...</small>
                                 </div>`
                 html +=     `</div>
                         </div>`
             })
         })
-        html +=         `<div class='list-group-item list-group-item-action' onclick='this.squadronClicked(0)'><i class='fas fa-plus'></i> Add Line...</div>`        
-        html += `</div>`
+        html +=         `<div class='list-group-item list-group-item-action add-line-menu'><i class='fas fa-plus'></i> Add Line...</div>`        
+        html +=     `</div>`
         
         $('#sorties-list').html(html)
+        this.addLineMenu = $('.add-line-menu')
+        this.addSortieMenu = $('.add-sortie-menu')
     }
 
     /**

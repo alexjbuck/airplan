@@ -25,9 +25,20 @@ class Controller {
         // this.airplan.addSortie(Object.keys(this.airplan.lines)[1],1, 1, 'hp','stuff','Poon',c2.ID,c2.ID)
         // this.airplan.addSortie(Object.keys(this.airplan.lines)[2],d1, d2, 'hp','flyoff','Jarvis')
         // this.airplan.addSortie(Object.keys(this.airplan.lines)[3],1, 1, 'flyon','stuff','Poon',c2.ID,c2.ID)
- 
         
+        /**
+         * Draw the view
+         */
+        this.onAirplanChanged();
+        
+        /**
+         * Bind Model update events
+         */
         this.airplan.bindOnChange(this.onAirplanChanged)
+        
+        /**
+         * Bind Menu Buttons. This only needs to be done once because the menu is not redrawn.
+         */
         this.view.bindMenuAddPlaceholderSquadron(this.handleAddPlaceholderSquadron)
         this.view.bindMenuRemoveSquadron(this.handleRemoveSquadron)
         this.view.bindMenuReset(this.handleReset)
@@ -36,14 +47,23 @@ class Controller {
         this.view.bindMenuSave(this.handleSaveFile)
         this.view.bindMenuExport(this.handleExportFile)
         this.view.bindMenuHelp(this.handleHelp)
-        this.view.help()
-        this.onAirplanChanged();
+        
+        /**
+         * Draw the spash page help.
+         */
+        this.view.drawHelp()
 
     }
     
     onAirplanChanged = () => {
         this.view.drawStage(this.airplan);
         this.view.drawList(this.airplan);
+        /**
+         * Bind items in the stage and list view.
+         * We need to rebind each time we draw because the elements are recreated.
+         */
+        this.view.bindAddCycleMenu(this.handleAddCycleMenu)
+        this.view.bindAddLineMenu(this.handleAddLineMenu)
     }
 
     handleAddPlaceholderSquadron = () => {
@@ -82,8 +102,22 @@ class Controller {
         pdf.save('airplan_'+this.airplan.date.toYYYYMMDD()+'.pdf');    
     }
 
-    handleHelp = () => {
-        this.view.help()
+    handleHelp = () => { this.view.drawHelp() }
+    
+    handleAddCycleMenu = () => {
+        this.view.drawAddCycleMenu()
+        this.view.bindAddCycleSubmit(this.handleAddCycleSubmit) 
+    }
+    handleAddCycleSubmit = (start, end) => { this.airplan.addCycle(start,end)}
+    
+    handleAddLineMenu = () => {
+        this.view.drawAddLineMenu(this.airplan.squadrons)
+        this.view.bindAddLineSubmit(this.handleAddLineSubmit)
+    }
+    handleAddLineSubmit = (squadronID) => { this.airplan.addLine(squadronID) }
+    
+    handleRemoveCycle = (id) => {
+        this.airplan.removeCycle(id)
     }
 
     handleRemoveSquadron = () => {
@@ -102,9 +136,6 @@ class Controller {
         this.airplan.addSortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID)
     }
 
-    handleAddCycle = (start, end) => {
-        this.airplan.addCycle(start, end)
-    }
     
     openCycleForm = (airplan) => {
         let html = `
