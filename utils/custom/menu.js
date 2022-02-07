@@ -135,6 +135,15 @@ menu.deleteBottomSquadron = function() {
         alert("There are no squadrons!")
         return
     }
+    //delete sorties with this squadron
+    let sorties = Object.values(airplan.data.events.sorties)
+    let squadronName = airplan.data.events.squadrons[airplan.data.events.squadrons.length-1].name
+    sorties.forEach((sortie) => {
+        if (sortie.squadron == squadronName) {
+            delete airplan.data.events.sorties[sortie.id]
+        }
+    })
+
     airplan.data.events.squadrons.pop()
     refresh()
 }

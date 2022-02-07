@@ -671,7 +671,7 @@ g.makeSquadronGroup = function(sq,i,p) {
       }))
       // Sortie Annotation
       let annotation = new Konva.Text({
-        x: x1,
+        x: x1+4,
         y: y-10,
         text: s.event + " " + s.annotation,
         fontSize: config.anno.fontSize,
