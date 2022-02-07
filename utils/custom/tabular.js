@@ -266,13 +266,46 @@ tabular.sorties.addEditForm = () => {
 tabular.sorties.add = () => {
     var html = "<h3>Add Sortie</h3>";
     html += tabular.sorties.addEditForm();
+    html += "<div class='row'>"
     html += "<button type='submit' class='btn btn-primary' onclick=tabular.sorties.addSubmit()>Submit</button>";
+    html += tabular.sorties.addCycleSelectButton();
+    html += "</div>"
     openModal(html);
     let d = new Date(airplan.data.date);
     d.setHours(0,0,0,0);
     $("#start").val(d.toLocalTimeString());
     $("#end").val(d.toLocalTimeString());
     $("#annotation").val("_");
+}
+
+tabular.sorties.addCycleSelectButton = function(){
+
+    var html = '<div class="dropdown ml-3">'
+        html += '<button class="btn btn-secondary dropdown-toggle" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
+            html += 'Sync With Cycle'
+        html += '</button>'
+        html += '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">'
+            //for over each cycle in airplan.data.events.cycles
+            for(var id in airplan.data.events.cycles){
+                var cycle = airplan.data.events.cycles[id];
+                html += `<a class="dropdown-item" onclick=tabular.sorties.setTimesToCycle('${id}')>Cycle ${cycle.number}</a>`
+            }
+        html += '</div>'
+    html += '</div>'
+    html += '</div>'
+
+
+
+    return html;
+}
+
+tabular.sorties.setTimesToCycle = function(id){
+    var cycle = airplan.data.events.cycles[id];
+    var start = new Date(cycle.start).toLocalTimeString();
+    var end = new Date(cycle.end).toLocalTimeString();
+
+    $("#start").val(start)
+    $("#end").val(end)
 }
 
 tabular.sorties.readForm = function() {
@@ -301,6 +334,7 @@ tabular.sorties.edit = (id) => {
     console.log("Editing sortie "+id);
     var html = "<h3>Edit Sortie</h3>";
     html += tabular.sorties.addEditForm();
+
     html += "<button type='submit' class='btn btn-primary' onclick=tabular.sorties.editSubmit('"+id+"')>Submit</button>";
     openModal(html);
     $("#squadron").val(airplan.data.events.sorties[id].squadron);
