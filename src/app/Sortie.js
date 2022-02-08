@@ -16,7 +16,9 @@ class Sortie extends Event {
         this.endCycleID = endCycleID;
     }
     static defaultDuration = 1;
-    static convert({lineID, start, end, startType, endType, note, startCycleID=null, endCycleID=null, ID}) {
+    static convert({lineID, _start, _end, startType, endType, note, startCycleID=null, endCycleID=null, ID}) {
+        let start = Date.parse(_start);
+        let end = Date.parse(_end);
         let sortie = new Sortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID);
         sortie.ID = ID
         return sortie;
@@ -40,12 +42,19 @@ class Sortie extends Event {
         }
         return this._start;
     }
-
+    set start(value) {
+        this._start = new Date(value);
+        return this._start;
+    }
     /** @returns {Date} The end time. If this.endOnCycle, then its the end of the cycle. */
     get end() {
         if (this.endOnCycle && this.parent) {
             this._end = this.parent.cycles[this.endCycleID].end;
         }
+        return this._end;
+    }
+    set end(value) {
+        this._end = new Date(value)
         return this._end;
     }
 
@@ -68,7 +77,7 @@ class Sortie extends Event {
         if (this.parent) {
             let sorted = Object.values(this.parent.cycles).sort((a,b)=>a.start-b.start);
             if (sorted.length<1) {
-                return null;
+                return {number:0};
             }
             if (this.start < sorted[0].start) {
                 // If the start is before the first cycle, it's cycle 0.
@@ -80,7 +89,6 @@ class Sortie extends Event {
                 // Otherwise, it's the first cycle that starts before and ends after the start.
                 let cycle = sorted.find(c => c.start <= this.start && c.end > this.start)
                 if (cycle == undefined) {
-                    console.log(cycle)
                     1+1;
                 }
                 return cycle ? cycle : {number:0};
@@ -93,7 +101,7 @@ class Sortie extends Event {
      * */
     get event() {
         if (this.parent) {
-            return this.cycle.number + this.line.squadron.letter + this.parent.counts[[this.cycle,this.line.squadron.letter]]
+            return this.cycle.number + this.line.squadron.letter + this.parent.counts[[this.cycle.number,this.line.squadron.letter]]
         }
     }
 

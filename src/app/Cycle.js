@@ -7,7 +7,9 @@ class Cycle extends Event {
     constructor(start, end) { 
         super(start,end);
     }
-    static convert({start, end, ID}) {
+    static convert({_start, _end, ID}) {
+        let start = Date.parse(_start);
+        let end = Date.parse(_end);
         let cycle = new Cycle(start,end);
         cycle.ID = ID;
         return cycle

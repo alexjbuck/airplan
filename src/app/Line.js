@@ -21,13 +21,18 @@ class Line extends Event {
         }
     }
     get start() {
-        if (this.sorties.length > 0) {
+        if (this.sorties && this.sorties.length > 0) {
             return this.sorties[0].start;
         }
     }
     get end() {
-        if (this.sorties.length > 0) {
+        if (this.sorties && this.sorties.length > 0) {
             return this.sorties[this.sorties.length-1].end;
+        }
+    }
+    get number() {
+        if (this.parent) {
+            return (Object.values(this.parent.lines).filter(l=>l.squadronID==this.squadronID).findIndex(l=>l.ID==this.ID) + 1)
         }
     }
 }

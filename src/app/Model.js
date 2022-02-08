@@ -7,10 +7,10 @@ class Model {
      * @method init Initializes the model with default values.
      */
     init() {
-        this._date           = new Date( new Date().setHours(0) )
         this._start          = new Date( new Date().setHours(8,0) )
         this._end            = new Date( new Date().setHours(18,0) )
-        this.title           = "Check it out Title";
+        // this._date           = new Date( this.start.valueOf()/2 + this.end.valueOf()/2 )
+        this.title           = "Airplan Title";
         this._sunrise        = new Date( new Date().setHours(6,46) )
         this._sunset         = new Date( new Date().setHours(19,29) )
         this._moonrise       = new Date( new Date().setHours(10,8) )
@@ -28,10 +28,11 @@ class Model {
         this.onChange()
     }
     
-    set date(date) {
-        this._date = new Date(date);
-        this._date.setHours(0);
-    }
+    // set date(date) {
+    //     this._date = new Date(date);
+    //     this._date.setHours(0);
+    // }
+    get date() { return new Date(this.start.valueOf()/2 + this.end.valueOf()/2) }
     set start(start)                    { this._start             = new Date(start)          }
     set end(end)                        { this._end               = new Date(end)            }
     set flightquarters(flightquarters)  { this._flightquarters    = new Date(flightquarters) }
@@ -40,7 +41,7 @@ class Model {
     set sunset(sunset)                  { this._sunset            = new Date(sunset)         }
     set moonrise(moonrise)              { this._moonrise          = new Date(moonrise)       }
     set moonset(moonset)                { this._moonset           = new Date(moonset)        }
-    get date()                          { return this._date           } 
+    // get date()                          { return this._date           } 
     get start()                         { return this._start          }
     get end()                           { return this._end            } 
     get flightquarters()                { return this._flightquarters }
@@ -56,10 +57,10 @@ class Model {
     updateCounts() {
         this.counts = {}
         Object.values(this.sorties).sort((a,b)=>a.start-b.start).forEach(s=>{
-            if (this.counts[[s.cycle,s.line.squadron.letter]] == undefined) {
-                this.counts[[s.cycle,s.line.squadron.letter]] = 1
+            if (this.counts[[s.cycle.number,s.line.squadron.letter]] == undefined) {
+                this.counts[[s.cycle.number,s.line.squadron.letter]] = 1
             } else {
-                this.counts[[s.cycle,s.line.squadron.letter]] += 1
+                this.counts[[s.cycle.number,s.line.squadron.letter]] += 1
             }
         })  
     }
@@ -82,45 +83,48 @@ class Model {
 
     load(data) {
         this.init()
-        this.date           = data._date
+        // this.date           = data._date
         this.start          = data._start
         this.end            = data._end
-        this.title           = data.title
+        this.title          = data.title
         this.sunrise        = data._sunrise
         this.sunset         = data._sunset
         this.moonrise       = data._moonrise
         this.moonset        = data._moonset
-        this.moonphase       = data.moonphase
+        this.moonphase      = data.moonphase
         this.flightquarters = data._flightquarters
         this.heloquarters   = data._heloquarters
-        this.variation       = data.variation
-        this.timezone        = data.timezone
+        this.variation      = data.variation
+        this.timezone       = data.timezone
         /**
          * The parent value needs to be reassigned to each object because it is stripped
          * from the JSON. It is stripped because it causes a circular reference.
          * Object.assign preserves all the properties of the json object, without calling the 
          * constructor. That means ID values are preserved.
          */
-        Object.values(data.lines).forEach(l=>{
-            this.lines[l.ID] = Object.assign(new Line, l)
-            this.lines[l.ID].parent = this;
-        })
         Object.values(data.squadrons).forEach(s=>{
-            this.squadrons[s.ID] = Object.assign(new Squadron, s)
+            this.squadrons[s.ID] = Squadron.convert(s)
             this.squadrons[s.ID].parent = this;
         })
         Object.values(data.cycles).forEach(c=>{
-            this.cycles[c.ID] = Object.assign(new Cycle, c)
+        this.cycles[c.ID] = Cycle.convert(c)
             this.cycles[c.ID].parent = this;
         })
+        Object.values(data.lines).forEach(l=>{
+            this.lines[l.ID] = Line.convert(l)
+            this.lines[l.ID].parent = this;
+        })
         Object.values(data.sorties).forEach(s=>{
-            this.sorties[s.ID] = Object.assign(new Sortie, s)
+            this.sorties[s.ID] = Sortie.convert(s)
             this.sorties[s.ID].parent = this;
         })
         this.onChange()    
     }
     
     async removeSquadron(squadron) {
+        this.lineList.filter(l=>l.squadronID == squadron.ID).forEach(l=>{
+            this.removeLine(l.ID)
+        })
         delete this.squadrons[squadron.ID]
         this.onChange()
     }
@@ -133,6 +137,9 @@ class Model {
     }
     
     async removeLine(id) {
+        this.sortieList.filter(s=>s.lineID == id).forEach(s=>{
+            this.removeSortie(s.ID)
+        })
         delete this.lines[id]
         this.onChange()
     }
@@ -166,5 +173,42 @@ class Model {
         this.cycles[cycle.ID] = cycle;
         this.onChange()
         return cycle
+    }
+
+    get sortieList() {
+        return Object.values(this.sorties)
+    }
+
+    get lineList() {
+        return Object.values(this.lines)
+    }
+
+    get cycleList() {
+        return Object.values(this.cycles).sort((a,b)=>a.start-b.start)
+    }
+
+    /**
+     * Default behavior for end => start mapping
+     */
+    get endStartTypeMap() {
+        let map = {
+            'hp': 'hp',
+            'hpcs': 'hpcs',
+            'stuff': 'pull',
+            'flyoff': 'flyon',
+        }
+        return map
+    }
+    /**
+     * Default behavior for start => end mapping.
+     */
+    get startEndTypeMap() {
+        let map = {
+            'hp': 'hp',
+            'hpcs': 'hpcs',
+            'pull': 'stuff',
+            'flyon': 'stuff',
+        }
+        return map
     }
 }

@@ -1,14 +1,14 @@
 class View {
     constructor(airplan) {
         this.app                = this.getElement('#view');
-
+        
         this.margin             = {top: 10, right: 10, bottom: 10, left: 10};
         this.sceneWidth         = 1100;
         this.sceneHeight        = 850;
-        this.headerHeight       = 100;
-        this.leftCol            = 100;
-        this.letterCol          = 20;
-        this.rightCol           = 50;
+        this.headerHeight       = 90;
+        this.leftCol            = 90;
+        this.letterCol          = 15;
+        this.rightCol           = 40;
         this.topRow             = 20;
         this.bottomRow          = 20;
         this.drawMenu();
@@ -16,7 +16,7 @@ class View {
             $('[data-toggle="tooltip"]').tooltip()
         })          
     }
-
+    
     bindMenuAddPlaceholderSquadron(handler){
         this.menu.squadron.add.on('click', event=>{
             handler()
@@ -87,89 +87,197 @@ class View {
             closeModal()
         })
     }
+    bindAddSortieMenu(handler){
+        this.addSortieMenu.on('click', event=>{
+            let lineID = event.currentTarget.id
+            handler(lineID)
+        })
+    }
+    bindAddSortieSubmit(handler){
+        this.addSortieSubmit.on('click', event=>{
+            let lineID = event.currentTarget.id
+            let start = Date.parse($( "#start" ).val())
+            let end   = Date.parse($( "#end"   ).val())
+            let startType = $( "#startType" ).val()
+            let endType   = $( "#endType" ).val()
+            let note = $( "#note" ).val()
+            let startCycleID = null
+            let endCycleID = null
+            handler(lineID, start, end, startType, endType, note, startCycleID, endCycleID)
+            closeModal()
+        })
+    }
+    bindEditSortieSubmit(handler){
+        this.editSortieSubmit.on('click', event=>{
+            let sortieID = event.currentTarget.id
+            let start = Date.parse($( "#start" ).val())
+            let end   = Date.parse($( "#end"   ).val())
+            let startType = $( "#startType" ).val()
+            let endType   = $( "#endType" ).val()
+            let note = $( "#note" ).val()
+            let startCycleID = null
+            let endCycleID = null
+            handler(sortieID, start, end, startType, endType, note, startCycleID, endCycleID)
+            closeModal()
+        })
+        
+    }
+    bindCanvasClick(handler) {
+        this.stage.find('.highlight').forEach(element => {
+            element.off('click')
+            element.on('click', event => {
+                handler(element)
+            })
+        })
+    }
+    
+    bindEditHeaderSubmit(handler){
+        this.editHeaderSubmit.on('click', event=>{
+            let title = $('#title').val();
+            let date = $('#date').val();
+            let start = $('#start').val();
+            let end = $('#end').val();
+            let sunrise = $('#sunrise').val();
+            let sunset = $('#sunset').val();
+            let moonrise = $('#moonrise').val();
+            let moonset = $('#moonset').val();
+            let moonphase = $('#moonphase').val();
+            let flightquarters = $('#flightquarters').val();
+            let heloquarters = $('#heloquarters').val();
+            let variation = $('#variation').val();
+            let timezone = $('#timezone').val();
+            handler(title, date, start, end, sunrise, sunset, moonrise, moonset, moonphase, flightquarters, heloquarters, variation, timezone)
+            closeModal()
+        })
+    }
+    
+    bindEditSquadronSubmit(handler){
+        this.editSquadronSubmit.on('click', event=>{
+            let name = $('#name').val();
+            let cs = $('#cs').val();
+            let tms = $('#tms').val();
+            let modex = $('#modex').val();
+            let squadronID = event.currentTarget.id
+            handler(squadronID, name, cs, tms, modex)
+            closeModal()
+        })
+    }
+    
+    bindEditCycleMenu(handler){
+        if(this.editCycleMenu.length){
+            this.editCycleMenu.on('click', event=>{
+                let cycleID = event.currentTarget.id
+                handler(cycleID)
+            })
+        }
+    }
+    bindEditCycleSubmit(handler){
+        this.editCycleSubmit.on('click', event=>{
+            let cycleID = event.currentTarget.id
+            let start = Date.parse($('#start').val())
+            let end = Date.parse($('#end').val())
+            handler(cycleID, start, end)
+            closeModal()
+        })
+    }
+    bindEditCycleRemove(handler){
+        this.editCycleRemove.on('click', event=>{
+            let cycleID = event.currentTarget.id
+            handler(cycleID)
+            closeModal()
+        })
+    }
+    
     bindMenuRemoveCycle(handler){
-
+        
     }
     bindMenuEditCycle(handler){
-
+        
     }
     bindMenuAddLine(handler){
-
+        
     }
     bindMenuRemoveLine(handler){
-
+        
     }
     bindMenuAddSortie(handler){
-
+        
     }
     bindMenuRemoveSortie(handler){
         
     }
-
+    
     /**
-     * @method help Draws the help modal dialog.
-     */
+    * @method help Draws the help modal dialog.
+    */
     drawHelp() {
         let html = `
         <div class='container'>
-            <div class='row'>
-                <div class=''>
-                    <h3> Bad Max airplan writer: \u2708</h3>
-                    <h5>For when you don't have ADMACS <sup><small>(maybe even when you do! &#129315;)</small></sup></h5>
-                </div>
-                <div class='ml-auto'>
-                    <small>Version: 0.2.0</small>
-                </div>
-            </div>
+        <div class='row'>
+        <div class=''>
+        <h3> Bad Max airplan writer: \u2708</h3>
+        <h5>For when you don't have ADMACS <sup><small>(maybe even when you do! &#129315;)</small></sup></h5>
+        </div>
+        <div class='ml-auto'>
+        <small>Version: 0.2.0</small>
+        </div>
+        </div>
         </div>
         <p>
-            Writing airplan's in PowerPoint is a big bummer &#129324;.
-            Never again will you chained to dragging around little lines on the screen \u26D3.
-            This is a simple web app that allows you to view and edit your squadron's flight plans &#128203;.
-            You can add new flights, edit existing flights, and delete flights.
-            You can also export your squadron's flight plans to PDF <i class="far fa-file-pdf"></i>.
+        Writing airplan's in PowerPoint is a big bummer &#129324;.
+        Never again will you chained to dragging around little lines on the screen \u26D3.
+        This is a simple web app that allows you to view and edit your squadron's air plans &#128203;.
+        You can add new flights, edit existing flights, and delete flights.
+        You can also export your squadron's flight plans to PDF <i class="far fa-file-pdf"></i>.
         </p>
         <i class="fas fa-exclamation-triangle"></i> Tips:
         <ul>
-            <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> or red <i style="color:red" class='fas fa-minus'></i> in the menu to add or remove a squadron.</li>
-            <li>You can add cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
-            <li>Next add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button.</li>
-            <li>Sorties are added into a line by clicking "<i class='fas fa-plus'></i> Add Sortie" within a line in the list.</li>
-            <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This will download a file that you can upload later to resume your progress.</li>
-            <li>Items on the display to the left open edit menu's if they have a <span class='blue-border'>blue border</span> when you hover over them.</li>
-            <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
-            <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
+        <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> or red <i style="color:red" class='fas fa-minus'></i> in the menu to add or remove a squadron.</li>
+        <li>You can add cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
+        <li>Next add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button.</li>
+        <li>Sorties are added into a line by clicking "<i class='fas fa-plus'></i> Add Sortie" within a line in the list.</li>
+        <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This will download a file that you can upload later to resume your progress.</li>
+        <li>Items on the display to the left open edit menu's if they have a <span class='blue-border'>blue border</span> when you hover over them.</li>
+        <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
+        <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
         </ul>
         <p>
-            Play around, you can't break anything, and hopefully you find this app useful!
+        Play around, you can't break anything, and hopefully you find this app useful!
         </p>
         <p>
-            Please provide feedback to <span class='jarvis'>JARVIS</span> at <a href=mailto:alexander.j.buck@gmail.com>alexander.j.buck@navy.mil</a> by
-            clicking the <span style="color:green">green</span> "Feedback" button in the menu.
+        Please provide feedback to <span class='jarvis'>JARVIS</span> at <a href=mailto:alexander.j.buck@gmail.com>alexander.j.buck@navy.mil</a> by
+        clicking the <span style="color:green">green</span> "Feedback" button in the menu.
         </p>
         `
         openModal(html)
     }
-
+    
     drawAddCycleMenu() {
         let html = this.drawAddEditCycleMenu()
-        html += `
-        <button id='add-cycle-submit' type='submit' class='btn btn-primary'>Submit</button>
-        `
+        html += `<button class='btn btn-primary add-cycle-submit'>Submit</button>`
         openModal(html)
-        this.addCycleSubmit = $('#add-cycle-submit')
+        this.addCycleSubmit = $('.add-cycle-submit')
     }
-
+    
+    drawEditCycleMenu(cycleID) {
+        let html = this.drawAddEditCycleMenu()
+        html += `<button id='`+cycleID+`' class='btn btn-primary edit-cycle-submit'>Submit</button>`
+        html += `<button id='`+cycleID+`' class='btn btn-danger edit-cycle-remove'>Remove</button>`
+        openModal(html)
+        this.editCycleSubmit = $('.edit-cycle-submit')
+        this.editCycleRemove = $('.edit-cycle-remove')
+    }
+    
     drawAddEditCycleMenu() {
         let html = `
         <h3>Add Cycle</h3>
         <div class='form-group row align-items-center'>
-            <label for='start' class='col-12 col-md-2 text-left text-md-right'>Start</label>
-            <input type='datetime-local' class='col form-control mr-5' id='start' placeholder='Start'>
+        <label for='start' class='col-12 col-md-2 text-left text-md-right'>Start</label>
+        <input type='datetime-local' class='col form-control mr-5' id='start' placeholder='Start'>
         </div>
         <div class='form-group row align-items-center'>
-            <label for='end' class='col-12 col-md-2 text-left text-md-right'>End</label>
-            <input type='datetime-local' class='col form-control mr-5' id='end' placeholder='End'>
+        <label for='end' class='col-12 col-md-2 text-left text-md-right'>End</label>
+        <input type='datetime-local' class='col form-control mr-5' id='end' placeholder='End'>
         </div>
         `
         return html
@@ -178,43 +286,201 @@ class View {
         let html = `
         <h3>Add Line</h3>
         <div class='form-group row align-items-center'>
-            <label for='start' class='col-12 col-md-2 text-left text-md-right'>Squadron</label>
-            <select class='col form-control mr-5' id='squadron'>`
+        <label for='start' class='col-12 col-md-2 text-left text-md-right'>Squadron</label>
+        <select class='col form-control mr-5' id='squadron'>`
         Object.values(squadrons).forEach((sqdrn, i) => {
             html += "<option value='"+sqdrn.ID+"'>"+sqdrn.name+"</option>";
         })
         html += `
-            </select>
+        </select>
         </div>
-        <button id='add-line-submit' type='submit' class='btn btn-primary'>Submit</button>
+        <button id='add-line-submit' class='btn btn-primary'>Submit</button>
         `
         openModal(html)
         this.addLineSubmit = $('#add-line-submit')
     }
-
-
-
+    
+    makeAddEditSortieMenu(line) {
+        let html = '<h3>Add/Edit Sortie: ' + line.squadron.name + ' Line ' + line.number+'</h3>'
+        // Start Time
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='start' class='col-12 col-md-3 text-left text-md-right'>Start Time</label>";
+        html += "<input type='datetime-local' class='col form-control mr-5' id='start' placeholder='0000'>";
+        html += "</div>";
+        // Start Condition
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='startType' class='col-12 col-md-3 text-left text-md-right'>Start Condition</label>";
+        html += "<select type='text' class='col form-control mr-5' id='startType' placeholder='Start Condition'>";
+        html += "<option value='pull'>Pull</option>";
+        html += "<option value='flyOn'>Fly On</option>";
+        html += "<option value='hp'>Hot Pump</option>";
+        html += "<option value='hpcs'>Hot Pump & Crew Swap</option>";
+        html += "</select>";
+        html += "</div>";
+        // End time
+        html += "<div class='form-group row align-items-center end-time'>";
+        html += "<label for='end' class='col-12 col-md-3 text-left text-md-right'>End Time</label>";
+        html += "<input type='datetime-local' class='col form-control mr-5' id='end' placeholder='0000'>";
+        html += "</div>";
+        // End Condition
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='endType' class='col-12 col-md-3 text-left text-md-right'>End Condition</label>";
+        html += "<select type='text' class='col form-control mr-5' id='endType' placeholder='End Condition'>";
+        html += "<option value='stuff'>Stuff</option>";
+        html += "<option value='flyOff'>Fly Off</option>";
+        html += "<option value='hp'>Hot Pump</option>";
+        html += "<option value='hpcs'>Hot Pump & Crew Swap</option>";
+        html += "</select>";
+        html += "</div>";
+        // note
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='note' class='col-12 col-md-3 text-left text-md-right'>Note</label>";
+        html += "<input type='text' class='col form-control mr-5' id='note' placeholder='Mission'>";
+        html += "</div>";
+        return html
+    }
+    
     /**
-     * @method drawMenu Populate the #menu in the menu div.
-     */
+    * I don't know if this actually needs to be async. I don't think it does.
+    * If you remove the async, then contrller.handleAddSortieMenu needs to change
+    * it is expecting a promise.
+    * @param {Line} line 
+    */
+    async drawAddSortieMenu(line) {
+        let html = this.makeAddEditSortieMenu(line)
+        html += "<button id='"+line.ID+"' class='btn btn-primary add-sortie-submit'>Submit</button>";
+        openModal(html)
+        this.addSortieSubmit = $('.add-sortie-submit')
+    }
+    
+    drawEditSortieMenu(sortie) { 
+        let line = sortie.line
+        let html = this.makeAddEditSortieMenu(line)
+        html += "<button id='"+sortie.ID+"' class='btn btn-primary edit-sortie-submit'>Submit</button>";
+        openModal(html)
+        this.editSortieSubmit = $('.edit-sortie-submit')
+    }
+    
+    drawEditHeaderData(airplan) {
+        let html = `<h3>Airplan Settings</h3>`
+        // Title
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='title' class='col-12 col-md-3 text-left text-md-right'>Title</label>";
+        html += "<input type='text' class='col form-control mr-5' id='title' placeholder='Airplan Title'>";
+        html += "</div>";
+        // // Date
+        // html += "<div class='form-group row align-items-center'>";
+        // html += "<label for='date' class='col-12 col-md-3 text-left text-md-right'>Date</label>";
+        // html += "<input type='date' class='col form-control mr-5' id='date' placeholder='0000'>";
+        // html += "</div>";
+        // Start
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='start' class='col-12 col-md-3 text-left text-md-right'>Start Time</label>";
+        html += "<input type='datetime-local' class='col form-control mr-5' id='start' placeholder='0000'>";
+        html += "</div>";
+        // End
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='end' class='col-12 col-md-3 text-left text-md-right'>End Time</label>";
+        html += "<input type='datetime-local' class='col form-control mr-5' id='end' placeholder='0000'>";
+        html += "</div>";
+        // Sunrise
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='sunrise' class='col-12 col-md-3 text-left text-md-right'>Sunrise Time</label>";
+        html += "<input type='datetime-local' class='col form-control mr-5' id='sunrise' placeholder='0000'>";
+        html += "</div>";
+        // sunset Time
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='sunset' class='col-12 col-md-3 text-left text-md-right'>Sunset Time</label>";
+        html += "<input type='datetime-local' class='col form-control mr-5' id='sunset' placeholder='0000'>";
+        html += "</div>";
+        // moonrise Time
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='moonrise' class='col-12 col-md-3 text-left text-md-right'>Moonrise Time</label>";
+        html += "<input type='datetime-local' class='col form-control mr-5' id='moonrise' placeholder='0000'>";
+        html += "</div>";
+        // moonset Time
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='moonset' class='col-12 col-md-3 text-left text-md-right'>Moonset Time</label>";
+        html += "<input type='datetime-local' class='col form-control mr-5' id='moonset' placeholder='0000'>";
+        html += "</div>";
+        // Moon phase
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='moonphase' class='col-12 col-md-3 text-left text-md-right'>Moon Phase</label>";
+        html += "<input type='text' class='col form-control mr-5' id='moonphase' placeholder='__%'>";
+        html += "</div>";
+        // Flight Quarters
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='flightquarters' class='col-12 col-md-3 text-left text-md-right'>Flight Quarters</label>";
+        html += "<input type='datetime-local' class='col form-control mr-5' id='flightquarters' placeholder='0000'>";
+        html += "</div>";
+        // Helo Quarters
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='heloquarters' class='col-12 col-md-3 text-left text-md-right'>Helo Quarters</label>";
+        html += "<input type='datetime-local' class='col form-control mr-5' id='heloquarters' placeholder='0000'>";
+        html += "</div>";
+        // Magvar
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='variation' class='col-12 col-md-3 text-left text-md-right'>Mag Var</label>";
+        html += "<input type='text' class='col form-control mr-5' id='variation' placeholder='__E/W'>";
+        html += "</div>";
+        // Time Zone
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='timezone' class='col-12 col-md-3 text-left text-md-right'>Timezone</label>";
+        html += "<input type='text' class='col form-control mr-5' id='timezone' placeholder='__(+/-)'>";
+        html += "</div>";
+        html += "<button class='btn btn-primary edit-header-submit'>Submit</button>";
+        openModal(html)
+        this.editHeaderSubmit = $('.edit-header-submit')
+    }
+    
+    drawEditSquadronData(squadron) {
+        let html = `<h3>Edit Squadron</h3>`
+        // Name
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='name' class='col-12 col-md-3 text-left text-md-right'>Squadron Name</label>";
+        html += "<input type='text' class='col form-control mr-5' id='name' placeholder='VFA-XX'>";
+        html += "</div>";
+        // Callsign
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='cs' class='col-12 col-md-3 text-left text-md-right'>Callsign</label>";
+        html += "<input type='text' class='col form-control mr-5' id='cs' placeholder='Airplan Title'>";
+        html += "</div>";
+        // TMS
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='tms' class='col-12 col-md-3 text-left text-md-right'>TMS</label>";
+        html += "<input type='text' class='col form-control mr-5' id='tms' placeholder='Airplan Title'>";
+        html += "</div>";
+        // Modex
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='modex' class='col-12 col-md-3 text-left text-md-right'>Modex</label>";
+        html += "<input type='text' class='col form-control mr-5' id='modex' placeholder='Airplan Title'>";
+        html += "</div>";
+        html += "<button id='"+squadron.ID+"' class='btn btn-primary edit-squadron-submit'>Submit</button>";
+        openModal(html)
+        this.editSquadronSubmit = $('.edit-squadron-submit')
+    }
+    
+    /**
+    * @method drawMenu Populate the #menu in the menu div.
+    */
     drawMenu = () => {
         this.menu = {squadron:{},file:{},info:{}}
         var html =`
         <h3>Menu</h3>
         <div class='btn-group menu-group'>
-            <button id='add-squadron' class='btn btn-outline-primary add-squadron' data-toggle='tooltip' data-placement='top' title='Add Squadron'>   <i class='fas fa-plus'> </i></button>
-            <button id='rem-squadron' class='btn btn-outline-danger rem-squadron'  data-toggle='tooltip' data-placement='top' title='Remove Squadron'><i class='fas fa-minus'></i></button>
+        <button id='add-squadron' class='btn btn-outline-primary add-squadron' data-toggle='tooltip' data-placement='top' title='Add Squadron'>   <i class='fas fa-plus'> </i></button>
+        <button id='rem-squadron' class='btn btn-outline-danger rem-squadron'  data-toggle='tooltip' data-placement='top' title='Remove Squadron'><i class='fas fa-minus'></i></button>
         </div>
         <div class='btn-group menu-group'>
-            <button id='reset'   class='btn btn-outline-danger'       data-toggle='tooltip' data-placement='top' title='Burn it Down!'><i class='fas fa-dumpster-fire'> </i></button>
-            <button id='refresh' class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Refresh'>      <i class='fas fa-sync'>          </i></button>
-            <label  id='load'    class='btn btn-outline-primary my-0' data-toggle='tooltip' data-placement='top' title='Load'>         <i class='fas fa-folder-open'>   </i><input type='file' id='filepath' hidden></label>
-            <button id='save'    class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Save'>         <i class='fas fa-save'>          </i></button>
-            <button id='export'  class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Export PDF'>   <i class='fas fa-file-pdf'>      </i></button>
+        <button id='reset'   class='btn btn-outline-danger'       data-toggle='tooltip' data-placement='top' title='Burn it Down!'><i class='fas fa-dumpster-fire'> </i></button>
+        <button id='refresh' class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Refresh'>      <i class='fas fa-sync'>          </i></button>
+        <label  id='load'    class='btn btn-outline-primary my-0' data-toggle='tooltip' data-placement='top' title='Load'>         <i class='fas fa-folder-open'>   </i><input type='file' id='filepath' hidden></label>
+        <button id='save'    class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Save'>         <i class='fas fa-save'>          </i></button>
+        <button id='export'  class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Export PDF'>   <i class='fas fa-file-pdf'>      </i></button>
         </div>
         <div class='btn-group menu-group'>
-            <button id="help"            class='btn btn-outline-warning'      data-toggle='tooltip' data-placement='top' title='Help'>         <i class='fas fa-question-circle'></i></button>
-            <button id="feedback" class='btn btn-outline-success' data-toggle='tooltip' data-placement='top' title='Send Feedback'        onclick='location.href="mailto:alexander.j.buck@navy.mil?subject=Airplan feedback&body=Three things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:%0d%0a%0d%0aThank You!"'><i class="fas fa-bullhorn"></i></button>
+        <button id="help"            class='btn btn-outline-warning'      data-toggle='tooltip' data-placement='top' title='Help'>         <i class='fas fa-question-circle'></i></button>
+        <button id="feedback" class='btn btn-outline-success' data-toggle='tooltip' data-placement='top' title='Send Feedback'        onclick='location.href="mailto:alexander.j.buck@navy.mil?subject=Airplan feedback&body=Three things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:%0d%0a%0d%0aThank You!"'><i class="fas fa-bullhorn"></i></button>
         </div>
         `;
         $('#menu').html(html)
@@ -230,39 +496,40 @@ class View {
     }
     
     /**
-     * @method drawList Wrapper around drawCycleList and drawSortieList
-     * @param {Model} airplan 
-     */
+    * @method drawList Wrapper around drawCycleList and drawSortieList
+    * @param {Model} airplan 
+    */
     drawList = (airplan) => {
         this.drawCycleList(airplan);
         this.drawSortieList(airplan);        
     }
     
     /**
-     * @param {Model} airplan 
-     * @method drawCycleList populates the #cycles-list div with cycles information.
-     */
+    * @param {Model} airplan 
+    * @method drawCycleList populates the #cycles-list div with cycles information.
+    */
     drawCycleList = (airplan) => {
         let html = `
         <h3>Cycles</h3>
         <ul class='list-group'>`
         
         Object.values(airplan.cycles).forEach(cycle => {
-            html += `<li class='list-group-item list-group-item-action'>`
+            html += `<li id='`+cycle.ID+`' class='list-group-item list-group-item-action edit-cycle-menu'>`
             html += `<div class='row cycle'>`
             html += `<div class='col-xl-3 col-md'><b>Cycle ${cycle.number}</b>:</div>`
             html += `<div class='col-xl col-md'>${cycle.start.toHHMM()} - ${cycle.end.toHHMM()}</div>`
             html += `</div>`
         })
-            html += `<li class='list-group-item list-group-item-action add-cycle-menu'><i class='fas fa-plus'></i> Add Cycle...</li>`
+        html += `<li class='list-group-item list-group-item-action add-cycle-menu'><i class='fas fa-plus'></i> Add Cycle...</li>`
         $('#cycles-list').html(html)
         this.addCycleMenu = $('.add-cycle-menu')
+        this.editCycleMenu = $('.edit-cycle-menu')
     }
     
     /**
-     * @param {Model} airplan
-     * @method drawSortieList populates the #sorties-view div view with sorties information
-     */
+    * @param {Model} airplan
+    * @method drawSortieList populates the #sorties-view div view with sorties information
+    */
     drawSortieList = (airplan) => {
         let html =  `<h3>Lines and Sorties</h3>`
         html +=     `<div class='list-group'>`
@@ -271,7 +538,7 @@ class View {
                 html += `<div class='list-group-item line'>`
                 html +=     `<div class='row'>`
                 html +=         `<div class='col-xl col-md-4'> <b>${squadron.name}</b> </div>`
-                html +=         `<div class='col-xl col-md-8'> Aircraft Line ${i+1} </div>`
+                html +=         `<div class='col-xl col-md-8'> Line ${i+1} </div>`
                 if (line.sorties.length) {
                     html +=     `<div class='col-xl-4 col-md-6'><small>${line.start.toHHMM()}-${line.end.toHHMM()}</small></div>`
                 }
@@ -279,18 +546,18 @@ class View {
                 html +=     `<div class='list-group list-group-flush'>`
                 Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
                     html += `
-                                <div class='list-group-item list-group-item-action px-5 py-1 sortie'>
-                                    <i class='fas fa-bars'></i>
-                                    <small>Event: <b>${sortie.event}:</b> ${sortie.start.toHHMM()} - ${sortie.end.toHHMM()}
-                                    <i class='fas fa-trash-alt'></i></small>
-                                </div>`
-            })
-                        html += `
-                                <div class='list-group-item list-group-item-action px-5 py-1 sortie add-sortie-menu'>
-                                    <small><i class='fas fa-plus'></i> Add Sortie...</small>
-                                </div>`
+                    <div class='list-group-item list-group-item-action px-5 py-1 sortie'>
+                    <i id='`+sortie.ID+`' class='fas fa-bars sortie-edit'></i>
+                    <small>Event: <b>${sortie.event}:</b> ${sortie.start.toHHMM()} - ${sortie.end.toHHMM()}</small>
+                    <i id='`+sortie.ID+`' class='fas fa-trash-alt sortie-delete'></i>
+                    </div>`
+                })
+                html += `
+                <div id='`+line.ID+`' class='list-group-item list-group-item-action px-5 py-1 sortie add-sortie-menu'>
+                <small><i class='fas fa-plus'></i> Add Sortie...</small>
+                </div>`
                 html +=     `</div>
-                        </div>`
+                </div>`
             })
         })
         html +=         `<div class='list-group-item list-group-item-action add-line-menu'><i class='fas fa-plus'></i> Add Line...</div>`        
@@ -300,11 +567,11 @@ class View {
         this.addLineMenu = $('.add-line-menu')
         this.addSortieMenu = $('.add-sortie-menu')
     }
-
+    
     /**
-     * 
-     * @param {Model} airplan Create the Konva object and draw the airplan on it.
-     */
+    * 
+    * @param {Model} airplan Create the Konva object and draw the airplan on it.
+    */
     drawStage = (airplan) => { 
         // Create Stage
         this.stage = new Konva.Stage({
@@ -324,7 +591,7 @@ class View {
             height: this.sceneHeight-this.margin.top-this.margin.bottom,
         }).addTo(this.pageLayer);
         
-        new Konva.Rect({ width: this.printArea.width(), height: this.printArea.height(), stroke:'black'})
+        new Konva.Rect({ width: this.printArea.width(), height: this.printArea.height(), stroke:'black', strokeWidth: 1})
         .addTo(this.printArea);
         
         // Header
@@ -335,12 +602,14 @@ class View {
         
         new Konva.Line({
             points: [0,this.header.height(),this.header.width(),this.header.height()],
-            stroke:'black'
+            stroke:'black',
+            strokeWidth:1,
         }).addTo(this.header);
         
         // Header.Slap
         new Konva.Group({
             id: 'slap',
+            name: 'header',
             x: config.body.padding,
             y: config.body.padding,
         }).addTo(this.header)
@@ -358,12 +627,13 @@ class View {
         this.stage.findOne('#slap').fitToChildren().addHighlightBox();
         
         // Header.Title
-        new Konva.Group({id: 'title', x: this.header.width()/2, y: config.body.padding }).addTo(this.header)
+        new Konva.Group({id: 'title', name:'header', x: this.header.width()/2, y: config.body.padding }).addTo(this.header)
         
         new Konva.Text({
             id: 'title.title',
             text: airplan.title,
             fontSize: config.title.fontSize,
+            fontFamily: config.title.fontFamily,
         }).addTo(this.stage.findOne('#title')).anchorTopMiddle()
         
         new Konva.Text({
@@ -376,7 +646,7 @@ class View {
         this.stage.findOne('#title').fitToChildren().addHighlightBox();
         
         // Header.Time
-        new Konva.Group({ id: 'time', x: this.header.width()-config.body.padding, y: config.body.padding }).addTo(this.header)
+        new Konva.Group({ id: 'time', name:'header', x: this.header.width()-config.body.padding, y: config.body.padding }).addTo(this.header)
         
         // Time Labels
         new Konva.Text({
@@ -403,22 +673,22 @@ class View {
         }).addTo(this.printArea);
         
         // Horizontal Line below sun/moon
-        new Konva.Line({stroke:'black', points: [0,this.topRow, this.events.width(),this.topRow]}).addTo(this.events);
+        new Konva.Line({stroke:'black', strokeWidth:1, points: [0,this.topRow, this.events.width(),this.topRow]}).addTo(this.events);
         
         // Horizontal Line across top of sorties
-        new Konva.Line({stroke:'black', points: [0,2*this.topRow, this.events.width(),2*this.topRow]}).addTo(this.events);
+        new Konva.Line({stroke:'black', strokeWidth:1, points: [0,2*this.topRow, this.events.width(),2*this.topRow]}).addTo(this.events);
         
         // Vertical Line along right side of squadrons
-        new Konva.Line({stroke:'black', points: [this.leftCol,2*this.topRow, this.leftCol, this.events.height()-this.bottomRow]}).addTo(this.events);
+        new Konva.Line({stroke:'black', strokeWidth:1, points: [this.leftCol,2*this.topRow, this.leftCol, this.events.height()-this.bottomRow]}).addTo(this.events);
         
         // Vertical Line along right side of squadron letter
-        new Konva.Line({stroke:'black', points: [this.leftCol+this.letterCol,2*this.topRow, this.leftCol+this.letterCol, this.events.height()]}).addTo(this.events);
+        new Konva.Line({stroke:'black', strokeWidth:1, points: [this.leftCol+this.letterCol,2*this.topRow, this.leftCol+this.letterCol, this.events.height()]}).addTo(this.events);
         
         // Horizontal Line across bottom of sorties
-        new Konva.Line({stroke:'black', points: [0,this.events.height()-this.bottomRow, this.events.width(), this.events.height()-this.bottomRow]}).addTo(this.events);
+        new Konva.Line({stroke:'black', strokeWidth:1, points: [0,this.events.height()-this.bottomRow, this.events.width(), this.events.height()-this.bottomRow]}).addTo(this.events);
         
         // Vertical Line along the left side of day/night totals
-        new Konva.Line({stroke:'black', points: [this.events.width()-this.rightCol,this.topRow, this.events.width()-this.rightCol, this.events.height()]}).addTo(this.events);
+        new Konva.Line({stroke:'black', strokeWidth:1, points: [this.events.width()-this.rightCol,this.topRow, this.events.width()-this.rightCol, this.events.height()]}).addTo(this.events);
         
         // Text label for Squadron column
         new Konva.Text({text:'SQUADRON', x: this.leftCol/2, y: 1.5 * this.topRow}).addTo(this.events).anchorCenter();
@@ -438,26 +708,26 @@ class View {
         }).addTo(this.events)
         
         /** Sunrise Group */
-        new Konva.Group({ x: this.time2pixels(airplan.sunrise,airplan), y: 20, id:'sunrise.group' }).addTo(this.timebox).anchorCenter()
+        new Konva.Group({id:'sunrise',name:'timeline', x: this.time2pixels(airplan.sunrise,airplan), y: 20 }).addTo(this.timebox).anchorCenter()
         
         // Sunrise
-        new Konva.Arc({ angle: 180, outerRadius: 15, clockwise: true, stroke:'black' }).addTo(this.stage.findOne('#sunrise.group'));
+        new Konva.Arc({ angle: 180, outerRadius: 15, clockwise: true, stroke:'black', strokeWidth:1 }).addTo(this.stage.findOne('#sunrise'));
         
         // Sunrise Text
-        new Konva.Text({ text: airplan.sunrise.toHHMM(), y: -20 }).addTo(this.stage.findOne('#sunrise.group')).anchorBottomMiddle();
+        new Konva.Text({ text: airplan.sunrise.toHHMM(), y: -20 }).addTo(this.stage.findOne('#sunrise')).anchorBottomMiddle();
         
-        this.stage.findOne('#sunrise.group').fitToChildren().addHighlightBox()
+        this.stage.findOne('#sunrise').fitToChildren().addHighlightBox()
         
         /** Sunset Group */
-        new Konva.Group({ x: this.time2pixels(airplan.sunset,airplan), y: 20, id:'sunset.group' }).addTo(this.timebox).anchorCenter()
+        new Konva.Group({id:'sunset',name:'timeline', x: this.time2pixels(airplan.sunset,airplan), y: 20 }).addTo(this.timebox).anchorCenter()
         
         // Sunset
-        new Konva.Arc({ angle: 180, outerRadius: 15, clockwise: true, stroke:'black', fill: 'black' }).addTo(this.stage.findOne('#sunset.group'));
+        new Konva.Arc({ angle: 180, outerRadius: 15, clockwise: true, stroke:'black', fill: 'black', strokeWidth:1 }).addTo(this.stage.findOne('#sunset'));
         
         // Sunset Text
-        new Konva.Text({ text: airplan.sunset.toHHMM(), y: -20 }).addTo(this.stage.findOne('#sunset.group')).anchorBottomMiddle();
+        new Konva.Text({ text: airplan.sunset.toHHMM(), y: -20 }).addTo(this.stage.findOne('#sunset')).anchorBottomMiddle();
         
-        this.stage.findOne('#sunset.group').fitToChildren().addHighlightBox()
+        this.stage.findOne('#sunset').fitToChildren().addHighlightBox()
         
         /** Timebox.Start/End */
         new Konva.Text({ text: `\u21A6${airplan.start.toHHMM()}`, y: this.topRow*2.5 }).addTo(this.timebox).anchorTopLeft()
@@ -473,9 +743,9 @@ class View {
                 height: this.timebox.height() - this.topRow*2,
             }).addTo(this.timebox)
             // Start of Cycle lineebox)
-            new Konva.Line({ stroke:'black', points: [0,0,0,group.height()+this.bottomRow]}).addTo(group)
+            new Konva.Line({ stroke:'black', strokeWidth:1, points: [0,0,0,group.height()+this.bottomRow]}).addTo(group)
             // End of Cycle Line
-            new Konva.Line({ stroke:'black', points: [group.width(),0,group.width(),group.height()+this.bottomRow]}).addTo(group)
+            new Konva.Line({ stroke:'black', strokeWidth:1, points: [group.width(),0,group.width(),group.height()+this.bottomRow]}).addTo(group)
             // Cycle # Label
             new Konva.Text({ text:cycle.number,      x: group.width()/2 }).addTo(group).anchorBottomMiddle()
             // Cycle Launch Count
@@ -495,7 +765,7 @@ class View {
         // For each squadron
         Object.values(airplan.squadrons).forEach((squadron,i)=>{
             // Group for Squadron Text
-            let group = new Konva.Group({x: this.leftCol/2, y: (i+.5)*spacing}).addTo(this.squadrons).anchorCenter()
+            let group = new Konva.Group({id:squadron.ID, name:'squadron', x: this.leftCol/2, y: (i+.5)*spacing}).addTo(this.squadrons).anchorCenter()
             
             // Squadron Text
             new Konva.Text({align: 'center', text: [squadron.name,squadron.cs,squadron.tms,squadron.modex].join('\n').toUpperCase()}).addTo(group).anchorCenter()
@@ -506,7 +776,7 @@ class View {
             new Konva.Text({ text: squadron.letter, x: this.leftCol/2+this.letterCol/2 }).addTo(group).anchorCenter()
             
             // Horizontal Line across bottom of squadron
-            new Konva.Line({stroke:'black', points: [0,(i+1)*spacing, this.squadrons.width(), (i+1)*spacing]}).addTo(this.squadrons);
+            new Konva.Line({stroke:'black', strokeWidth:1, points: [0,(i+1)*spacing, this.squadrons.width(), (i+1)*spacing]}).addTo(this.squadrons);
             
             // Group for D/N Totals
             group = new Konva.Group({x: this.squadrons.width()-this.rightCol/2, y: (i+.5)*spacing}).addTo(this.squadrons).anchorCenter()
@@ -515,7 +785,7 @@ class View {
             new Konva.Text({ text: squadron.day + '/' + squadron.night }).addTo(group).anchorCenter()
             
             // Squadron.Timebox
-            let timebox = new Konva.Group({ 
+            let timebox = new Konva.Group({
                 x: this.leftCol + this.letterCol,
                 y: i*spacing,
                 width: this.squadrons.width() - this.leftCol - this.letterCol-this.rightCol,
@@ -533,10 +803,12 @@ class View {
                         x: this.time2pixels(sortie.start,airplan),
                         y: (1+j)*lineSpace,
                         width: this.time2pixels(sortie.end,airplan) - this.time2pixels(sortie.start,airplan),
+                        id: sortie.ID,
+                        name: 'sortie',
                     }).addTo(timebox)
                     
                     // Sortie Line
-                    new Konva.Line({stroke:'black', points:[0,0,sortieGroup.width(),0]}).addTo(sortieGroup)
+                    new Konva.Line({stroke:'black', strokeWidth:1, points:[0,0,sortieGroup.width(),0]}).addTo(sortieGroup)
                     View.drawCondition[sortie.startType](0,0).addTo(sortieGroup)
                     View.drawCondition[sortie.endType](sortieGroup.width(),0).addTo(sortieGroup)
                     
@@ -585,21 +857,22 @@ class View {
     
     static drawCondition = {
         flyon: (x,y) => {
-            return new Konva.Line({ points: [x-12,y-12,x,y],stroke: 'black' })
+            return new Konva.Line({ points: [x-12,y-12,x,y],stroke: 'black', lineWidth:1, })
         },
         flyoff: (x,y) => {
-            return new Konva.Line({ points: [x,y,x+12,y-12],stroke: 'black' })
+            return new Konva.Line({ points: [x,y,x+12,y-12],stroke: 'black', lineWidth:1, })
         },
         pull: (x,y) => {
-            return new Konva.Line({ points: [x,y-8,x,y+8],stroke: 'black' })
+            return new Konva.Line({ points: [x,y-8,x,y+8],stroke: 'black', lineWidth:1, })
         },
         stuff: (x,y) => {
-            return new Konva.Line({ points: [x,y-8,x,y+8],stroke: 'black' })
+            return new Konva.Line({ points: [x,y-8,x,y+8],stroke: 'black', lineWidth:1, })
         },
         hp: (x,y) => {
             return new Konva.Line({
                 points: [x,y+5, x+4,y,  x,y-5,  x-4,y,  x,y+5],
                 stroke: 'black',
+                lineWidth:1,
                 closed: true,
                 fill: 'white', fillEnabled: true,
             })
@@ -608,6 +881,7 @@ class View {
             return new Konva.Line({
                 points: [x,y+5, x+4,y,  x,y-5,  x-4,y,  x,y+5],
                 stroke: 'black',
+                lineWidth:1,
                 closed: true,
                 fill: 'black', fillEnabled: true,
             })
