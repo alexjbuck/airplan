@@ -22,20 +22,20 @@ menu.load = function(e) {
     reader.onload = function(e) {
         airplan = JSON.parse(reader.result)
         // convert all Date objects to Date objects
-        airplan.data.date = new Date(airplan.data.date)
-        airplan.data.events.start = new Date(airplan.data.events.start)
-        airplan.data.events.end = new Date(airplan.data.events.end)
-        airplan.data.header.slap.sunrise = new Date(airplan.data.header.slap.sunrise)
-        airplan.data.header.slap.sunset = new Date(airplan.data.header.slap.sunset)
-        airplan.data.header.slap.moonrise = new Date(airplan.data.header.slap.moonrise)
-        airplan.data.header.slap.moonset = new Date(airplan.data.header.slap.moonset)
-        airplan.data.header.time.flightquarters = new Date(airplan.data.header.time.flightquarters)
-        airplan.data.header.time.heloquarters = new Date(airplan.data.header.time.heloquarters)
-        Object.values(airplan.data.events.sorties).forEach((sortie) => {
+        airplan.date = new Date(airplan.date)
+        airplan.start = new Date(airplan.start)
+        airplan.end = new Date(airplan.end)
+        airplan.slap.sunrise = new Date(airplan.slap.sunrise)
+        airplan.slap.sunset = new Date(airplan.slap.sunset)
+        airplan.slap.moonrise = new Date(airplan.slap.moonrise)
+        airplan.slap.moonset = new Date(airplan.slap.moonset)
+        airplan.flightquarters = new Date(airplan.flightquarters)
+        airplan.heloquarters = new Date(airplan.heloquarters)
+        Object.values(airplan.sorties).forEach((sortie) => {
             sortie.start = new Date(sortie.start)
             sortie.end = new Date(sortie.end)
         })
-        Object.values(airplan.data.events.cycles).forEach((cycle) => {
+        Object.values(airplan.cycles).forEach((cycle) => {
             cycle.start = new Date(cycle.start)
             cycle.end = new Date(cycle.end)
         })
@@ -46,7 +46,7 @@ menu.load = function(e) {
 menu.save = function() {
     console.log("Save!")
     let file = new Blob([JSON.stringify(airplan)], {type: "application/json"})
-    saveAs(file,airplan.data.date.toYYYYMMDD()+".json")
+    saveAs(file,airplan.date.toYYYYMMDD()+".json")
 }
 
 menu.print = function() {
@@ -56,11 +56,11 @@ menu.print = function() {
     var pdf = new jspdf.jsPDF('l', 'in', [8.5, 11]);
     let imgData = g.stage.toDataURL({mimeType: 'image/png', quality: 1, pixelRatio: 3});
     pdf.addImage(imgData, 'JPEG', m*w/2, m*h/2, w*(1-m), h*(1-m), undefined, 'FAST');
-    pdf.save('airplan_'+airplan.data.date.toYYYYMMDD()+'.pdf');
+    pdf.save('airplan_'+airplan.date.toYYYYMMDD()+'.pdf');
 }
 
 menu.addSquadron = function() {
-    if (airplan.data.events.squadrons.length >= 9) {
+    if (Object.values(airplan.squadrons).length >= 9) {
         alert("You can only have 9 squadrons!")
         return
     }
@@ -76,10 +76,10 @@ menu.editSquadron = function(i) {
     html += menu.squadronForm()
     html += "<button class='btn btn-primary' onclick='menu.editSquadronConfirm("+i+")'>Update Squadron</button>"
     openModal(html)
-    $('#squadron-name').val(airplan.data.events.squadrons[i].name)
-    $('#squadron-cs').val(airplan.data.events.squadrons[i].cs)
-    $('#squadron-tms').val(airplan.data.events.squadrons[i].tms)
-    $('#squadron-modex').val(airplan.data.events.squadrons[i].modex)
+    $('#squadron-name').val(airplan.squadrons[id].name)
+    $('#squadron-cs').val(airplan.squadrons[id].cs)
+    $('#squadron-tms').val(airplan.squadrons[id].tms)
+    $('#squadron-modex').val(airplan.squadrons[id].modex)
 }
 
 menu.squadronForm = function() {
@@ -110,41 +110,32 @@ menu.addSquadronConfirm = function() {
         cs: $('#squadron-cs').val(),
         tms: $('#squadron-tms').val(),
         modex: $('#squadron-modex').val(),
-        letter: String.fromCharCode(airplan.data.events.squadrons.length + 65),
+        letter: String.fromCharCode(Object.values(airplan.squadrons).length + 65),
     }
-    airplan.data.events.squadrons.push(squadron)
+    airplan.squadrons.push(squadron)
     refresh()
     closeModal()
 }
 
-menu.editSquadronConfirm = function(i) {
+menu.editSquadronConfirm = function(id) {
     let squadron = {
         name: $('#squadron-name').val(),
         cs: $('#squadron-cs').val(),
         tms: $('#squadron-tms').val(),
         modex: $('#squadron-modex').val(),
-        letter: String.fromCharCode(i + 65),
+        letter: airplan.squadrons[id].letter,
     }
-    airplan.data.events.squadrons[i] = squadron
+    airplan.squadrons[id] = squadron
     refresh()
     closeModal()
 }
 
 menu.deleteBottomSquadron = function() {
-    if (airplan.data.events.squadrons.length <= 0) {
+    if (Object.values(airplan.squadrons).length <= 0) {
         alert("There are no squadrons!")
         return
     }
-    //delete sorties with this squadron
-    let sorties = Object.values(airplan.data.events.sorties)
-    let squadronName = airplan.data.events.squadrons[airplan.data.events.squadrons.length-1].name
-    sorties.forEach((sortie) => {
-        if (sortie.squadron == squadronName) {
-            delete airplan.data.events.sorties[sortie.id]
-        }
-    })
-
-    airplan.data.events.squadrons.pop()
+    airplan.squadrons.pop()
     refresh()
 }
 

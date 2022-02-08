@@ -1,6 +1,6 @@
 {
     "name": "airplan",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Airplan visualization and building",
     "author": "Alex 'Jarvis' Buck <alexander.j.buck@navy.mil>",
     "contributors": [
@@ -18,7 +18,8 @@
       "jspdf": "^2.5.0",
       "file-saver": "^2.0.4",
       "bootstrap": "^4.0.0",
-      "konva": "^8.3.2"
+      "konva": "^8.3.2",
+      "fontawesome": "^5.15.4"
     }
 
 }  
