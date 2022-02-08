@@ -225,7 +225,6 @@ class View {
         </div>
         <p>
         Writing airplan's in PowerPoint is a big bummer &#129324;.
-        Never again will you chained to dragging around little lines on the screen \u26D3.
         This is a simple web app that allows you to view and edit your squadron's air plans &#128203;.
         You can add new flights, edit existing flights, and delete flights.
         You can also export your squadron's flight plans to PDF <i class="far fa-file-pdf"></i>.
