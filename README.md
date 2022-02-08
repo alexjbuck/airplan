@@ -2,7 +2,7 @@
 
 **For when you don't have ADMACS (maybe even when you do! 🤣)**
 
-Version: 0.1.0
+Version: 0.2.0
 
 Writing airplan's in PowerPoint is a big bummer 🤬.
 Never again will you chained to dragging around little lines on the screen ⛓.
