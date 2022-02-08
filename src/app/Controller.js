@@ -144,11 +144,11 @@ class Controller {
     handleEditCycleSubmit = (cycleID, start, end) => {
         this.airplan.cycles[cycleID].start = start;
         this.airplan.cycles[cycleID].end = end;
-        this.onAirplanChanged()
+        this.airplan.onChange()
     }
     handleEditCycleRemove = (cycleID) => {
         this.airplan.removeCycle({ID:cycleID})
-        .then(this.onAirplanChanged())
+        .then(this.airplan.onChange())
     }
     handleAddLineMenu = () => {
         this.view.drawAddLineMenu(this.airplan.squadrons)
@@ -222,10 +222,7 @@ class Controller {
         this.airplan.sorties[sortieID].note = note
         this.airplan.sorties[sortieID].startCycleID = startCycleID
         this.airplan.sorties[sortieID].endCycleID = endCycleID
-        this.onAirplanChanged()
-    }
-    handleEditSortieMenu = (sortieID) => {
-        this.view.drawEditSortieMenu
+        this.airplan.onChange()
     }
 
     handleEditHeaderSubmit = (title, date, start, end, sunrise, sunset, moonrise, moonset, moonphase, flightquarters, heloquarters, variation, timezone) => {
