@@ -1,7 +1,13 @@
+/**
+* The View class is the base class for all views.
+*/
 class View {
-    constructor(airplan) {
+    /**
+    * Create a view object
+    * @param {Model} airplan 
+    */
+    constructor() {
         this.app                = this.getElement('#view');
-        
         this.margin             = {top: 10, right: 10, bottom: 10, left: 10};
         this.sceneWidth         = 1100;
         this.sceneHeight        = 850;
@@ -16,17 +22,104 @@ class View {
             $('[data-toggle="tooltip"]').tooltip()
         })          
     }
-    
-    bindMenuAddPlaceholderSquadron(handler){
-        this.menu.squadron.add.on('click', event=>{
-            handler()
-        })
+    // ASCII Comments generated with: https://patorjk.com/software/taag
+    //    __  __                      __      __ _                      
+    //   |  \/  |                     \ \    / /(_)                     
+    //   | \  / |  ___  _ __   _   _   \ \  / /  _   ___ __      __ ___ 
+    //   | |\/| | / _ \| '_ \ | | | |   \ \/ /  | | / _ \\ \ /\ / // __|
+    //   | |  | ||  __/| | | || |_| |    \  /   | ||  __/ \ V  V / \__ \
+    //   |_|  |_| \___||_| |_| \__,_|     \/    |_| \___|  \_/\_/  |___/
+    /**
+    * @method drawMenu Populate the #menu in the menu div.
+    */
+    drawMenu = () => {
+        this.menu = {squadron:{},file:{},info:{}}
+        var html =`
+        <h3>Menu</h3>
+        <div class='btn-group menu-group'>
+        <button id='add-squadron' class='btn btn-outline-primary add-squadron' data-toggle='tooltip' data-placement='top' title='Add Squadron'>   <i class='fas fa-plus'> </i></button>
+        <button id='rem-squadron' class='btn btn-outline-danger rem-squadron'  data-toggle='tooltip' data-placement='top' title='Remove Squadron'><i class='fas fa-minus'></i></button>
+        </div>
+        <div class='btn-group menu-group'>
+        <button id='reset'   class='btn btn-outline-danger'       data-toggle='tooltip' data-placement='top' title='Burn it Down!'><i class='fas fa-dumpster-fire'> </i></button>
+        <button id='refresh' class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Refresh'>      <i class='fas fa-sync'>          </i></button>
+        <label  id='load'    class='btn btn-outline-primary my-0' data-toggle='tooltip' data-placement='top' title='Load'>         <i class='fas fa-folder-open'>   </i><input type='file' id='filepath' hidden></label>
+        <button id='save'    class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Save'>         <i class='fas fa-save'>          </i></button>
+        <button id='export'  class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Export PDF'>   <i class='fas fa-file-pdf'>      </i></button>
+        </div>
+        <div class='btn-group menu-group'>
+        <button id="help"            class='btn btn-outline-warning'      data-toggle='tooltip' data-placement='top' title='Help'>         <i class='fas fa-question-circle'></i></button>
+        <button id="feedback" class='btn btn-outline-success' data-toggle='tooltip' data-placement='top' title='Send Feedback'        onclick='location.href="mailto:alexander.j.buck@navy.mil?subject=Airplan feedback&body=Three things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:%0d%0a%0d%0aThank You!"'><i class="fas fa-bullhorn"></i></button>
+        </div>
+        `;
+        $('#menu').html(html)
+        this.menu.squadron.add = $('#add-squadron')
+        this.menu.squadron.rem = $('#rem-squadron')
+        this.menu.file.reset = $('#reset')
+        this.menu.file.refresh = $('#refresh')
+        this.menu.file.load = $('#load')
+        this.menu.file.save = $('#save')
+        this.menu.file.export = $('#export')
+        this.menu.info.help = $('#help')
+        this.menu.info.feedback = $('#feedback')
     }
-    bindMenuRemoveSquadron(handler){
-        this.menu.squadron.rem.on('click', event=>{
-            handler()
-        })
+    /**
+    * @method drawHelp Draws the help modal dialog.
+    */
+    drawHelp() {
+        let html = `
+        <div class='container'>
+        <div class='row'>
+        <div>
+        <h3>Bad Max airplan writer: \u2708</h3>
+        <h5>For when you don't have ADMACS <sup><em><small>maybe even when you do!</small></em></sup></h5>
+        </div>
+        <div class='ml-auto'>
+        <small>Version: 0.2.0</small>
+        </div>
+        </div>
+        </div>
+        <hr>
+        <p>
+        Writing airplan's in PowerPoint is a big bummer &#129324;.
+        This is a simple web app that allows you to view and edit your squadron's air plans.
+        You can add new flights, edit existing flights, and delete flights.
+        You can also export your air plan to PDF <i class="far fa-file-pdf"></i>.
+        </p>
+        <h5>Structure</h5>
+        <i class="fas fa-exclamation-triangle"></i> Tips:
+        <ul>
+        <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> or red <i style="color:red" class='fas fa-minus'></i> in the menu to add or remove a squadron.</li>
+        <li>You can add cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
+        <li>Next add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button.</li>
+        <li>Sorties are added into a line by clicking "<i class='fas fa-plus'></i> Add Sortie" within a line in the list.</li>
+        <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This will download a file that you can load to resume your progress.</li>
+        <li>Items on the display to the left open edit menu's if they have a <span class='blue-border'>blue border</span> when you hover over them.</li>
+        <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
+        <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
+        </ul>
+        <p>
+        Play around, you can't break anything, and hopefully you find this app useful!
+        </p>
+        <p>
+        Please provide feedback to <span class='jarvis'>JARVIS</span> at <a href=mailto:alexander.j.buck@gmail.com>alexander.j.buck@navy.mil</a> by
+        clicking the green <span style="color:green"><i class="fas fa-bullhorn"></i></span> button in the menu.
+        </p>
+        `
+        openModal(html)
     }
+    //    __  __                       ____   _             _  _                    
+    //   |  \/  |                     |  _ \ (_)           | |(_)                   
+    //   | \  / |  ___  _ __   _   _  | |_) | _  _ __    __| | _  _ __    __ _  ___ 
+    //   | |\/| | / _ \| '_ \ | | | | |  _ < | || '_ \  / _` || || '_ \  / _` |/ __|
+    //   | |  | ||  __/| | | || |_| | | |_) || || | | || (_| || || | | || (_| |\__ \
+    //   |_|  |_| \___||_| |_| \__,_| |____/ |_||_| |_| \__,_||_||_| |_| \__, ||___/
+    //                                                                    __/ |     
+    //                                                                   |___/      
+    /**
+    * Bind the menu controls functions to the view object click event
+    * @param {Function} handler
+    */
     bindMenuReset(handler){
         this.menu.file.reset.on('click', event=>{
             handler()
@@ -62,6 +155,116 @@ class View {
             handler()
         })
     }
+    
+    
+    //     _____                           _                      ____   _             _  _                    
+    //    / ____|                         | |                    |  _ \ (_)           | |(_)                   
+    //   | (___    __ _  _   _   __ _   __| | _ __  ___   _ __   | |_) | _  _ __    __| | _  _ __    __ _  ___ 
+    //    \___ \  / _` || | | | / _` | / _` || '__|/ _ \ | '_ \  |  _ < | || '_ \  / _` || || '_ \  / _` |/ __|
+    //    ____) || (_| || |_| || (_| || (_| || |  | (_) || | | | | |_) || || | | || (_| || || | | || (_| |\__ \
+    //   |_____/  \__, | \__,_| \__,_| \__,_||_|   \___/ |_| |_| |____/ |_||_| |_| \__,_||_||_| |_| \__, ||___/
+    //               | |                                                                             __/ |     
+    //               |_|                                                                            |___/      
+    /**
+    * Bind the add squadron controller to the view object click event
+    * @param {Function} handler 
+    */
+    bindMenuAddPlaceholderSquadron(handler){
+        this.menu.squadron.add.on('click', event=>{
+            handler()
+        })
+    }
+    bindMenuRemoveSquadron(handler){
+        this.menu.squadron.rem.on('click', event=>{
+            handler()
+        })
+    }
+    bindEditSquadronSubmit(handler){
+        this.editSquadronSubmit.on('click', event=>{
+            let name = $('#name').val();
+            let cs = $('#cs').val();
+            let tms = $('#tms').val();
+            let modex = $('#modex').val();
+            let squadronID = event.currentTarget.id
+            handler(squadronID, name, cs, tms, modex)
+            closeModal()
+        })
+    }
+    //     _____                           _                      __  __                          
+    //    / ____|                         | |                    |  \/  |                         
+    //   | (___    __ _  _   _   __ _   __| | _ __  ___   _ __   | \  / |  ___  _ __   _   _  ___ 
+    //    \___ \  / _` || | | | / _` | / _` || '__|/ _ \ | '_ \  | |\/| | / _ \| '_ \ | | | |/ __|
+    //    ____) || (_| || |_| || (_| || (_| || |  | (_) || | | | | |  | ||  __/| | | || |_| |\__ \
+    //   |_____/  \__, | \__,_| \__,_| \__,_||_|   \___/ |_| |_| |_|  |_| \___||_| |_| \__,_||___/
+    //               | |                                                                          
+    //               |_|                                                                          
+    drawEditSquadronData(squadron) {
+        let html = `<h3>Edit Squadron</h3>`
+        // Name
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='name' class='col-12 col-md-3 text-left text-md-right'>Squadron Name</label>";
+        html += "<input type='text' class='col form-control mr-5' id='name' placeholder='VFA-XX'>";
+        html += "</div>";
+        // Callsign
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='cs' class='col-12 col-md-3 text-left text-md-right'>Callsign</label>";
+        html += "<input type='text' class='col form-control mr-5' id='cs' placeholder='Airplan Title'>";
+        html += "</div>";
+        // TMS
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='tms' class='col-12 col-md-3 text-left text-md-right'>TMS</label>";
+        html += "<input type='text' class='col form-control mr-5' id='tms' placeholder='Airplan Title'>";
+        html += "</div>";
+        // Modex
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='modex' class='col-12 col-md-3 text-left text-md-right'>Modex</label>";
+        html += "<input type='text' class='col form-control mr-5' id='modex' placeholder='Airplan Title'>";
+        html += "</div>";
+        html += "<button id='"+squadron.ID+"' class='btn btn-primary edit-squadron-submit'>Submit</button>";
+        openModal(html)
+        this.editSquadronSubmit = $('.edit-squadron-submit')
+    }
+    
+    //     _____              _        __      __ _                 
+    //    / ____|            | |       \ \    / /(_)                
+    //   | |     _   _   ___ | |  ___   \ \  / /  _   ___ __      __
+    //   | |    | | | | / __|| | / _ \   \ \/ /  | | / _ \\ \ /\ / /
+    //   | |____| |_| || (__ | ||  __/    \  /   | ||  __/ \ V  V / 
+    //    \_____|\__, | \___||_| \___|     \/    |_| \___|  \_/\_/  
+    //            __/ |                                             
+    //           |___/                                              
+    /**
+    * @param {Model} airplan 
+    * @method drawCycleList populates the #cycles-list div with cycles information.
+    */
+    drawCycleList = (airplan) => {
+        let html = `
+        <h3>Cycles</h3>
+        <ul class='list-group'>`
+        Object.values(airplan.cycles).forEach(cycle => {
+            html += `<li id='`+cycle.ID+`' class='list-group-item list-group-item-action edit-cycle-menu'>`
+            html += `<div class='row cycle'>`
+            html += `<div class='col-xl-3 col-md'><b>Cycle ${cycle.number}</b>:</div>`
+            html += `<div class='col-xl col-md'>${cycle.start.toHHMM()} - ${cycle.end.toHHMM()}</div>`
+            html += `</div>`
+        })
+        html += `<li class='list-group-item list-group-item-action add-cycle-menu'><i class='fas fa-plus'></i> Add Cycle...</li>`
+        $('#cycles-list').html(html)
+        this.addCycleMenu = $('.add-cycle-menu')
+        this.editCycleMenu = $('.edit-cycle-menu')
+    }
+    //     _____              _         ____   _             _  _                    
+    //    / ____|            | |       |  _ \ (_)           | |(_)                   
+    //   | |     _   _   ___ | |  ___  | |_) | _  _ __    __| | _  _ __    __ _  ___ 
+    //   | |    | | | | / __|| | / _ \ |  _ < | || '_ \  / _` || || '_ \  / _` |/ __|
+    //   | |____| |_| || (__ | ||  __/ | |_) || || | | || (_| || || | | || (_| |\__ \
+    //    \_____|\__, | \___||_| \___| |____/ |_||_| |_| \__,_||_||_| |_| \__, ||___/
+    //            __/ |                                                    __/ |     
+    //           |___/                                                    |___/      
+    /**
+    * Bind the add cycle controller to the view object click event
+    * @param {Function} handler 
+    */
     bindAddCycleMenu(handler){
         this.addCycleMenu.on('click', event=>{
             handler()
@@ -75,6 +278,79 @@ class View {
             closeModal()
         })
     }
+    bindEditCycleMenu(handler){
+        if(this.editCycleMenu.length){
+            this.editCycleMenu.on('click', event=>{
+                let cycleID = event.currentTarget.id
+                handler(cycleID)
+            })
+        }
+    }
+    bindEditCycleSubmit(handler){
+        this.editCycleSubmit.on('click', event=>{
+            let cycleID = event.currentTarget.id
+            let start = Date.parse($('#start').val())
+            let end = Date.parse($('#end').val())
+            handler(cycleID, start, end)
+            closeModal()
+        })
+    }
+    bindEditCycleRemove(handler){
+        this.editCycleRemove.on('click', event=>{
+            let cycleID = event.currentTarget.id
+            handler(cycleID)
+            closeModal()
+        })
+    }
+    //     _____              _         __  __                          
+    //    / ____|            | |       |  \/  |                         
+    //   | |     _   _   ___ | |  ___  | \  / |  ___  _ __   _   _  ___ 
+    //   | |    | | | | / __|| | / _ \ | |\/| | / _ \| '_ \ | | | |/ __|
+    //   | |____| |_| || (__ | ||  __/ | |  | ||  __/| | | || |_| |\__ \
+    //    \_____|\__, | \___||_| \___| |_|  |_| \___||_| |_| \__,_||___/
+    //            __/ |                                                 
+    //           |___/                                                  
+    drawAddCycleMenu() {
+        let html = this.drawAddEditCycleMenu()
+        html += `<button class='btn btn-primary add-cycle-submit'>Submit</button>`
+        openModal(html)
+        this.addCycleSubmit = $('.add-cycle-submit')
+    }
+    drawEditCycleMenu(cycleID) {
+        let html = this.drawAddEditCycleMenu()
+        html += `<button id='`+cycleID+`' class='btn btn-primary edit-cycle-submit'>Submit</button>`
+        html += `<button id='`+cycleID+`' class='btn btn-danger edit-cycle-remove'>Remove</button>`
+        openModal(html)
+        this.editCycleSubmit = $('.edit-cycle-submit')
+        this.editCycleRemove = $('.edit-cycle-remove')
+    }
+    drawAddEditCycleMenu() {
+        let html = `
+        <h3>Add Cycle</h3>
+        <div class='form-group row align-items-center'>
+        <label for='start' class='col-12 col-md-2 text-left text-md-right'>Start</label>
+        <input type='datetime-local' class='col form-control mr-5' id='start' placeholder='Start'>
+        </div>
+        <div class='form-group row align-items-center'>
+        <label for='end' class='col-12 col-md-2 text-left text-md-right'>End</label>
+        <input type='datetime-local' class='col form-control mr-5' id='end' placeholder='End'>
+        </div>
+        `
+        return html
+    }
+    
+    //    _       _                ____   _             _  _                    
+    //   | |     (_)              |  _ \ (_)           | |(_)                   
+    //   | |      _  _ __    ___  | |_) | _  _ __    __| | _  _ __    __ _  ___ 
+    //   | |     | || '_ \  / _ \ |  _ < | || '_ \  / _` || || '_ \  / _` |/ __|
+    //   | |____ | || | | ||  __/ | |_) || || | | || (_| || || | | || (_| |\__ \
+    //   |______||_||_| |_| \___| |____/ |_||_| |_| \__,_||_||_| |_| \__, ||___/
+    //                                                                __/ |     
+    //                                                               |___/      
+    /**
+    * Bind the add line controller to the view object click event
+    * @param {Function} handler 
+    */
     bindAddLineMenu(handler){
         this.addLineMenu.on('click', event=>{
             handler()
@@ -87,6 +363,91 @@ class View {
             closeModal()
         })
     }
+    //    _       _                __  __                          
+    //   | |     (_)              |  \/  |                         
+    //   | |      _  _ __    ___  | \  / |  ___  _ __   _   _  ___ 
+    //   | |     | || '_ \  / _ \ | |\/| | / _ \| '_ \ | | | |/ __|
+    //   | |____ | || | | ||  __/ | |  | ||  __/| | | || |_| |\__ \
+    //   |______||_||_| |_| \___| |_|  |_| \___||_| |_| \__,_||___/
+    //                                                             
+    //                                                             
+    drawAddLineMenu(squadrons) {
+        let html = `
+        <h3>Add Line</h3>
+        <div class='form-group row align-items-center'>
+        <label for='start' class='col-12 col-md-2 text-left text-md-right'>Squadron</label>
+        <select class='col form-control mr-5' id='squadron'>`
+        Object.values(squadrons).forEach((sqdrn, i) => {
+            html += "<option value='"+sqdrn.ID+"'>"+sqdrn.name+"</option>";
+        })
+        html += `
+        </select>
+        </div>
+        <button id='add-line-submit' class='btn btn-primary'>Submit</button>`
+        openModal(html)
+        this.addLineSubmit = $('#add-line-submit')
+    }
+    //    _       _                    __   _____               _    _        __      __ _                 
+    //   | |     (_)                  / /  / ____|             | |  (_)       \ \    / /(_)                
+    //   | |      _  _ __    ___     / /  | (___    ___   _ __ | |_  _   ___   \ \  / /  _   ___ __      __
+    //   | |     | || '_ \  / _ \   / /    \___ \  / _ \ | '__|| __|| | / _ \   \ \/ /  | | / _ \\ \ /\ / /
+    //   | |____ | || | | ||  __/  / /     ____) || (_) || |   | |_ | ||  __/    \  /   | ||  __/ \ V  V / 
+    //   |______||_||_| |_| \___| /_/     |_____/  \___/ |_|    \__||_| \___|     \/    |_| \___|  \_/\_/  
+    //                                                                                                     
+    //                                                                                                     
+    /**
+    * @param {Model} airplan
+    * @method drawSortieList populates the #sorties-view div view with sorties information
+    */
+    drawSortieList = (airplan) => {
+        let html =  `<h3>Lines and Sorties</h3>`
+        html +=     `<div class='list-group'>`
+        Object.values(airplan.squadrons).forEach(squadron => {
+            Object.values(airplan.lines).filter(line=>line.squadronID == squadron.ID).sort((a,b)=>a.start-b.start).forEach((line,i) => {
+                html += `<div class='list-group-item line'>`
+                html +=     `<div class='row'>`
+                html +=         `<div class='col-xl col-md-4'> <b>${squadron.name}</b> </div>`
+                html +=         `<div class='col-xl col-md-8'> Line ${i+1} </div>`
+                if (line.sorties.length) {
+                    html +=     `<div class='col-xl-4 col-md-6'><small>${line.start.toHHMM()}-${line.end.toHHMM()}</small></div>`
+                }
+                html +=     `</div>`
+                html +=     `<div class='list-group list-group-flush'>`
+                Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
+                    html += `
+                    <div class='list-group-item list-group-item-action px-5 py-1 sortie'>
+                    <i id='`+sortie.ID+`' class='fas fa-bars sortie-edit'></i>
+                    <small>Event: <b>${sortie.event}:</b> ${sortie.start.toHHMM()} - ${sortie.end.toHHMM()}</small>
+                    <i id='`+sortie.ID+`' class='fas fa-trash-alt sortie-delete'></i>
+                    </div>`
+                })
+                html += `
+                <div id='`+line.ID+`' class='list-group-item list-group-item-action px-5 py-1 sortie add-sortie-menu'>
+                <small><i class='fas fa-plus'></i> Add Sortie...</small>
+                </div>`
+                html +=     `</div>
+                </div>`
+            })
+        })
+        html +=         `<div class='list-group-item list-group-item-action add-line-menu'><i class='fas fa-plus'></i> Add Line...</div>`        
+        html +=     `</div>`
+        
+        $('#sorties-list').html(html)
+        this.addLineMenu = $('.add-line-menu')
+        this.addSortieMenu = $('.add-sortie-menu')
+    }
+    //     _____               _    _         ____   _             _  _                    
+    //    / ____|             | |  (_)       |  _ \ (_)           | |(_)                   
+    //   | (___    ___   _ __ | |_  _   ___  | |_) | _  _ __    __| | _  _ __    __ _  ___ 
+    //    \___ \  / _ \ | '__|| __|| | / _ \ |  _ < | || '_ \  / _` || || '_ \  / _` |/ __|
+    //    ____) || (_) || |   | |_ | ||  __/ | |_) || || | | || (_| || || | | || (_| |\__ \
+    //   |_____/  \___/ |_|    \__||_| \___| |____/ |_||_| |_| \__,_||_||_| |_| \__, ||___/
+    //                                                                           __/ |     
+    //                                                                          |___/      
+    /**
+    * Bind the add sortie controller to the view object click event
+    * @param {Function} handler 
+    */
     bindAddSortieMenu(handler){
         this.addSortieMenu.on('click', event=>{
             let lineID = event.currentTarget.id
@@ -120,185 +481,15 @@ class View {
             handler(sortieID, start, end, startType, endType, note, startCycleID, endCycleID)
             closeModal()
         })
-        
     }
-    bindCanvasClick(handler) {
-        this.stage.find('.highlight').forEach(element => {
-            element.off('click')
-            element.on('click', event => {
-                handler(element)
-            })
-        })
-    }
-    
-    bindEditHeaderSubmit(handler){
-        this.editHeaderSubmit.on('click', event=>{
-            let title = $('#title').val();
-            let date = $('#date').val();
-            let start = $('#start').val();
-            let end = $('#end').val();
-            let sunrise = $('#sunrise').val();
-            let sunset = $('#sunset').val();
-            let moonrise = $('#moonrise').val();
-            let moonset = $('#moonset').val();
-            let moonphase = $('#moonphase').val();
-            let flightquarters = $('#flightquarters').val();
-            let heloquarters = $('#heloquarters').val();
-            let variation = $('#variation').val();
-            let timezone = $('#timezone').val();
-            handler(title, date, start, end, sunrise, sunset, moonrise, moonset, moonphase, flightquarters, heloquarters, variation, timezone)
-            closeModal()
-        })
-    }
-    
-    bindEditSquadronSubmit(handler){
-        this.editSquadronSubmit.on('click', event=>{
-            let name = $('#name').val();
-            let cs = $('#cs').val();
-            let tms = $('#tms').val();
-            let modex = $('#modex').val();
-            let squadronID = event.currentTarget.id
-            handler(squadronID, name, cs, tms, modex)
-            closeModal()
-        })
-    }
-    
-    bindEditCycleMenu(handler){
-        if(this.editCycleMenu.length){
-            this.editCycleMenu.on('click', event=>{
-                let cycleID = event.currentTarget.id
-                handler(cycleID)
-            })
-        }
-    }
-    bindEditCycleSubmit(handler){
-        this.editCycleSubmit.on('click', event=>{
-            let cycleID = event.currentTarget.id
-            let start = Date.parse($('#start').val())
-            let end = Date.parse($('#end').val())
-            handler(cycleID, start, end)
-            closeModal()
-        })
-    }
-    bindEditCycleRemove(handler){
-        this.editCycleRemove.on('click', event=>{
-            let cycleID = event.currentTarget.id
-            handler(cycleID)
-            closeModal()
-        })
-    }
-    
-    bindMenuRemoveCycle(handler){
-        
-    }
-    bindMenuEditCycle(handler){
-        
-    }
-    bindMenuAddLine(handler){
-        
-    }
-    bindMenuRemoveLine(handler){
-        
-    }
-    bindMenuAddSortie(handler){
-        
-    }
-    bindMenuRemoveSortie(handler){
-        
-    }
-    
-    /**
-    * @method help Draws the help modal dialog.
-    */
-    drawHelp() {
-        let html = `
-        <div class='container'>
-        <div class='row'>
-        <div class=''>
-        <h3> Bad Max airplan writer: \u2708</h3>
-        <h5>For when you don't have ADMACS <sup><small>(maybe even when you do! &#129315;)</small></sup></h5>
-        </div>
-        <div class='ml-auto'>
-        <small>Version: 0.2.0</small>
-        </div>
-        </div>
-        </div>
-        <p>
-        Writing airplan's in PowerPoint is a big bummer &#129324;.
-        This is a simple web app that allows you to view and edit your squadron's air plans &#128203;.
-        You can add new flights, edit existing flights, and delete flights.
-        You can also export your squadron's flight plans to PDF <i class="far fa-file-pdf"></i>.
-        </p>
-        <i class="fas fa-exclamation-triangle"></i> Tips:
-        <ul>
-        <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> or red <i style="color:red" class='fas fa-minus'></i> in the menu to add or remove a squadron.</li>
-        <li>You can add cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
-        <li>Next add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button.</li>
-        <li>Sorties are added into a line by clicking "<i class='fas fa-plus'></i> Add Sortie" within a line in the list.</li>
-        <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This will download a file that you can upload later to resume your progress.</li>
-        <li>Items on the display to the left open edit menu's if they have a <span class='blue-border'>blue border</span> when you hover over them.</li>
-        <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
-        <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
-        </ul>
-        <p>
-        Play around, you can't break anything, and hopefully you find this app useful!
-        </p>
-        <p>
-        Please provide feedback to <span class='jarvis'>JARVIS</span> at <a href=mailto:alexander.j.buck@gmail.com>alexander.j.buck@navy.mil</a> by
-        clicking the <span style="color:green">green</span> "Feedback" button in the menu.
-        </p>
-        `
-        openModal(html)
-    }
-    
-    drawAddCycleMenu() {
-        let html = this.drawAddEditCycleMenu()
-        html += `<button class='btn btn-primary add-cycle-submit'>Submit</button>`
-        openModal(html)
-        this.addCycleSubmit = $('.add-cycle-submit')
-    }
-    
-    drawEditCycleMenu(cycleID) {
-        let html = this.drawAddEditCycleMenu()
-        html += `<button id='`+cycleID+`' class='btn btn-primary edit-cycle-submit'>Submit</button>`
-        html += `<button id='`+cycleID+`' class='btn btn-danger edit-cycle-remove'>Remove</button>`
-        openModal(html)
-        this.editCycleSubmit = $('.edit-cycle-submit')
-        this.editCycleRemove = $('.edit-cycle-remove')
-    }
-    
-    drawAddEditCycleMenu() {
-        let html = `
-        <h3>Add Cycle</h3>
-        <div class='form-group row align-items-center'>
-        <label for='start' class='col-12 col-md-2 text-left text-md-right'>Start</label>
-        <input type='datetime-local' class='col form-control mr-5' id='start' placeholder='Start'>
-        </div>
-        <div class='form-group row align-items-center'>
-        <label for='end' class='col-12 col-md-2 text-left text-md-right'>End</label>
-        <input type='datetime-local' class='col form-control mr-5' id='end' placeholder='End'>
-        </div>
-        `
-        return html
-    }
-    drawAddLineMenu(squadrons) {
-        let html = `
-        <h3>Add Line</h3>
-        <div class='form-group row align-items-center'>
-        <label for='start' class='col-12 col-md-2 text-left text-md-right'>Squadron</label>
-        <select class='col form-control mr-5' id='squadron'>`
-        Object.values(squadrons).forEach((sqdrn, i) => {
-            html += "<option value='"+sqdrn.ID+"'>"+sqdrn.name+"</option>";
-        })
-        html += `
-        </select>
-        </div>
-        <button id='add-line-submit' class='btn btn-primary'>Submit</button>
-        `
-        openModal(html)
-        this.addLineSubmit = $('#add-line-submit')
-    }
-    
+    //     _____               _    _         __  __                          
+    //    / ____|             | |  (_)       |  \/  |                         
+    //   | (___    ___   _ __ | |_  _   ___  | \  / |  ___  _ __   _   _  ___ 
+    //    \___ \  / _ \ | '__|| __|| | / _ \ | |\/| | / _ \| '_ \ | | | |/ __|
+    //    ____) || (_) || |   | |_ | ||  __/ | |  | ||  __/| | | || |_| |\__ \
+    //   |_____/  \___/ |_|    \__||_| \___| |_|  |_| \___||_| |_| \__,_||___/
+    //                                                                        
+    //                                                                        
     makeAddEditSortieMenu(line) {
         let html = '<h3>Add/Edit Sortie: ' + line.squadron.name + ' Line ' + line.number+'</h3>'
         // Start Time
@@ -338,7 +529,6 @@ class View {
         html += "</div>";
         return html
     }
-    
     /**
     * I don't know if this actually needs to be async. I don't think it does.
     * If you remove the async, then contrller.handleAddSortieMenu needs to change
@@ -351,7 +541,6 @@ class View {
         openModal(html)
         this.addSortieSubmit = $('.add-sortie-submit')
     }
-    
     drawEditSortieMenu(sortie) { 
         let line = sortie.line
         let html = this.makeAddEditSortieMenu(line)
@@ -360,6 +549,53 @@ class View {
         this.editSortieSubmit = $('.edit-sortie-submit')
     }
     
+    //     _____                                 ____   _             _  _                    
+    //    / ____|                               |  _ \ (_)           | |(_)                   
+    //   | |      __ _  _ __ __   __ __ _  ___  | |_) | _  _ __    __| | _  _ __    __ _  ___ 
+    //   | |     / _` || '_ \\ \ / // _` |/ __| |  _ < | || '_ \  / _` || || '_ \  / _` |/ __|
+    //   | |____| (_| || | | |\ V /| (_| |\__ \ | |_) || || | | || (_| || || | | || (_| |\__ \
+    //    \_____|\__,_||_| |_| \_/  \__,_||___/ |____/ |_||_| |_| \__,_||_||_| |_| \__, ||___/
+    //                                                                              __/ |     
+    //                                                                             |___/      
+    /**
+    * Bind the canvas click controller to the view object click event
+    * @param {Function} handler Universal handler for all canvas click events. Sorts out which element was clicked based on Konva name and id values.
+    */
+    bindCanvasClick(handler) {
+        this.stage.find('.highlight').forEach(element => {
+            element.off('click')
+            element.on('click', event => {
+                handler(element)
+            })
+        })
+    }
+    bindEditHeaderSubmit(handler){
+        this.editHeaderSubmit.on('click', event=>{
+            let title = $('#title').val();
+            let date = $('#date').val();
+            let start = $('#start').val();
+            let end = $('#end').val();
+            let sunrise = $('#sunrise').val();
+            let sunset = $('#sunset').val();
+            let moonrise = $('#moonrise').val();
+            let moonset = $('#moonset').val();
+            let moonphase = $('#moonphase').val();
+            let flightquarters = $('#flightquarters').val();
+            let heloquarters = $('#heloquarters').val();
+            let variation = $('#variation').val();
+            let timezone = $('#timezone').val();
+            handler(title, date, start, end, sunrise, sunset, moonrise, moonset, moonphase, flightquarters, heloquarters, variation, timezone)
+            closeModal()
+        })
+    }
+    //    _    _                   _               __  __                          
+    //   | |  | |                 | |             |  \/  |                         
+    //   | |__| |  ___   __ _   __| |  ___  _ __  | \  / |  ___  _ __   _   _  ___ 
+    //   |  __  | / _ \ / _` | / _` | / _ \| '__| | |\/| | / _ \| '_ \ | | | |/ __|
+    //   | |  | ||  __/| (_| || (_| ||  __/| |    | |  | ||  __/| | | || |_| |\__ \
+    //   |_|  |_| \___| \__,_| \__,_| \___||_|    |_|  |_| \___||_| |_| \__,_||___/
+    //                                                                             
+    //                                                                             
     drawEditHeaderData(airplan) {
         let html = `<h3>Airplan Settings</h3>`
         // Title
@@ -367,11 +603,6 @@ class View {
         html += "<label for='title' class='col-12 col-md-3 text-left text-md-right'>Title</label>";
         html += "<input type='text' class='col form-control mr-5' id='title' placeholder='Airplan Title'>";
         html += "</div>";
-        // // Date
-        // html += "<div class='form-group row align-items-center'>";
-        // html += "<label for='date' class='col-12 col-md-3 text-left text-md-right'>Date</label>";
-        // html += "<input type='date' class='col form-control mr-5' id='date' placeholder='0000'>";
-        // html += "</div>";
         // Start
         html += "<div class='form-group row align-items-center'>";
         html += "<label for='start' class='col-12 col-md-3 text-left text-md-right'>Start Time</label>";
@@ -432,143 +663,15 @@ class View {
         this.editHeaderSubmit = $('.edit-header-submit')
     }
     
-    drawEditSquadronData(squadron) {
-        let html = `<h3>Edit Squadron</h3>`
-        // Name
-        html += "<div class='form-group row align-items-center'>";
-        html += "<label for='name' class='col-12 col-md-3 text-left text-md-right'>Squadron Name</label>";
-        html += "<input type='text' class='col form-control mr-5' id='name' placeholder='VFA-XX'>";
-        html += "</div>";
-        // Callsign
-        html += "<div class='form-group row align-items-center'>";
-        html += "<label for='cs' class='col-12 col-md-3 text-left text-md-right'>Callsign</label>";
-        html += "<input type='text' class='col form-control mr-5' id='cs' placeholder='Airplan Title'>";
-        html += "</div>";
-        // TMS
-        html += "<div class='form-group row align-items-center'>";
-        html += "<label for='tms' class='col-12 col-md-3 text-left text-md-right'>TMS</label>";
-        html += "<input type='text' class='col form-control mr-5' id='tms' placeholder='Airplan Title'>";
-        html += "</div>";
-        // Modex
-        html += "<div class='form-group row align-items-center'>";
-        html += "<label for='modex' class='col-12 col-md-3 text-left text-md-right'>Modex</label>";
-        html += "<input type='text' class='col form-control mr-5' id='modex' placeholder='Airplan Title'>";
-        html += "</div>";
-        html += "<button id='"+squadron.ID+"' class='btn btn-primary edit-squadron-submit'>Submit</button>";
-        openModal(html)
-        this.editSquadronSubmit = $('.edit-squadron-submit')
-    }
-    
+    //     _____                                __      __ _                 
+    //    / ____|                               \ \    / /(_)                
+    //   | |      __ _  _ __ __   __ __ _  ___   \ \  / /  _   ___ __      __
+    //   | |     / _` || '_ \\ \ / // _` |/ __|   \ \/ /  | | / _ \\ \ /\ / /
+    //   | |____| (_| || | | |\ V /| (_| |\__ \    \  /   | ||  __/ \ V  V / 
+    //    \_____|\__,_||_| |_| \_/  \__,_||___/     \/    |_| \___|  \_/\_/  
+    //                                                                       
+    //                                                                       
     /**
-    * @method drawMenu Populate the #menu in the menu div.
-    */
-    drawMenu = () => {
-        this.menu = {squadron:{},file:{},info:{}}
-        var html =`
-        <h3>Menu</h3>
-        <div class='btn-group menu-group'>
-        <button id='add-squadron' class='btn btn-outline-primary add-squadron' data-toggle='tooltip' data-placement='top' title='Add Squadron'>   <i class='fas fa-plus'> </i></button>
-        <button id='rem-squadron' class='btn btn-outline-danger rem-squadron'  data-toggle='tooltip' data-placement='top' title='Remove Squadron'><i class='fas fa-minus'></i></button>
-        </div>
-        <div class='btn-group menu-group'>
-        <button id='reset'   class='btn btn-outline-danger'       data-toggle='tooltip' data-placement='top' title='Burn it Down!'><i class='fas fa-dumpster-fire'> </i></button>
-        <button id='refresh' class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Refresh'>      <i class='fas fa-sync'>          </i></button>
-        <label  id='load'    class='btn btn-outline-primary my-0' data-toggle='tooltip' data-placement='top' title='Load'>         <i class='fas fa-folder-open'>   </i><input type='file' id='filepath' hidden></label>
-        <button id='save'    class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Save'>         <i class='fas fa-save'>          </i></button>
-        <button id='export'  class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Export PDF'>   <i class='fas fa-file-pdf'>      </i></button>
-        </div>
-        <div class='btn-group menu-group'>
-        <button id="help"            class='btn btn-outline-warning'      data-toggle='tooltip' data-placement='top' title='Help'>         <i class='fas fa-question-circle'></i></button>
-        <button id="feedback" class='btn btn-outline-success' data-toggle='tooltip' data-placement='top' title='Send Feedback'        onclick='location.href="mailto:alexander.j.buck@navy.mil?subject=Airplan feedback&body=Three things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:%0d%0a%0d%0aThank You!"'><i class="fas fa-bullhorn"></i></button>
-        </div>
-        `;
-        $('#menu').html(html)
-        this.menu.squadron.add = $('#add-squadron')
-        this.menu.squadron.rem = $('#rem-squadron')
-        this.menu.file.reset = $('#reset')
-        this.menu.file.refresh = $('#refresh')
-        this.menu.file.load = $('#load')
-        this.menu.file.save = $('#save')
-        this.menu.file.export = $('#export')
-        this.menu.info.help = $('#help')
-        this.menu.info.feedback = $('#feedback')
-    }
-    
-    /**
-    * @method drawList Wrapper around drawCycleList and drawSortieList
-    * @param {Model} airplan 
-    */
-    drawList = (airplan) => {
-        this.drawCycleList(airplan);
-        this.drawSortieList(airplan);        
-    }
-    
-    /**
-    * @param {Model} airplan 
-    * @method drawCycleList populates the #cycles-list div with cycles information.
-    */
-    drawCycleList = (airplan) => {
-        let html = `
-        <h3>Cycles</h3>
-        <ul class='list-group'>`
-        
-        Object.values(airplan.cycles).forEach(cycle => {
-            html += `<li id='`+cycle.ID+`' class='list-group-item list-group-item-action edit-cycle-menu'>`
-            html += `<div class='row cycle'>`
-            html += `<div class='col-xl-3 col-md'><b>Cycle ${cycle.number}</b>:</div>`
-            html += `<div class='col-xl col-md'>${cycle.start.toHHMM()} - ${cycle.end.toHHMM()}</div>`
-            html += `</div>`
-        })
-        html += `<li class='list-group-item list-group-item-action add-cycle-menu'><i class='fas fa-plus'></i> Add Cycle...</li>`
-        $('#cycles-list').html(html)
-        this.addCycleMenu = $('.add-cycle-menu')
-        this.editCycleMenu = $('.edit-cycle-menu')
-    }
-    
-    /**
-    * @param {Model} airplan
-    * @method drawSortieList populates the #sorties-view div view with sorties information
-    */
-    drawSortieList = (airplan) => {
-        let html =  `<h3>Lines and Sorties</h3>`
-        html +=     `<div class='list-group'>`
-        Object.values(airplan.squadrons).forEach(squadron => {
-            Object.values(airplan.lines).filter(line=>line.squadronID == squadron.ID).sort((a,b)=>a.start-b.start).forEach((line,i) => {
-                html += `<div class='list-group-item line'>`
-                html +=     `<div class='row'>`
-                html +=         `<div class='col-xl col-md-4'> <b>${squadron.name}</b> </div>`
-                html +=         `<div class='col-xl col-md-8'> Line ${i+1} </div>`
-                if (line.sorties.length) {
-                    html +=     `<div class='col-xl-4 col-md-6'><small>${line.start.toHHMM()}-${line.end.toHHMM()}</small></div>`
-                }
-                html +=     `</div>`
-                html +=     `<div class='list-group list-group-flush'>`
-                Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
-                    html += `
-                    <div class='list-group-item list-group-item-action px-5 py-1 sortie'>
-                    <i id='`+sortie.ID+`' class='fas fa-bars sortie-edit'></i>
-                    <small>Event: <b>${sortie.event}:</b> ${sortie.start.toHHMM()} - ${sortie.end.toHHMM()}</small>
-                    <i id='`+sortie.ID+`' class='fas fa-trash-alt sortie-delete'></i>
-                    </div>`
-                })
-                html += `
-                <div id='`+line.ID+`' class='list-group-item list-group-item-action px-5 py-1 sortie add-sortie-menu'>
-                <small><i class='fas fa-plus'></i> Add Sortie...</small>
-                </div>`
-                html +=     `</div>
-                </div>`
-            })
-        })
-        html +=         `<div class='list-group-item list-group-item-action add-line-menu'><i class='fas fa-plus'></i> Add Line...</div>`        
-        html +=     `</div>`
-        
-        $('#sorties-list').html(html)
-        this.addLineMenu = $('.add-line-menu')
-        this.addSortieMenu = $('.add-sortie-menu')
-    }
-    
-    /**
-    * 
     * @param {Model} airplan Create the Konva object and draw the airplan on it.
     */
     drawStage = (airplan) => { 
@@ -818,11 +921,17 @@ class View {
                 })
             })
         })
-        
-        
         this.fitStageIntoParentContainer();
     }
     
+    //     _____                                 _    _        _                         
+    //    / ____|                               | |  | |      | |                        
+    //   | |      __ _  _ __ __   __ __ _  ___  | |__| |  ___ | | _ __    ___  _ __  ___ 
+    //   | |     / _` || '_ \\ \ / // _` |/ __| |  __  | / _ \| || '_ \  / _ \| '__|/ __|
+    //   | |____| (_| || | | |\ V /| (_| |\__ \ | |  | ||  __/| || |_) ||  __/| |   \__ \
+    //    \_____|\__,_||_| |_| \_/  \__,_||___/ |_|  |_| \___||_|| .__/  \___||_|   |___/
+    //                                                           | |                     
+    //                                                           |_|                     
     // Create an element with an optional CSS class
     createElement(tag, className) {
         const element = document.createElement(tag)

@@ -57,7 +57,8 @@ class Controller {
     
     onAirplanChanged = () => {
         this.view.drawStage(this.airplan);
-        this.view.drawList(this.airplan);
+        this.view.drawCycleList(this.airplan);
+        this.view.drawSortieList(this.airplan);        
         /**
         * Bind items in the stage and list view.
         * We need to rebind each time we draw because the elements are recreated.
