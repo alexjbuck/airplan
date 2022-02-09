@@ -3,42 +3,12 @@ class Controller {
         this.airplan = new Model();
         this.view = new View();
         window.addEventListener('resize', this.view.fitStageIntoParentContainer);
-        
-        // this.airplan.addSquadron('VFA-213','TOM','FA-18','100')
-        // this.airplan.addLine(Object.keys(this.airplan.squadrons)[0])
-        // this.airplan.addLine(Object.keys(this.airplan.squadrons)[0])
-        // this.airplan.addSquadron('VFA-87','HEX','FA-18','200')
-        // this.airplan.addLine(Object.keys(this.airplan.squadrons)[1])
-        // this.airplan.addLine(Object.keys(this.airplan.squadrons)[1])
-        // let d1 = new Date()
-        // let d2 = new Date()
-        // d1.setHours(10,0,0,0)
-        // d2.setHours(11,0,0,0)
-        // let c1 = this.airplan.addCycle(d1,d2)
-        // this.airplan.addSortie(Object.keys(this.airplan.lines)[0],d1, d2, 'flyon','hpcs','Jarvis')
-        // this.airplan.addSortie(Object.keys(this.airplan.lines)[1],1, 1, 'pull','hp','Poon',c1.ID,c1.ID)
-        // this.airplan.addSortie(Object.keys(this.airplan.lines)[2],d1-3600*1000, d2, 'flyon','hp','Jarvis')
-        // d1.setHours(11,0,0,0)
-        // d2.setHours(12,0,0,0)
-        // let c2 = this.airplan.addCycle(d1,d2)
-        // this.airplan.addSortie(Object.keys(this.airplan.lines)[0],d1, d2+3600, 'hpcs','flyoff','Jarvis')
-        // this.airplan.addSortie(Object.keys(this.airplan.lines)[1],1, 1, 'hp','stuff','Poon',c2.ID,c2.ID)
-        // this.airplan.addSortie(Object.keys(this.airplan.lines)[2],d1, d2, 'hp','flyoff','Jarvis')
-        // this.airplan.addSortie(Object.keys(this.airplan.lines)[3],1, 1, 'flyon','stuff','Poon',c2.ID,c2.ID)
-        
-        /**
-        * Draw the view
-        */
         this.onAirplanChanged();
         
-        /**
-        * Bind Model update events
-        */
+        // Bind Model update events
         this.airplan.bindOnChange(this.onAirplanChanged)
         
-        /**
-        * Bind Menu Buttons. This only needs to be done once because the menu is not redrawn.
-        */
+        // Bind Menu Buttons. This only needs to be done once because the menu is not redrawn.
         this.view.bindMenuAddPlaceholderSquadron(this.handleAddPlaceholderSquadron)
         this.view.bindMenuRemoveSquadron(this.handleRemoveSquadron)
         this.view.bindMenuReset(this.handleReset)
@@ -48,27 +18,37 @@ class Controller {
         this.view.bindMenuExport(this.handleExportFile)
         this.view.bindMenuHelp(this.handleHelp)
         
-        /**
-        * Draw the spash page help.
-        */
+        // Draw the spash page help.
         this.view.drawHelp()
-        
     }
     
+    /**
+     * Core function to handle any updates that need to occur when the model changes.
+     * @callback onAirplanChanged This is called when the model changes.
+     */
     onAirplanChanged = () => {
+        // Redraw the view.
         this.view.drawStage(this.airplan);
         this.view.drawCycleList(this.airplan);
         this.view.drawSortieList(this.airplan);        
-        /**
-        * Bind items in the stage and list view.
-        * We need to rebind each time we draw because the elements are recreated.
-        */
+
+        // Bind items in the stage and list view.
+        // We need to rebind each time we draw because the elements are recreated.
         this.view.bindAddCycleMenu(this.handleAddCycleMenu)
         this.view.bindEditCycleMenu(this.handleEditCycleMenu)
+
         this.view.bindAddLineMenu(this.handleAddLineMenu)
+        // this.view.bindEditLineMenu(this.handleEditLineMenu)
+
         this.view.bindAddSortieMenu(this.handleAddSortieMenu)
+        // this.view.bindEditSortieMenu(this.handleEditSortieMenu)
+
         this.view.bindCanvasClick(this.handleCanvasClick)
     }
+
+    // Stubs
+    handleEditLineMenu = () => {}
+    handleEditSortieMenu = () => {}
     
     handleAddPlaceholderSquadron = () => {
         this.airplan.addSquadron('Squadron ' + (Object.keys(this.airplan.squadrons).length+1),'CS','TMS','MODEX')
@@ -242,13 +222,24 @@ class Controller {
         this.airplan.timezone = timezone
         this.onAirplanChanged();
     }
-
+    handleEditSquadronMenu = (squadron) => {
+        this.view.drawEditSquadronData(squadron)
+        $('#name').val(squadron.name)
+        $('#cs').val(squadron.cs)
+        $('#tms').val(squadron.tms)
+        $('#modex').val(squadron.modex)
+        this.view.bindEditSquadronSubmit(this.handleEditSquadronSubmit)
+        this.view.bindEditSquadronRemove(this.handleEditSquadronRemove)
+    }
     handleEditSquadronSubmit = (squadronID, name,cs,tms,modex) => {
         this.airplan.squadrons[squadronID].name = name
         this.airplan.squadrons[squadronID].cs = cs
         this.airplan.squadrons[squadronID].tms = tms
         this.airplan.squadrons[squadronID].modex = modex
         this.onAirplanChanged();
+    }
+    handleEditSquadronRemove = (squadronID) => {
+        this.airplan.removeSquadron(this.airplan.squadrons[squadronID])
     }
 
     handleCanvasClick = (e) => {
@@ -281,15 +272,11 @@ class Controller {
             $('#timezone').val(this.airplan.timezone)
             this.view.bindEditHeaderSubmit(this.handleEditHeaderSubmit)
         } else if (e.parent.name() == 'squadron') {
-            let squadron = this.airplan.squadrons[e.parent.id()]
-            this.view.drawEditSquadronData(squadron)
-            $('#name').val(squadron.name)
-            $('#cs').val(squadron.cs)
-            $('#tms').val(squadron.tms)
-            $('#modex').val(squadron.modex)
-            this.view.bindEditSquadronSubmit(this.handleEditSquadronSubmit)
+            this.handleEditSquadronMenu(this.airplan.squadrons[e.parent.id()])
         }
     }
+
+
     
     handleRemoveCycle = (id) => {
         this.airplan.removeCycle(id)

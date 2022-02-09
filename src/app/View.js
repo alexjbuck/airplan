@@ -190,6 +190,13 @@ class View {
             closeModal()
         })
     }
+    bindEditSquadronRemove(handler){
+        this.editSquadronRemove.on('click', event=>{
+            let squadronID = event.currentTarget.id
+            handler(squadronID)
+            closeModal()
+        })
+    }
     //     _____                           _                      __  __                          
     //    / ____|                         | |                    |  \/  |                         
     //   | (___    __ _  _   _   __ _   __| | _ __  ___   _ __   | \  / |  ___  _ __   _   _  ___ 
@@ -220,9 +227,13 @@ class View {
         html += "<label for='modex' class='col-12 col-md-3 text-left text-md-right'>Modex</label>";
         html += "<input type='text' class='col form-control mr-5' id='modex' placeholder='Airplan Title'>";
         html += "</div>";
+        html += "<div class='btn-group'>";
         html += "<button id='"+squadron.ID+"' class='btn btn-primary edit-squadron-submit'>Submit</button>";
+        html += "<button id='"+squadron.ID+"' class='btn btn-danger edit-squadron-remove'><i class='fas fa-trash-alt'></i></button>";
+        html += "</div>";
         openModal(html)
         this.editSquadronSubmit = $('.edit-squadron-submit')
+        this.editSquadronRemove = $('.edit-squadron-remove')
     }
     
     //     _____              _        __      __ _                 
