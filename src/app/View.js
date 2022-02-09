@@ -71,7 +71,7 @@ class View {
         <div class='container'>
         <div class='row'>
         <div>
-        <h3>Bad Max airplan writer: \u2708</h3>
+        <h3>BAD MAX airplan writer: \u2708</h3>
         <h5>For when you don't have ADMACS <sup><em><small>maybe even when you do!</small></em></sup></h5>
         </div>
         <div class='ml-auto'>
@@ -81,7 +81,7 @@ class View {
         </div>
         <hr>
         <p>
-        Writing airplan's in PowerPoint is a big bummer &#129324;.
+        Writing airplan's in PowerPoint is the worst &#129324;.
         This is a simple web app that allows you to view and edit your squadron's air plans.
         You can add new flights, edit existing flights, and delete flights.
         You can also export your air plan to PDF <i class="far fa-file-pdf"></i>.
@@ -93,7 +93,7 @@ class View {
         <li>You can add cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
         <li>Next add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button.</li>
         <li>Sorties are added into a line by clicking "<i class='fas fa-plus'></i> Add Sortie" within a line in the list.</li>
-        <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This will download a file that you can load to resume your progress.</li>
+        <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This downloads a file that you can load <i class='fas fa-folder-open'></i> to resume your progress.</li>
         <li>Items on the display to the left open edit menu's if they have a <span class='blue-border'>blue border</span> when you hover over them.</li>
         <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
         <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
@@ -318,8 +318,10 @@ class View {
     }
     drawEditCycleMenu(cycleID) {
         let html = this.drawAddEditCycleMenu()
+        html += `<div class='btn-group'>`
         html += `<button id='`+cycleID+`' class='btn btn-primary edit-cycle-submit'>Submit</button>`
-        html += `<button id='`+cycleID+`' class='btn btn-danger edit-cycle-remove'>Remove</button>`
+        html += `<button id='`+cycleID+`' class='btn btn-danger edit-cycle-remove'><i class='fas fa-trash-alt'></i></button>`
+        html += `</div>`
         openModal(html)
         this.editCycleSubmit = $('.edit-cycle-submit')
         this.editCycleRemove = $('.edit-cycle-remove')
