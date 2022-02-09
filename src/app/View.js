@@ -502,7 +502,7 @@ class View {
         html += "<label for='startType' class='col-12 col-md-3 text-left text-md-right'>Start Condition</label>";
         html += "<select type='text' class='col form-control mr-5' id='startType' placeholder='Start Condition'>";
         html += "<option value='pull'>Pull</option>";
-        html += "<option value='flyOn'>Fly On</option>";
+        html += "<option value='flyon'>Fly On</option>";
         html += "<option value='hp'>Hot Pump</option>";
         html += "<option value='hpcs'>Hot Pump & Crew Swap</option>";
         html += "</select>";
@@ -517,7 +517,7 @@ class View {
         html += "<label for='endType' class='col-12 col-md-3 text-left text-md-right'>End Condition</label>";
         html += "<select type='text' class='col form-control mr-5' id='endType' placeholder='End Condition'>";
         html += "<option value='stuff'>Stuff</option>";
-        html += "<option value='flyOff'>Fly Off</option>";
+        html += "<option value='flyoff'>Fly Off</option>";
         html += "<option value='hp'>Hot Pump</option>";
         html += "<option value='hpcs'>Hot Pump & Crew Swap</option>";
         html += "</select>";
