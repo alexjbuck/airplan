@@ -417,7 +417,7 @@ class View {
         html +=     `<div class='list-group'>`
         Object.values(airplan.squadrons).forEach(squadron => {
             Object.values(airplan.lines).filter(line=>line.squadronID == squadron.ID).sort((a,b)=>a.start-b.start).forEach((line,i) => {
-                html += `<div class='list-group-item line'>`
+                html += `<div class='list-group-item list-group-item-action line'>`
                 html +=     `<div class='row'>`
                 html +=         `<div class='col-xl col-md-4'> <b>${squadron.name}</b> </div>`
                 html +=         `<div class='col-xl col-md-8'> Line ${i+1} </div>`
@@ -428,14 +428,14 @@ class View {
                 html +=     `<div class='list-group list-group-flush'>`
                 Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
                     html += `
-                    <div class='list-group-item list-group-item-action px-5 py-1 sortie'>
-                    <i id='`+sortie.ID+`' class='fas fa-bars sortie-edit'></i>
-                    <small>Event: <b>${sortie.event}:</b> ${sortie.start.toHHMM()} - ${sortie.end.toHHMM()}</small>
+                    <div class='list-group-item list-group-item-action px-4 py-1 sortie'>
+                    <small><b>${sortie.event}:</b> ${sortie.start.toHHMM()}-${sortie.end.toHHMM()}</small>
+                    <i id='`+sortie.ID+`' class='fas fa-edit sortie-edit'></i>
                     <i id='`+sortie.ID+`' class='fas fa-trash-alt sortie-delete'></i>
                     </div>`
                 })
                 html += `
-                <div id='`+line.ID+`' class='list-group-item list-group-item-action px-5 py-1 sortie add-sortie-menu'>
+                <div id='`+line.ID+`' class='list-group-item list-group-item-action px-4 py-1 sortie add-sortie-menu'>
                 <small><i class='fas fa-plus'></i> Add Sortie...</small>
                 </div>`
                 html +=     `</div>
@@ -447,7 +447,9 @@ class View {
         
         $('#sorties-list').html(html)
         this.addLineMenu = $('.add-line-menu')
+        this.editLineMenu = $('.edit-line-menu')
         this.addSortieMenu = $('.add-sortie-menu')
+        this.editSortieMenu = $('.edit-sortie-menu')
     }
     //     _____               _    _         ____   _             _  _                    
     //    / ____|             | |  (_)       |  _ \ (_)           | |(_)                   
