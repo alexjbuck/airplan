@@ -101,7 +101,7 @@ class Sortie extends Event {
      * */
     get event() {
         if (this.parent) {
-            return this.cycle.number + this.line.squadron.letter + this.parent.counts[[this.cycle.number,this.line.squadron.letter]]
+            return this.cycle.number + this.line.squadron.letter + this.parent.squadronCycleSortieMap[this.ID]
         }
     }
 

@@ -25,6 +25,7 @@ class Model {
         this.squadrons      = {};
         this.cycles         = {};
         this.counts         = {};
+        this.squadronCycleSortieMap = {};
         this.onChange()
     }
     
@@ -62,6 +63,7 @@ class Model {
             } else {
                 this.counts[[s.cycle.number,s.line.squadron.letter]] += 1
             }
+            this.squadronCycleSortieMap[s.ID] = this.counts[[s.cycle.number,s.line.squadron.letter]]
         })  
     }
 
