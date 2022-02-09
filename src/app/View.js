@@ -322,13 +322,13 @@ class View {
     //            __/ |                                                 
     //           |___/                                                  
     drawAddCycleMenu() {
-        let html = this.drawAddEditCycleMenu()
+        let html = this.drawAddEditCycleMenu('Add')
         html += `<button class='btn btn-primary add-cycle-submit'>Submit</button>`
         openModal(html)
         this.addCycleSubmit = $('.add-cycle-submit')
     }
     drawEditCycleMenu(cycleID) {
-        let html = this.drawAddEditCycleMenu()
+        let html = this.drawAddEditCycleMenu('Edit')
         html += `<div class='btn-group'>`
         html += `<button id='`+cycleID+`' class='btn btn-primary edit-cycle-submit'>Submit</button>`
         html += `<button id='`+cycleID+`' class='btn btn-danger edit-cycle-remove'><i class='fas fa-trash-alt'></i></button>`
@@ -337,9 +337,9 @@ class View {
         this.editCycleSubmit = $('.edit-cycle-submit')
         this.editCycleRemove = $('.edit-cycle-remove')
     }
-    drawAddEditCycleMenu() {
+    drawAddEditCycleMenu(type) {
         let html = `
-        <h3>Add Cycle</h3>
+        <h3>`+type+` Cycle</h3>
         <div class='form-group row align-items-center'>
         <label for='start' class='col-12 col-md-2 text-left text-md-right'>Start</label>
         <input type='datetime-local' class='col form-control mr-5' id='start' placeholder='Start'>
