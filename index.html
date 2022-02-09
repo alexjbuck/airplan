@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="src/css/font-awesome-all.min.css">
     <link rel="stylesheet" href="src/css/bootstrap.min.css">
     <link rel="stylesheet" href="src/css/modal.css">
+    <link rel="stylesheet" href="src/css/custom-menu-collapse.css">
     <!-- JS Libraries -->
     <script src="src/libraries/jquery.js"></script>
     <script src="src/libraries/bootstrap.bundle.min.js"></script>
@@ -71,7 +72,7 @@
 <body>
     <!-- Main View (Graphical + Tabular) -->
     <div id='view' class='row h-100 w-100 m-0'>
-        <div id="graphic" class="col-md-8 col-12 graphic-col">
+        <div id="graphic" class="col-md-12 col-12 graphic-col">
             <div id="graphic-stage" width="100%" height="100%"></div>
             <!-- submit feedback button, mailto alexander.j.buck@navy.mil -->
             <div class='credit d-flex flex-wrap'>
@@ -79,7 +80,10 @@
                 <div class='mr-auto'><i>Source code on <a href=https://github.com/alexjbuck/airplan>GitHub</a>.</i></div>
             </div>
         </div>
-        <div id="list" class="col-md-4 col-12 list-col">
+        <div id="menu-collapse">
+        </div>
+        <div id="list" class="list-col">
+            <h1 id="close-menu" style="position: absolute; top: 0%; right: 2%; cursor: pointer;">x</h1>
             <div id="menu" class='menu'></div>
             <div id="cycles-list" class='cycles-col'></div>
             <div id="sorties-list" class='sorties-col'></div>
@@ -108,7 +112,7 @@
     <script src="src/app/Model.js"></script>
     <script src="src/app/View.js"></script>
     <script src="src/app/Controller.js"></script>
-    
+    <script src="src/app/menu-collapse.js"></script>
     <!-- Run App -->
     <script>
         let app = new Controller()
