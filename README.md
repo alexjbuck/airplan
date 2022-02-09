@@ -2,6 +2,8 @@
 
 **For when you don't have ADMACS (maybe even when you do! 🤣)**
 
+[![S3 Host](https://github.com/alexjbuck/airplan/actions/workflows/s3sync.yml/badge.svg)](http://airplan.alexjbuck.com.s3-website-us-east-1.amazonaws.com/)
+
 Version: 0.2.0
 
 Writing airplan's in PowerPoint is a big bummer 🤬.
