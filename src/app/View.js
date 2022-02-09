@@ -72,7 +72,7 @@ class View {
         <div class='row'>
         <div>
         <h3>BAD MAX airplan writer: \u2708</h3>
-        <h5>For when you don't have ADMACS <sup><em><small>maybe even when you do!</small></em></sup></h5>
+        <h5>For when you don't have ADMACS, <em>and <sup>maybe <sup>even <sup>when <sup>you do!</sup></sup></sup></sup></em></h5>
         </div>
         <div class='ml-auto'>
         <small>Version: 0.2.0</small>
@@ -86,15 +86,16 @@ class View {
         You can add new flights, edit existing flights, and delete flights.
         You can also export your air plan to PDF <i class="far fa-file-pdf"></i>.
         </p>
-        <h5>Structure</h5>
         <i class="fas fa-exclamation-triangle"></i> Tips:
-        <ul>
+        <ol>
         <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> or red <i style="color:red" class='fas fa-minus'></i> in the menu to add or remove a squadron.</li>
-        <li>You can add cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
-        <li>Next add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button.</li>
-        <li>Sorties are added into a line by clicking "<i class='fas fa-plus'></i> Add Sortie" within a line in the list.</li>
+        <li>Click on the squadron text block in the graphical view to edit the name, callsign, TMS, and modex.</li>
+        <li>Start adding cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
+        <li>Add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button and selecting a squadron.</li>
+        <li>Add a sortie in the line by clicking "<i class='fas fa-plus'></i> Add Sortie" underneath the desired line.</li>
         <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This downloads a file that you can load <i class='fas fa-folder-open'></i> to resume your progress.</li>
         <li>Items on the display to the left open edit menu's if they have a <span class='blue-border'>blue border</span> when you hover over them.</li>
+        </ol><ul>
         <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
         <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
         </ul>
