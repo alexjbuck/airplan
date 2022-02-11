@@ -34,11 +34,11 @@
 }
 @font-face {
   font-family: jarvis;
-  src: url(src/webfonts/AvengeroDisassembledRegular-nRvd4.ttf);
+  src: url(../webfonts/AvengeroDisassembledRegular-nRvd4.ttf);
 }
 @font-face {
   font-family: marvel;
-  src: url(src/webfonts/MarvelRegular-Dj83.ttf);
+  src: url(../webfonts/MarvelRegular-Dj83.ttf);
 }
 .jarvis {
   font-family: jarvis;
