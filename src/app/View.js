@@ -469,8 +469,8 @@ class View {
                 if (line.sorties.length) {
                     html +=         `<small>${line.start.toHHMM()}-${line.end.toHHMM()}</small> `
                 }
-                html +=             `<i id='`+line.ID+`' class='fas fa-edit edit-line-menu'></i>`
-                html +=             `<i id='`+line.ID+`' class='fas fa-trash-alt line-remove'></i>`
+                html +=             `<i id='`+line.ID+`' class='fas fa-edit edit-line-menu'></i> `
+                html +=             `<i id='`+line.ID+`' class='fas fa-trash-alt line-remove'></i> `
                 html +=         `</div>`
                 html +=     `</div>`
                 html +=     `<div class='list-group list-group-flush'>`
