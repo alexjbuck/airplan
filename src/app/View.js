@@ -973,7 +973,9 @@ class View {
         // now we need to fit stage into parent container
         var containerWidth = container.offsetWidth;
         // but we also make the full scene visible so we need to scale all objects on canvas
-        var scale = containerWidth / this.sceneWidth;
+        var scaleLimW = containerWidth / this.sceneWidth;
+        var scaleLimH = window.innerHeight / this.sceneHeight;
+        var scale = Math.min(scaleLimW, scaleLimH);
         this.stage.width(this.sceneWidth * scale);
         this.stage.height(this.sceneHeight * scale);
         this.stage.scale({ x: scale, y: scale });
