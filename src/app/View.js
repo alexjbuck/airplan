@@ -498,6 +498,13 @@ class View {
             closeModal()
         })
     }
+    bindEditSortieRemove(handler){
+        this.editSortieRemove.on('click', event=>{
+            let sortieID = event.currentTarget.id
+            handler(sortieID)
+            closeModal()
+        })
+    }
     //     _____               _    _         __  __                          
     //    / ____|             | |  (_)       |  \/  |                         
     //   | (___    ___   _ __ | |_  _   ___  | \  / |  ___  _ __   _   _  ___ 
@@ -560,9 +567,13 @@ class View {
     drawEditSortieMenu(sortie) { 
         let line = sortie.line
         let html = this.makeAddEditSortieMenu(line)
+        html += "<div class='btn-group'>";
         html += "<button id='"+sortie.ID+"' class='btn btn-primary edit-sortie-submit'>Submit</button>";
+        html += "<button id='"+sortie.ID+"' class='btn btn-danger edit-sortie-remove'><i class='fas fa-trash-alt'></i></button>";
+        html += "</div>";
         openModal(html)
         this.editSortieSubmit = $('.edit-sortie-submit')
+        this.editSortieRemove = $('.edit-sortie-remove')
     }
     
     //     _____                                 ____   _             _  _                    

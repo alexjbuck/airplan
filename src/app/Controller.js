@@ -23,29 +23,29 @@ class Controller {
     }
     
     /**
-     * Core function to handle any updates that need to occur when the model changes.
-     * @callback onAirplanChanged This is called when the model changes.
-     */
+    * Core function to handle any updates that need to occur when the model changes.
+    * @callback onAirplanChanged This is called when the model changes.
+    */
     onAirplanChanged = () => {
         // Redraw the view.
         this.view.drawStage(this.airplan);
         this.view.drawCycleList(this.airplan);
         this.view.drawSortieList(this.airplan);        
-
+        
         // Bind items in the stage and list view.
         // We need to rebind each time we draw because the elements are recreated.
         this.view.bindAddCycleMenu(this.handleAddCycleMenu)
         this.view.bindEditCycleMenu(this.handleEditCycleMenu)
-
+        
         this.view.bindAddLineMenu(this.handleAddLineMenu)
         // this.view.bindEditLineMenu(this.handleEditLineMenu)
-
+        
         this.view.bindAddSortieMenu(this.handleAddSortieMenu)
         // this.view.bindEditSortieMenu(this.handleEditSortieMenu)
-
+        
         this.view.bindCanvasClick(this.handleCanvasClick)
     }
-
+    
     // Stubs
     handleEditLineMenu = () => {}
     handleEditSortieMenu = () => {}
@@ -89,15 +89,15 @@ class Controller {
     handleHelp = () => { this.view.drawHelp() }
     
     /**
-     * @method handleAddCycleMenu is called when the user clicks the add cycle button.
-     * It draws the menu and binds the submit button.
-     * It prepopulates the start and end fields based on the following rules:
-     *  - The start time is set based on the following priorities:
-     *    1. The last cycle's end time
-     *    2. One hour after the airplan's start time
-     *  - The end time is set based on the following priorities:
-     *    1. The start time plus one hour
-     */
+    * @method handleAddCycleMenu is called when the user clicks the add cycle button.
+    * It draws the menu and binds the submit button.
+    * It prepopulates the start and end fields based on the following rules:
+    *  - The start time is set based on the following priorities:
+    *    1. The last cycle's end time
+    *    2. One hour after the airplan's start time
+    *  - The end time is set based on the following priorities:
+    *    1. The start time plus one hour
+    */
     handleAddCycleMenu = () => {
         this.view.drawAddCycleMenu()
         let start = new Date()
@@ -129,7 +129,6 @@ class Controller {
     }
     handleEditCycleRemove = (cycleID) => {
         this.airplan.removeCycle({ID:cycleID})
-        .then(this.airplan.onChange())
     }
     handleAddLineMenu = () => {
         this.view.drawAddLineMenu(this.airplan.squadrons)
@@ -205,6 +204,19 @@ class Controller {
         this.airplan.sorties[sortieID].endCycleID = endCycleID
         this.airplan.onChange()
     }
+    handleEditSortieRemove = (sortieID) => {
+        this.airplan.removeSortie(sortieID)
+    }
+    handleEditSortieMenu = (sortie) => {
+        this.view.drawEditSortieMenu(sortie)
+        $('#start').val(sortie.start.toLocalTimeString())
+        $('#end').val(sortie.end.toLocalTimeString())
+        $('#startType').val(sortie.startType)
+        $('#endType').val(sortie.endType)
+        $('#note').val(sortie.note)
+        this.view.bindEditSortieSubmit(this.handleEditSortieSubmit)
+        this.view.bindEditSortieRemove(this.handleEditSortieRemove)
+    }
 
     handleEditHeaderSubmit = (title, date, start, end, sunrise, sunset, moonrise, moonset, moonphase, flightquarters, heloquarters, variation, timezone) => {
         this.airplan.title = title
@@ -241,18 +253,11 @@ class Controller {
     handleEditSquadronRemove = (squadronID) => {
         this.airplan.removeSquadron(this.airplan.squadrons[squadronID])
     }
-
+    
     handleCanvasClick = (e) => {
         console.log(e.parent.name() + ' ' + e.parent.id())
         if (e.parent.name() == 'sortie') {
-            let sortie = this.airplan.sorties[e.parent.id()]
-            this.view.drawEditSortieMenu(sortie)
-            $('#start').val(sortie.start.toLocalTimeString())
-            $('#end').val(sortie.end.toLocalTimeString())
-            $('#startType').val(sortie.startType)
-            $('#endType').val(sortie.endType)
-            $('#note').val(sortie.note)
-            this.view.bindEditSortieSubmit(this.handleEditSortieSubmit)
+            this.handleEditSortieMenu(this.airplan.sorties[e.parent.id()])
         } else if (e.parent.name() == 'cycle') {
             // Does not yet exist
         } else if (e.parent.name() == 'header' || e.parent.name() == 'timeline') {
@@ -275,8 +280,9 @@ class Controller {
             this.handleEditSquadronMenu(this.airplan.squadrons[e.parent.id()])
         }
     }
+    
 
-
+        
     
     handleRemoveCycle = (id) => {
         this.airplan.removeCycle(id)
