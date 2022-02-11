@@ -9,6 +9,8 @@
 
 .list-group-item > .fa-edit {
   display: none;
+  float:right;
+  padding-left:.25em;
 }
 
 .list-group-item:hover > .fa-edit {
@@ -17,6 +19,8 @@
 
 .list-group-item > .fa-trash-alt {
   display: none;
+  float:right;
+  padding-left:.25em;
 }
 
 .list-group-item:hover > .fa-trash-alt {

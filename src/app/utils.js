@@ -183,11 +183,6 @@ Konva.Node.prototype.anchorBottomRight = function({padX=0,padY=0}={}) {
     return this.offsetX(this.width()+padX).offsetY(this.height()+padY)
 }
 
-
-
-
-
-
 Konva.Node.prototype.addTo = function (node) {
     node.add(this)
     return this

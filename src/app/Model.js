@@ -123,11 +123,11 @@ class Model {
         this.onChange()    
     }
     
-    async removeSquadron(squadron) {
-        this.lineList.filter(l=>l.squadronID == squadron.ID).forEach(l=>{
+    async removeSquadron(id) {
+        this.lineList.filter(l=>l.squadronID == id).forEach(l=>{
             this.removeLine(l.ID)
         })
-        delete this.squadrons[squadron.ID]
+        delete this.squadrons[id]
         this.onChange()
     }
     addSquadron(name, cs, tms, modex) {
@@ -137,7 +137,14 @@ class Model {
         this.onChange()
         return squadron
     }
-    
+    editSquadron(id, name, cs, tms, modex) {
+        this.squadrons[id].name = name
+        this.squadrons[id].cs = cs
+        this.squadrons[id].tms = tms
+        this.squadrons[id].modex = modex
+        this.onChange()
+    }
+
     async removeLine(id) {
         this.sortieList.filter(s=>s.lineID == id).forEach(s=>{
             this.removeSortie(s.ID)
@@ -152,6 +159,10 @@ class Model {
         this.onChange()
         return line;
     }
+    editLine(lineID,squadronID) {
+        this.lines[lineID].squadronID = squadronID
+        this.onChange()
+    }
     
     async removeSortie(id) {
         delete this.sorties[id]
@@ -164,9 +175,19 @@ class Model {
         this.onChange()
         return sortie
     }
+    editSortie(id, start, end, startType, endType, note, startCycleID=null, endCycleID=null) {
+        this.sorties[id].start = start
+        this.sorties[id].end = end
+        this.sorties[id].startType = startType
+        this.sorties[id].endType = endType
+        this.sorties[id].note = note
+        this.sorties[id].startCycleID = startCycleID
+        this.sorties[id].endCycleID = endCycleID
+        this.onChange()
+    }
     
-    async removeCycle(cycle) {
-        delete this.cycles[cycle.ID]
+    async removeCycle(id) {
+        delete this.cycles[id]
         this.onChange()
     }
     addCycle(start, end) {
@@ -175,6 +196,11 @@ class Model {
         this.cycles[cycle.ID] = cycle;
         this.onChange()
         return cycle
+    }
+    editCycle(id,start,end) {
+        this.cycles[id].start = start
+        this.cycles[id].end = end
+        this.onChange()
     }
 
     get sortieList() {

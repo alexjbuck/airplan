@@ -10,7 +10,7 @@ class Controller {
         
         // Bind Menu Buttons. This only needs to be done once because the menu is not redrawn.
         this.view.bindMenuAddPlaceholderSquadron(this.handleAddPlaceholderSquadron)
-        this.view.bindMenuRemoveSquadron(this.handleRemoveSquadron)
+        this.view.bindMenuRemoveSquadron(this.handleRemoveBottomSquadron)
         this.view.bindMenuReset(this.handleReset)
         this.view.bindMenuRefresh(this.handleRefresh)
         this.view.bindMenuLoad(this.handleLoadFile)
@@ -36,6 +36,7 @@ class Controller {
         // We need to rebind each time we draw because the elements are recreated.
         this.view.bindAddCycleMenu(this.handleAddCycleMenu)
         this.view.bindEditCycleMenu(this.handleEditCycleMenu)
+        this.view.bindEditCycleRemove(this.handleRemoveCycle)
         
         this.view.bindAddLineMenu(this.handleAddLineMenu)
         this.view.bindEditLineMenu(this.handleEditLineMenu)
@@ -48,21 +49,14 @@ class Controller {
         this.view.bindCanvasClick(this.handleCanvasClick)
     }
     
-    // Stubs
-
-    
+    /**
+     * MENU VIEW UNIQUE EVENTS
+     */ 
     handleAddPlaceholderSquadron = () => {
         this.airplan.addSquadron('Squadron ' + (Object.keys(this.airplan.squadrons).length+1),'CS','TMS','MODEX')
     }
-    
-    handleReset = () => {
-        this.airplan.init()
-    }
-    
-    handleRefresh = () => {
-        this.onAirplanChanged();
-    }
-    
+    handleReset = () => { this.airplan.init() }
+    handleRefresh = () => { this.onAirplanChanged() }
     handleLoadFile = (file) => {
         let reader = new FileReader();
         reader.onload = (e) => {
@@ -71,12 +65,10 @@ class Controller {
         }
         reader.readAsText(file)
     }
-    
     handleSaveFile = () => {
         let file = new Blob([JSON.stringify(this.airplan,getCircularReplacer())], {type: "application/json"})
         saveAs(file,this.airplan.date.toYYYYMMDD()+".json")
     }
-    
     handleExportFile = () => {
         let w = 11
         let h = 8.5
@@ -86,9 +78,11 @@ class Controller {
         pdf.addImage(imgData, 'JPEG', m*w/2, m*h/2, w*(1-m), h*(1-m), undefined, 'FAST');
         pdf.save('airplan_'+this.airplan.date.toYYYYMMDD()+'.pdf');    
     }
-    
     handleHelp = () => { this.view.drawHelp() }
     
+    /**
+     * ADD/EDIT MENU HANDLERS
+     */
     /**
     * @method handleAddCycleMenu is called when the user clicks the add cycle button.
     * It draws the menu and binds the submit button.
@@ -111,43 +105,25 @@ class Controller {
         end = new Date(start.valueOf() + 3600*1000)
         $('#start').val(start.toLocalTimeString())
         $('#end').val(end.toLocalTimeString())
-        this.view.bindAddCycleSubmit(this.handleAddCycleSubmit) 
-    }
-    handleAddCycleSubmit = (start, end) => { this.airplan.addCycle(start,end)}
-    
+        this.view.bindAddCycleSubmit(this.handleAddCycle) 
+    }    
     handleEditCycleMenu = (cycleID) => {
         this.view.drawEditCycleMenu(cycleID)
         let cycle = this.airplan.cycles[cycleID]
         $('#start').val(cycle.start.toLocalTimeString())
         $('#end').val(cycle.end.toLocalTimeString())
-        this.view.bindEditCycleSubmit(this.handleEditCycleSubmit)
-        this.view.bindEditCycleRemove(this.handleEditCycleRemove)
-    }
-    handleEditCycleSubmit = (cycleID, start, end) => {
-        this.airplan.cycles[cycleID].start = start;
-        this.airplan.cycles[cycleID].end = end;
-        this.airplan.onChange()
-    }
-    handleEditCycleRemove = (cycleID) => {
-        this.airplan.removeCycle({ID:cycleID})
+        this.view.bindEditCycleSubmit(this.handleEditCycle)
+        this.view.bindEditCycleRemove(this.handleRemoveCycle)
     }
     handleAddLineMenu = () => {
         this.view.drawAddLineMenu(this.airplan.squadrons)
-        this.view.bindAddLineSubmit(this.handleAddLineSubmit)
-    }
-    handleAddLineSubmit = (squadronID) => { this.airplan.addLine(squadronID) }
-    handleEditLineSubmit = (lineID, squadronID) => {
-        this.airplan.lines[lineID].squadronID = squadronID
-        this.airplan.onChange()
+        this.view.bindAddLineSubmit(this.handleAddLine)
     }
     handleEditLineMenu = (lineID) => {
         this.view.drawEditLineMenu(lineID, this.airplan.squadrons)
         $('#squadron').val(this.airplan.lines[lineID].squadronID)
-        this.view.bindEditLineSubmit(this.handleEditLineSubmit)
+        this.view.bindEditLineSubmit(this.handleEditLine)
         this.view.bindEditLineRemove(this.handleRemoveLine)
-    }
-    handleRemoveLine = (lineID) => {
-        this.airplan.removeLine(lineID)
     }
     /**
     * @method handleAddSortieMenu is called when the user clicks on the add sortie button.
@@ -197,28 +173,9 @@ class Controller {
             $('#end').val(end.toLocalTimeString())
             $('#startType').val(startType)
             $('#endType').val(endType)
-            // Bind handleAddSortieSubmit to the submit button.
-            this.view.bindAddSortieSubmit(this.handleAddSortieSubmit)
+            // Bind handleAddSortie to the submit button.
+            this.view.bindAddSortieSubmit(this.handleAddSortie)
         })
-    }
-    handleAddSortieSubmit = (lineID, start, end, startType, endType, note, startCycleID, endCycleID) => {
-        this.airplan.addSortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID)
-    }
-    // This could get pushed into an Model.editSortie method.
-    // That would thin the controller and let the model manage updating values.
-    // Its sorta trivial difference right now though.
-    handleEditSortieSubmit = (sortieID, start, end, startType, endType, note, startCycleID, endCycleID) => {
-        this.airplan.sorties[sortieID].start = start
-        this.airplan.sorties[sortieID].end = end
-        this.airplan.sorties[sortieID].startType = startType
-        this.airplan.sorties[sortieID].endType = endType
-        this.airplan.sorties[sortieID].note = note
-        this.airplan.sorties[sortieID].startCycleID = startCycleID
-        this.airplan.sorties[sortieID].endCycleID = endCycleID
-        this.airplan.onChange()
-    }
-    handleRemoveSortie = (sortieID) => {
-        this.airplan.removeSortie(sortieID)
     }
     handleEditSortieMenu = (sortieID) => {
         let sortie = this.airplan.sorties[sortieID]
@@ -228,13 +185,91 @@ class Controller {
         $('#startType').val(sortie.startType)
         $('#endType').val(sortie.endType)
         $('#note').val(sortie.note)
-        this.view.bindEditSortieSubmit(this.handleEditSortieSubmit)
+        this.view.bindEditSortieSubmit(this.handleEditSortie)
         this.view.bindEditSortieRemove(this.handleRemoveSortie)
     }
+    handleEditSquadronMenu = (squadronID) => {
+        let squadron = this.airplan.squadrons[squadronID]
+        this.view.drawEditSquadronData(squadron)
+        $('#name').val(squadron.name)
+        $('#cs').val(squadron.cs)
+        $('#tms').val(squadron.tms)
+        $('#modex').val(squadron.modex)
+        this.view.bindEditSquadronSubmit(this.handleEditSquadron)
+        this.view.bindEditSquadronRemove(this.handleRemoveSquadron)
+    }
+    handleEditHeaderMenu = () => {
+        this.view.drawEditHeaderData(this.airplan)
+        $('#title').val(this.airplan.title)
+        // $('#date').val(this.airplan.date.toYYYYMMDD())
+        $('#start').val(this.airplan.start.toLocalTimeString())
+        $('#end').val(this.airplan.end.toLocalTimeString())
+        $('#sunrise').val(this.airplan.sunrise.toLocalTimeString())
+        $('#sunset').val(this.airplan.sunset.toLocalTimeString())
+        $('#moonrise').val(this.airplan.moonrise.toLocalTimeString())
+        $('#moonset').val(this.airplan.moonset.toLocalTimeString())
+        $('#moonphase').val(this.airplan.moonphase)
+        $('#flightquarters').val(this.airplan.flightquarters.toLocalTimeString())
+        $('#heloquarters').val(this.airplan.heloquarters.toLocalTimeString())
+        $('#variation').val(this.airplan.variation)
+        $('#timezone').val(this.airplan.timezone)
+        this.view.bindEditHeaderSubmit(this.handleEditHeader)
+    }
+    
+    /**
+     * handleCanvasClick is bound to all clickable objects in the Konva canvas.
+     * The event target is the Highlight Box.
+     * The event parent is the object the box is drawn around.
+     * The event parent ID is the type of object that it represents:
+     *  - Sortie
+     *  - Header
+     *  - Timeline
+     *  - Squadron
+     *  - (TODO) Cycle
+     * @param {Object} e Event object e. Triggered from on.click events.
+     */
+    handleCanvasClick = (e) => {
+        console.log(e.parent.name() + ' ' + e.parent.id())
+        if (e.parent.name() == 'sortie') {
+            this.handleEditSortieMenu(e.parent.id())
+        } else if (e.parent.name() == 'cycle') {
+            // Does not yet exist
+        } else if (e.parent.name() == 'header' || e.parent.name() == 'timeline') {
+            this.handleEditHeaderMenu(e.parent.id())
+        } else if (e.parent.name() == 'squadron') {
+            this.handleEditSquadronMenu(e.parent.id())
+        }
+    }
 
+    // Handle State Changes
 
+    // Add/Remove/Edit Squadron
+    handleAddSquadron = (name,cs,tms,modex) => { this.airplan.addSquadron(name,cs,tms,modex) }
+    handleRemoveSquadron = (id) => { this.airplan.removeSquadron(id) }
+    handleRemoveBottomSquadron = () => { this.airplan.removeSquadron(Object.values(this.airplan.squadrons).at(-1)) }
+    handleEditSquadron = (squadronID, name,cs,tms,modex) => { this.airplan.editSquadron(squadronID, name,cs,tms,modex) }
 
-    handleEditHeaderSubmit = (title, date, start, end, sunrise, sunset, moonrise, moonset, moonphase, flightquarters, heloquarters, variation, timezone) => {
+    // Add/Remove/Edit Cycle
+    handleAddCycle = (start, end) => { this.airplan.addCycle(start,end) }
+    handleRemoveCycle = (id) => { this.airplan.removeCycle(id) }
+    handleEditCycle = (id, start, end) => { this.airplan.editCycle(id, start, end) }
+    
+    // Add/Remove/Edit Line
+    handleAddLine = (id) => { this.airplan.addLine(id) }
+    handleRemoveLine = (id) => { this.airplan.removeLine(id) }
+    handleEditLine = (id, squadronID) => { this.airplan.editLine(id, squadronID) }
+
+    // Add/Remove/Edit Sortie
+    handleAddSortie = (lineID, start, end, startType, endType, note, startCycleID, endCycleID) => {
+        this.airplan.addSortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID)
+    }
+    handleRemoveSortie = (id) => { this.airplan.removeSortie(id) }
+    handleEditSortie = (id, start, end, startType, endType, note, startCycleID, endCycleID) => {
+        this.airplan.editSortie(id, start, end, startType, endType, note, startCycleID, endCycleID);
+    }
+
+    // Edit Header
+    handleEditHeader = (title, date, start, end, sunrise, sunset, moonrise, moonset, moonphase, flightquarters, heloquarters, variation, timezone) => {
         this.airplan.title = title
         // this.airplan.date = new Date(Date.parse(date+'T00:00'))
         this.airplan.start = new Date(Date.parse(start))
@@ -250,104 +285,4 @@ class Controller {
         this.airplan.timezone = timezone
         this.onAirplanChanged();
     }
-    handleEditSquadronMenu = (squadronID) => {
-        let squadron = this.airplan.squadrons[squadronID]
-        this.view.drawEditSquadronData(squadron)
-        $('#name').val(squadron.name)
-        $('#cs').val(squadron.cs)
-        $('#tms').val(squadron.tms)
-        $('#modex').val(squadron.modex)
-        this.view.bindEditSquadronSubmit(this.handleEditSquadronSubmit)
-        this.view.bindEditSquadronRemove(this.handleEditSquadronRemove)
-    }
-    handleEditSquadronSubmit = (squadronID, name,cs,tms,modex) => {
-        this.airplan.squadrons[squadronID].name = name
-        this.airplan.squadrons[squadronID].cs = cs
-        this.airplan.squadrons[squadronID].tms = tms
-        this.airplan.squadrons[squadronID].modex = modex
-        this.onAirplanChanged();
-    }
-    handleEditSquadronRemove = (squadronID) => {
-        this.airplan.removeSquadron(this.airplan.squadrons[squadronID])
-    }
-    
-    handleCanvasClick = (e) => {
-        console.log(e.parent.name() + ' ' + e.parent.id())
-        if (e.parent.name() == 'sortie') {
-            this.handleEditSortieMenu(e.parent.id())
-        } else if (e.parent.name() == 'cycle') {
-            // Does not yet exist
-        } else if (e.parent.name() == 'header' || e.parent.name() == 'timeline') {
-            this.view.drawEditHeaderData(this.airplan)
-            $('#title').val(this.airplan.title)
-            // $('#date').val(this.airplan.date.toYYYYMMDD())
-            $('#start').val(this.airplan.start.toLocalTimeString())
-            $('#end').val(this.airplan.end.toLocalTimeString())
-            $('#sunrise').val(this.airplan.sunrise.toLocalTimeString())
-            $('#sunset').val(this.airplan.sunset.toLocalTimeString())
-            $('#moonrise').val(this.airplan.moonrise.toLocalTimeString())
-            $('#moonset').val(this.airplan.moonset.toLocalTimeString())
-            $('#moonphase').val(this.airplan.moonphase)
-            $('#flightquarters').val(this.airplan.flightquarters.toLocalTimeString())
-            $('#heloquarters').val(this.airplan.heloquarters.toLocalTimeString())
-            $('#variation').val(this.airplan.variation)
-            $('#timezone').val(this.airplan.timezone)
-            this.view.bindEditHeaderSubmit(this.handleEditHeaderSubmit)
-        } else if (e.parent.name() == 'squadron') {
-            this.handleEditSquadronMenu(e.parent.id())
-        }
-    }
-    
-
-        
-    
-    handleRemoveCycle = (id) => {
-        this.airplan.removeCycle(id)
-    }
-    
-    handleRemoveSquadron = () => {
-        this.airplan.removeSquadron(Object.values(this.airplan.squadrons).at(-1))
-    }
-    
-    handleAddSquadron = (name,cs,tms,modex) => {
-        this.airplan.addSquadron(name,cs,tms,modex)
-    }
-    
-    handleAddLine = (squadronID) => {
-        this.airplan.addLine(squadronID)
-    }
-    
-    handleAddSortie = (lineID, start, end, startType, endType, note, startCycleID, endCycleID) => {
-        this.airplan.addSortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID)
-    }
-    
-    
-    openCycleForm = (airplan) => {
-        let html = `
-        <h3>Cycle Form</h3>
-        `
-        openModal(html)
-    }
-    
-    openListForm = (airplan) => {
-        let html = `
-        <h3>List Form</h3>
-        `
-        openModal(html)
-    }
-    
-    openSortieForm = (airplan) => {
-        let html = `
-        <h3>Sortie Form</h3>
-        `
-        openModal(html)
-    }
-    
-    openTimeForm = (airplan) => {
-        let html = `
-        <h3>Time Form</h3>
-        `
-        openModal(html)
-    }
-    
 }

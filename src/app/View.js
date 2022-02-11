@@ -252,18 +252,20 @@ class View {
     drawCycleList = (airplan) => {
         let html = `
         <h3>Cycles</h3>
-        <ul class='list-group'>`
+        <div class='list-group'>`
         Object.values(airplan.cycles).forEach(cycle => {
-            html += `<li id='`+cycle.ID+`' class='list-group-item list-group-item-action edit-cycle-menu'>`
-            html += `<div class='row cycle'>`
-            html += `<div class='col-xl-3 col-md'><b>Cycle ${cycle.number}</b>:</div>`
-            html += `<div class='col-xl col-md'>${cycle.start.toHHMM()} - ${cycle.end.toHHMM()}</div>`
+            html += `<div id='`+cycle.ID+`' class='list-group-item list-group-item-action edit-cycle-menu'>`
+            html +=     `<b>Cycle ${cycle.number}</b>: ${cycle.start.toHHMM()} - ${cycle.end.toHHMM()}`
+            html +=     `<i id='`+cycle.ID+`' class='fas fa-trash-alt cycle-remove'></i> `
+            html +=     `<i id='`+cycle.ID+`' class='fas fa-edit edit-cycle-menu'></i> `
             html += `</div>`
         })
-        html += `<li class='list-group-item list-group-item-action add-cycle-menu'><i class='fas fa-plus'></i> Add Cycle...</li>`
+        html += `<div class='list-group-item list-group-item-action add-cycle-menu'><i class='fas fa-plus'></i> Add Cycle...</div>`
+        html += '</div>'
         $('#cycles-list').html(html)
         this.addCycleMenu = $('.add-cycle-menu')
         this.editCycleMenu = $('.edit-cycle-menu')
+        this.editCycleRemove = $('.cycle-remove')
     }
     //     _____              _         ____   _             _  _                    
     //    / ____|            | |       |  _ \ (_)           | |(_)                   
@@ -459,20 +461,22 @@ class View {
         html +=     `<div class='list-group'>`
         Object.values(airplan.squadrons).forEach(squadron => {
             Object.values(airplan.lines).filter(line=>line.squadronID == squadron.ID).sort((a,b)=>a.start-b.start).forEach((line,i) => {
-                html += `<div class='list-group-item list-group-item-action line'>`
+                html += `<div id='`+line.ID+`' class='list-group-item list-group-item-action line'>`
                 html += `<b>${squadron.name}</b>: Line ${i+1} `
                 if (line.sorties.length) {
                     html +=         `<small>${line.start.toHHMM()}-${line.end.toHHMM()}</small> `
                 }
-                html +=             `<i id='`+line.ID+`' class='fas fa-edit edit-line-menu'></i> `
                 html +=             `<i id='`+line.ID+`' class='fas fa-trash-alt line-remove'></i> `
+                html +=             `<i id='`+line.ID+`' class='fas fa-edit edit-line-menu'></i> `
                 html +=     `<div class='list-group list-group-flush'>`
                 Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
                     html += `
-                    <div class='list-group-item list-group-item-action px-4 py-1 sortie'>
-                    <small><b>${sortie.event}:</b> ${sortie.start.toHHMM()}-${sortie.end.toHHMM()}</small>
-                    <i id='`+sortie.ID+`' class='fas fa-edit edit-sortie-menu'></i>
+                    <div id='`+sortie.ID+`' class='list-group-item list-group-item-action edit-sortie-menu px-4 py-1 sortie'>
+                    <small>
+                        <b>${sortie.event}:</b> ${sortie.start.toHHMM()}-${sortie.end.toHHMM()} ${sortie.note}
+                    </small>
                     <i id='`+sortie.ID+`' class='fas fa-trash-alt sortie-remove'></i>
+                    <i id='`+sortie.ID+`' class='fas fa-edit edit-sortie-menu'></i>
                     </div>`
                 })
                 html += `
