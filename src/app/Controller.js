@@ -38,17 +38,18 @@ class Controller {
         this.view.bindEditCycleMenu(this.handleEditCycleMenu)
         
         this.view.bindAddLineMenu(this.handleAddLineMenu)
-        // this.view.bindEditLineMenu(this.handleEditLineMenu)
+        this.view.bindEditLineMenu(this.handleEditLineMenu)
+        this.view.bindLineRemove(this.handleRemoveLine)
         
         this.view.bindAddSortieMenu(this.handleAddSortieMenu)
-        // this.view.bindEditSortieMenu(this.handleEditSortieMenu)
-        
+        this.view.bindEditSortieMenu(this.handleEditSortieMenu)
+        this.view.bindSortieRemove(this.handleRemoveSortie)
+
         this.view.bindCanvasClick(this.handleCanvasClick)
     }
     
     // Stubs
-    handleEditLineMenu = () => {}
-    handleEditSortieMenu = () => {}
+
     
     handleAddPlaceholderSquadron = () => {
         this.airplan.addSquadron('Squadron ' + (Object.keys(this.airplan.squadrons).length+1),'CS','TMS','MODEX')
@@ -135,7 +136,19 @@ class Controller {
         this.view.bindAddLineSubmit(this.handleAddLineSubmit)
     }
     handleAddLineSubmit = (squadronID) => { this.airplan.addLine(squadronID) }
-    
+    handleEditLineSubmit = (lineID, squadronID) => {
+        this.airplan.lines[lineID].squadronID = squadronID
+        this.airplan.onChange()
+    }
+    handleEditLineMenu = (lineID) => {
+        this.view.drawEditLineMenu(lineID, this.airplan.squadrons)
+        $('#squadron').val(this.airplan.lines[lineID].squadronID)
+        this.view.bindEditLineSubmit(this.handleEditLineSubmit)
+        this.view.bindEditLineRemove(this.handleRemoveLine)
+    }
+    handleRemoveLine = (lineID) => {
+        this.airplan.removeLine(lineID)
+    }
     /**
     * @method handleAddSortieMenu is called when the user clicks on the add sortie button.
     * It draws the menu and binds the submit button.
@@ -204,10 +217,11 @@ class Controller {
         this.airplan.sorties[sortieID].endCycleID = endCycleID
         this.airplan.onChange()
     }
-    handleEditSortieRemove = (sortieID) => {
+    handleRemoveSortie = (sortieID) => {
         this.airplan.removeSortie(sortieID)
     }
-    handleEditSortieMenu = (sortie) => {
+    handleEditSortieMenu = (sortieID) => {
+        let sortie = this.airplan.sorties[sortieID]
         this.view.drawEditSortieMenu(sortie)
         $('#start').val(sortie.start.toLocalTimeString())
         $('#end').val(sortie.end.toLocalTimeString())
@@ -215,8 +229,10 @@ class Controller {
         $('#endType').val(sortie.endType)
         $('#note').val(sortie.note)
         this.view.bindEditSortieSubmit(this.handleEditSortieSubmit)
-        this.view.bindEditSortieRemove(this.handleEditSortieRemove)
+        this.view.bindEditSortieRemove(this.handleRemoveSortie)
     }
+
+
 
     handleEditHeaderSubmit = (title, date, start, end, sunrise, sunset, moonrise, moonset, moonphase, flightquarters, heloquarters, variation, timezone) => {
         this.airplan.title = title
@@ -234,7 +250,8 @@ class Controller {
         this.airplan.timezone = timezone
         this.onAirplanChanged();
     }
-    handleEditSquadronMenu = (squadron) => {
+    handleEditSquadronMenu = (squadronID) => {
+        let squadron = this.airplan.squadrons[squadronID]
         this.view.drawEditSquadronData(squadron)
         $('#name').val(squadron.name)
         $('#cs').val(squadron.cs)
@@ -257,7 +274,7 @@ class Controller {
     handleCanvasClick = (e) => {
         console.log(e.parent.name() + ' ' + e.parent.id())
         if (e.parent.name() == 'sortie') {
-            this.handleEditSortieMenu(this.airplan.sorties[e.parent.id()])
+            this.handleEditSortieMenu(e.parent.id())
         } else if (e.parent.name() == 'cycle') {
             // Does not yet exist
         } else if (e.parent.name() == 'header' || e.parent.name() == 'timeline') {
@@ -277,7 +294,7 @@ class Controller {
             $('#timezone').val(this.airplan.timezone)
             this.view.bindEditHeaderSubmit(this.handleEditHeaderSubmit)
         } else if (e.parent.name() == 'squadron') {
-            this.handleEditSquadronMenu(this.airplan.squadrons[e.parent.id()])
+            this.handleEditSquadronMenu(e.parent.id())
         }
     }
     

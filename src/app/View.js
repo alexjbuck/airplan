@@ -377,6 +377,33 @@ class View {
             closeModal()
         })
     }
+    bindEditLineMenu(handler){
+        this.editLineMenu.on('click', event=>{
+            let lineID = event.currentTarget.id
+            handler(lineID)
+        })
+    }
+    bindEditLineSubmit(handler){
+        this.editLineSubmit.on('click', event=>{
+            let lineID = event.currentTarget.id
+            let squadronID = $('#squadron').val()
+            handler(lineID, squadronID)
+            closeModal()
+        })
+    }
+    bindEditLineRemove(handler){
+        this.editLineRemove.on('click', event=>{
+            let lineID = event.currentTarget.id
+            handler(lineID)
+            closeModal()
+        })
+    }
+    bindLineRemove(handler){
+        this.lineRemove.on('click', event=>{
+            let lineID = event.currentTarget.id
+            handler(lineID)
+        })
+    }
     //    _       _                __  __                          
     //   | |     (_)              |  \/  |                         
     //   | |      _  _ __    ___  | \  / |  ___  _ __   _   _  ___ 
@@ -385,21 +412,35 @@ class View {
     //   |______||_||_| |_| \___| |_|  |_| \___||_| |_| \__,_||___/
     //                                                             
     //                                                             
-    drawAddLineMenu(squadrons) {
+    makeAddEditLineMenu(type,squadrons) {
         let html = `
-        <h3>Add Line</h3>
+        <h3>${type} Line</h3>
         <div class='form-group row align-items-center'>
-        <label for='start' class='col-12 col-md-2 text-left text-md-right'>Squadron</label>
+        <label for='squadron' class='col-12 col-md-2 text-left text-md-right'>Squadron</label>
         <select class='col form-control mr-5' id='squadron'>`
         Object.values(squadrons).forEach((sqdrn, i) => {
             html += "<option value='"+sqdrn.ID+"'>"+sqdrn.name+"</option>";
         })
         html += `
         </select>
-        </div>
-        <button id='add-line-submit' class='btn btn-primary'>Submit</button>`
+        </div>`
+        return html
+    }
+    drawAddLineMenu(squadrons) {
+        let html = this.makeAddEditLineMenu('Add',squadrons)
+        html += `<button id='add-line-submit' class='btn btn-primary'>Submit</button>`
         openModal(html)
         this.addLineSubmit = $('#add-line-submit')
+    }
+    drawEditLineMenu(lineID, squadrons) {
+        let html = this.makeAddEditLineMenu('Edit',squadrons)
+        html += `<div class='btn-group'>`
+        html += `<button id='`+lineID+`' class='btn btn-primary edit-line-submit'>Submit</button>`
+        html += `<button id='`+lineID+`' class='btn btn-danger edit-line-remove'><i class='fas fa-trash-alt'></i></button>`
+        html += `</div>`
+        openModal(html)
+        this.editLineSubmit = $('.edit-line-submit')
+        this.editLineRemove = $('.edit-line-remove')
     }
     //    _       _                    __   _____               _    _        __      __ _                 
     //   | |     (_)                  / /  / ____|             | |  (_)       \ \    / /(_)                
@@ -421,18 +462,24 @@ class View {
                 html += `<div class='list-group-item list-group-item-action line'>`
                 html +=     `<div class='row'>`
                 html +=         `<div class='col-xl col-md-4'> <b>${squadron.name}</b> </div>`
-                html +=         `<div class='col-xl col-md-8'> Line ${i+1} </div>`
+                html +=         `<div class='col-xl col-md-8'>`
+                html +=             `Line ${i+1}`
+                html +=         `</div>`
+                html +=         `<div class='col-xl-4 col-md-6'>`
                 if (line.sorties.length) {
-                    html +=     `<div class='col-xl-4 col-md-6'><small>${line.start.toHHMM()}-${line.end.toHHMM()}</small></div>`
+                    html +=         `<small>${line.start.toHHMM()}-${line.end.toHHMM()}</small> `
                 }
+                html +=             `<i id='`+line.ID+`' class='fas fa-edit edit-line-menu'></i>`
+                html +=             `<i id='`+line.ID+`' class='fas fa-trash-alt line-remove'></i>`
+                html +=         `</div>`
                 html +=     `</div>`
                 html +=     `<div class='list-group list-group-flush'>`
                 Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
                     html += `
                     <div class='list-group-item list-group-item-action px-4 py-1 sortie'>
                     <small><b>${sortie.event}:</b> ${sortie.start.toHHMM()}-${sortie.end.toHHMM()}</small>
-                    <i id='`+sortie.ID+`' class='fas fa-edit sortie-edit'></i>
-                    <i id='`+sortie.ID+`' class='fas fa-trash-alt sortie-delete'></i>
+                    <i id='`+sortie.ID+`' class='fas fa-edit edit-sortie-menu'></i>
+                    <i id='`+sortie.ID+`' class='fas fa-trash-alt sortie-remove'></i>
                     </div>`
                 })
                 html += `
@@ -449,8 +496,10 @@ class View {
         $('#sorties-list').html(html)
         this.addLineMenu = $('.add-line-menu')
         this.editLineMenu = $('.edit-line-menu')
+        this.lineRemove = $('.line-remove')
         this.addSortieMenu = $('.add-sortie-menu')
         this.editSortieMenu = $('.edit-sortie-menu')
+        this.sortieRemove = $('.sortie-remove')
     }
     //     _____               _    _         ____   _             _  _                    
     //    / ____|             | |  (_)       |  _ \ (_)           | |(_)                   
@@ -461,13 +510,19 @@ class View {
     //                                                                           __/ |     
     //                                                                          |___/      
     /**
-    * Bind the add sortie controller to the view object click event
+    * Bind the add sortie controller to the list view add sortie
     * @param {Function} handler 
     */
     bindAddSortieMenu(handler){
         this.addSortieMenu.on('click', event=>{
             let lineID = event.currentTarget.id
             handler(lineID)
+        })
+    }
+    bindEditSortieMenu(handler){
+        this.editSortieMenu.on('click', event=>{
+            let sortieID = event.currentTarget.id
+            handler(sortieID)
         })
     }
     bindAddSortieSubmit(handler){
@@ -498,11 +553,21 @@ class View {
             closeModal()
         })
     }
+    /**
+     * 
+     * @param {Function} handler Bind the delete sortie controller to the delete button on the edit menu
+     */
     bindEditSortieRemove(handler){
         this.editSortieRemove.on('click', event=>{
             let sortieID = event.currentTarget.id
             handler(sortieID)
             closeModal()
+        })
+    }
+    bindSortieRemove(handler){
+        this.sortieRemove.on('click', event=>{
+            let sortieID = event.currentTarget.id
+            handler(sortieID)
         })
     }
     //     _____               _    _         __  __                          
