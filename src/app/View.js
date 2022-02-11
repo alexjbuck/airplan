@@ -460,19 +460,12 @@ class View {
         Object.values(airplan.squadrons).forEach(squadron => {
             Object.values(airplan.lines).filter(line=>line.squadronID == squadron.ID).sort((a,b)=>a.start-b.start).forEach((line,i) => {
                 html += `<div class='list-group-item list-group-item-action line'>`
-                html +=     `<div class='row'>`
-                html +=         `<div class='col-xl col-md-4'> <b>${squadron.name}</b> </div>`
-                html +=         `<div class='col-xl col-md-8'>`
-                html +=             `Line ${i+1}`
-                html +=         `</div>`
-                html +=         `<div class='col-xl-4 col-md-6'>`
+                html += `<b>${squadron.name}</b>: Line ${i+1} `
                 if (line.sorties.length) {
                     html +=         `<small>${line.start.toHHMM()}-${line.end.toHHMM()}</small> `
                 }
                 html +=             `<i id='`+line.ID+`' class='fas fa-edit edit-line-menu'></i> `
                 html +=             `<i id='`+line.ID+`' class='fas fa-trash-alt line-remove'></i> `
-                html +=         `</div>`
-                html +=     `</div>`
                 html +=     `<div class='list-group list-group-flush'>`
                 Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
                     html += `

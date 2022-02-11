@@ -6,6 +6,22 @@
   color: red;
   filter:drop-shadow(1px 1px 1px black);
 }
+
+.list-group-item > .fa-edit {
+  display: none;
+}
+
+.list-group-item:hover > .fa-edit {
+  display: inline-block;
+}
+
+.list-group-item > .fa-trash-alt {
+  display: none;
+}
+
+.list-group-item:hover > .fa-trash-alt {
+  display: inline-block;
+}
 .graphic-col {
   padding: 0;
   margin: 0;
