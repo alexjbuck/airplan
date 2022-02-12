@@ -35,7 +35,8 @@ class View {
     drawMenu = () => {
         this.menu = {squadron:{},file:{},info:{}}
         var html =`
-        <h3>Menu</h3>
+        <details open>
+        <summary class='h3'>Menu</summary>
         <div class='btn-group menu-group'>
         <button id='add-squadron' class='btn btn-outline-primary add-squadron' data-toggle='tooltip' data-placement='top' title='Add Squadron'>   <i class='fas fa-plus'> </i></button>
         <button id='rem-squadron' class='btn btn-outline-danger rem-squadron'  data-toggle='tooltip' data-placement='top' title='Remove Squadron'><i class='fas fa-minus'></i></button>
@@ -51,6 +52,7 @@ class View {
         <button id="help"            class='btn btn-outline-warning'      data-toggle='tooltip' data-placement='top' title='Help'>         <i class='fas fa-question-circle'></i></button>
         <button id="feedback" class='btn btn-outline-success' data-toggle='tooltip' data-placement='top' title='Send Feedback'        onclick='location.href="mailto:alexander.j.buck@navy.mil?subject=Airplan feedback&body=Three things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:%0d%0a%0d%0aThank You!"'><i class="fas fa-bullhorn"></i></button>
         </div>
+        </details>
         `;
         $('#menu').html(html)
         this.menu.squadron.add = $('#add-squadron')
@@ -251,7 +253,8 @@ class View {
     */
     drawCycleList = (airplan) => {
         let html = `
-        <h3>Cycles</h3>
+        <details open>
+        <summary class='h3'>Cycles</summary>
         <div class='list-group'>`
         Object.values(airplan.cycles).forEach(cycle => {
             html += `<div id='`+cycle.ID+`' class='list-group-item list-group-item-action edit-cycle-menu'>`
@@ -262,6 +265,7 @@ class View {
         })
         html += `<div class='list-group-item list-group-item-action add-cycle-menu'><i class='fas fa-plus'></i> Add Cycle...</div>`
         html += '</div>'
+        html += '</details>'
         $('#cycles-list').html(html)
         this.addCycleMenu = $('.add-cycle-menu')
         this.editCycleMenu = $('.edit-cycle-menu')
@@ -457,7 +461,9 @@ class View {
     * @method drawSortieList populates the #sorties-view div view with sorties information
     */
     drawSortieList = (airplan) => {
-        let html =  `<h3>Lines and Sorties</h3>`
+        let html =  `
+        <details open>
+        <summary class='h3'>Lines and Sorties</summary>`
         html +=     `<div class='list-group'>`
         Object.values(airplan.squadrons).forEach(squadron => {
             Object.values(airplan.lines).filter(line=>line.squadronID == squadron.ID).sort((a,b)=>a.start-b.start).forEach((line,i) => {
@@ -489,6 +495,7 @@ class View {
         })
         html +=         `<div class='list-group-item list-group-item-action add-line-menu'><i class='fas fa-plus'></i> Add Line...</div>`        
         html +=     `</div>`
+        html += `</details>`
         
         $('#sorties-list').html(html)
         this.addLineMenu = $('.add-line-menu')
