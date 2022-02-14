@@ -1,10 +1,11 @@
 # SSL Certificate
 resource "aws_acm_certificate" "ssl_certificate" {
+  #depends_on = [aws_route53_record.parent_subdomain]
   provider = aws
   domain_name = var.domain_name
-  subject_alternative_names = ["*.${var.domain_name}"]
-  #validation_method = "EMAIL"
-  validation_method = "DNS"
+  subject_alternative_names = ["www.${var.domain_name}"]
+  validation_method = "EMAIL"
+  #validation_method = "DNS"
 
   tags = var.common_tags
 
@@ -17,5 +18,5 @@ resource "aws_acm_certificate" "ssl_certificate" {
 resource "aws_acm_certificate_validation" "cert_validation" {
   provider = aws
   certificate_arn = aws_acm_certificate.ssl_certificate.arn
-  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+  #validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
 }

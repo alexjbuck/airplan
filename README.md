@@ -2,7 +2,7 @@
 
 **For when you don't have ADMACS (maybe even when you do! 🤣)**
 
-[![S3 Host](https://github.com/alexjbuck/airplan/actions/workflows/s3sync.yml/badge.svg)](http://airplan.alexjbuck.com.s3-website-us-east-1.amazonaws.com/)
+[![S3 Host](https://github.com/alexjbuck/airplan/actions/workflows/s3sync.yml/badge.svg)](https://airplan.alexjbuck.com/)
 
 Version: 0.3.0
 

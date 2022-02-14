@@ -1,3 +1,4 @@
+// Create a user for the cicd pipeline
 resource "aws_iam_user" "cicd-user" {
   name = "${var.bucket_name}-cicd-user"
 }
@@ -7,6 +8,19 @@ resource "aws_iam_access_key" "cicd-user-access-key" {
   user = "${aws_iam_user.cicd-user.name}"
 }
 
+// Origin Access Identity bucket policy for CloudFront
+data "aws_iam_policy_document" "root_bucket_policy" {
+  statement {
+    actions = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.root_bucket.arn}/*"]
+    principals {
+      type        = "AWS"
+      identifiers = [aws_cloudfront_origin_access_identity.root_origin_access_identity.iam_arn]  
+    }
+  }
+}
+
+// Policy for CICD user (GitHub aws s3 sync action)
 resource "aws_iam_policy" "cicd-user-policy" {
   name        = "cicd-user-policy"
   description = "Full access to ${var.bucket_name} bucket."
@@ -18,7 +32,8 @@ resource "aws_iam_policy" "cicd-user-policy" {
             "Action": [
                 "s3:GetObject",
                 "s3:PutObject",
-                "s3:ListBucket"
+                "s3:ListBucket",
+                "s3:DeleteObject",
             ],
             "Resource": [
                 "arn:aws:s3:::${var.bucket_name}",
