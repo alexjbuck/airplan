@@ -246,7 +246,7 @@ class Controller {
     // Add/Remove/Edit Squadron
     handleAddSquadron = (name,cs,tms,modex) => { this.airplan.addSquadron(name,cs,tms,modex) }
     handleRemoveSquadron = (id) => { this.airplan.removeSquadron(id) }
-    handleRemoveBottomSquadron = () => { this.airplan.removeSquadron(Object.values(this.airplan.squadrons).at(-1)) }
+    handleRemoveBottomSquadron = () => { this.airplan.removeSquadron(Object.values(this.airplan.squadrons).at(-1).ID) }
     handleEditSquadron = (squadronID, name,cs,tms,modex) => { this.airplan.editSquadron(squadronID, name,cs,tms,modex) }
 
     // Add/Remove/Edit Cycle
