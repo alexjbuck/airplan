@@ -479,7 +479,7 @@ class View {
                     html += `
                     <div id='`+sortie.ID+`' class='list-group-item list-group-item-action edit-sortie-menu px-4 py-1 sortie'>
                     <small>
-                        <b>${sortie.event}:</b> ${sortie.start.toHHMM()}-${sortie.end.toHHMM()} ${sortie.note}
+                    <b>${sortie.event}:</b> ${sortie.start.toHHMM()}-${sortie.end.toHHMM()} ${sortie.note}
                     </small>
                     <i id='`+sortie.ID+`' class='fas fa-trash-alt sortie-remove'></i>
                     <i id='`+sortie.ID+`' class='fas fa-edit edit-sortie-menu'></i>
@@ -558,9 +558,9 @@ class View {
         })
     }
     /**
-     * 
-     * @param {Function} handler Bind the delete sortie controller to the delete button on the edit menu
-     */
+    * 
+    * @param {Function} handler Bind the delete sortie controller to the delete button on the edit menu
+    */
     bindEditSortieRemove(handler){
         this.editSortieRemove.on('click', event=>{
             let sortieID = event.currentTarget.id
@@ -668,6 +668,7 @@ class View {
     bindEditHeaderSubmit(handler){
         this.editHeaderSubmit.on('click', event=>{
             let title = $('#title').val();
+            let subtitle = $('#subtitle').val();
             let date = $('#date').val();
             let start = $('#start').val();
             let end = $('#end').val();
@@ -680,7 +681,7 @@ class View {
             let heloquarters = $('#heloquarters').val();
             let variation = $('#variation').val();
             let timezone = $('#timezone').val();
-            handler(title, date, start, end, sunrise, sunset, moonrise, moonset, moonphase, flightquarters, heloquarters, variation, timezone)
+            handler(title, subtitle, date, start, end, sunrise, sunset, moonrise, moonset, moonphase, flightquarters, heloquarters, variation, timezone)
             closeModal()
         })
     }
@@ -698,6 +699,11 @@ class View {
         html += "<div class='form-group row align-items-center'>";
         html += "<label for='title' class='col-12 col-md-3 text-left text-md-right'>Title</label>";
         html += "<input type='text' class='col form-control mr-5' id='title' placeholder='Airplan Title'>";
+        html += "</div>";
+        // Subtitle
+        html += "<div class='form-group row align-items-center'>";
+        html += "<label for='subtitle' class='col-12 col-md-3 text-left text-md-right'>Subtitle</label>";
+        html += "<input type='text' class='col form-control mr-5' id='subtitle' placeholder='Airplan Subtitle'>";
         html += "</div>";
         // Start
         html += "<div class='form-group row align-items-center'>";
@@ -837,7 +843,7 @@ class View {
         new Konva.Text({
             id: 'title.subtitle',
             y: this.stage.findOne('#title.title').height() + config.subtitle.padding,
-            text: airplan.date.toDateString(),
+            text: airplan.subtitle,
             fontSize : config.subtitle.fontSize,
         }).addTo(this.stage.findOne('#title')).anchorTopMiddle()
         

@@ -11,6 +11,7 @@ class Model {
         this._end            = new Date( new Date().setHours(18,0) )
         // this._date           = new Date( this.start.valueOf()/2 + this.end.valueOf()/2 )
         this.title           = "Airplan Title";
+        this.subtitle        = "Subtitle";
         this._sunrise        = new Date( new Date().setHours(6,46) )
         this._sunset         = new Date( new Date().setHours(19,29) )
         this._moonrise       = new Date( new Date().setHours(10,8) )

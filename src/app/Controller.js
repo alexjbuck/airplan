@@ -201,6 +201,7 @@ class Controller {
     handleEditHeaderMenu = () => {
         this.view.drawEditHeaderData(this.airplan)
         $('#title').val(this.airplan.title)
+        $('#subtitle').val(this.airplan.subtitle)
         // $('#date').val(this.airplan.date.toYYYYMMDD())
         $('#start').val(this.airplan.start.toLocalTimeString())
         $('#end').val(this.airplan.end.toLocalTimeString())
@@ -269,8 +270,9 @@ class Controller {
     }
 
     // Edit Header
-    handleEditHeader = (title, date, start, end, sunrise, sunset, moonrise, moonset, moonphase, flightquarters, heloquarters, variation, timezone) => {
+    handleEditHeader = (title, subtitle, date, start, end, sunrise, sunset, moonrise, moonset, moonphase, flightquarters, heloquarters, variation, timezone) => {
         this.airplan.title = title
+        this.airplan.subtitle = subtitle 
         // this.airplan.date = new Date(Date.parse(date+'T00:00'))
         this.airplan.start = new Date(Date.parse(start))
         this.airplan.end = new Date(Date.parse(end))
