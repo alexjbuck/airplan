@@ -11,11 +11,22 @@ resource "aws_iam_access_key" "cicd-user-access-key" {
 // Origin Access Identity bucket policy for CloudFront
 data "aws_iam_policy_document" "root_bucket_policy" {
   statement {
+    sid = "Allow access to CloudFront OAI"
     actions = ["s3:GetObject"]
     resources = ["${aws_s3_bucket.root_bucket.arn}/*"]
     principals {
       type        = "AWS"
       identifiers = [aws_cloudfront_origin_access_identity.root_origin_access_identity.iam_arn]  
+    }
+  }
+
+  statement {
+    sid = "Allow access to all"
+    actions = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.root_bucket.arn}","${aws_s3_bucket.root_bucket.arn}/*"]
+    principals {
+      type        = "*"
+      identifiers = ["*"]
     }
   }
 }
