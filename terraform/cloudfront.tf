@@ -13,7 +13,8 @@ resource "aws_cloudfront_distribution" "root_s3_distribution" {
     #  origin_ssl_protocols = ["TLSv1", "TLSv1.1", "TLSv1.2"]
     #}
   }
-
+  
+  
   enabled = true
   is_ipv6_enabled = true
   wait_for_deployment = true
@@ -58,6 +59,7 @@ resource "aws_cloudfront_distribution" "root_s3_distribution" {
     minimum_protocol_version = "TLSv1.2_2019"
   }
 
+  comment = "S3-${var.bucket_name}"
   tags = var.common_tags
 }
 
