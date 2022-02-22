@@ -24,7 +24,7 @@ class Sortie extends Event {
         return sortie;
     }
     
-    /** @param {String} lineID */
+    /** @param {Line} line */
     set line(line) {
         this.lineID = line.ID;
     }
