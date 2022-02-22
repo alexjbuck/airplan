@@ -36,22 +36,18 @@ class View {
         this.menu = {squadron:{},file:{},info:{}}
         var html =`
         <details open>
-        <summary class='h3'>Menu</summary>
-        <div class='btn-group menu-group'>
-        <button id='add-squadron' class='btn btn-outline-primary add-squadron' data-toggle='tooltip' data-placement='top' title='Add Squadron'>   <i class='fas fa-plus'> </i></button>
-        <button id='rem-squadron' class='btn btn-outline-danger rem-squadron'  data-toggle='tooltip' data-placement='top' title='Remove Squadron'><i class='fas fa-minus'></i></button>
-        </div>
-        <div class='btn-group menu-group'>
-        <button id='reset'   class='btn btn-outline-danger'       data-toggle='tooltip' data-placement='top' title='Burn it Down!'><i class='fas fa-dumpster-fire'> </i></button>
-        <button id='refresh' class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Refresh'>      <i class='fas fa-sync'>          </i></button>
-        <label  id='load'    class='btn btn-outline-primary my-0' data-toggle='tooltip' data-placement='top' title='Load'>         <i class='fas fa-folder-open'>   </i><input type='file' id='filepath' hidden></label>
-        <button id='save'    class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Save'>         <i class='fas fa-save'>          </i></button>
-        <button id='export'  class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Export PDF'>   <i class='fas fa-file-pdf'>      </i></button>
-        </div>
-        <div class='btn-group menu-group'>
-        <button id="help"            class='btn btn-outline-warning'      data-toggle='tooltip' data-placement='top' title='Help'>         <i class='fas fa-question-circle'></i></button>
-        <button id="feedback" class='btn btn-outline-success' data-toggle='tooltip' data-placement='top' title='Send Feedback'        onclick='location.href="mailto:alexander.j.buck@navy.mil?subject=Airplan feedback&body=Three things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:%0d%0a%0d%0aThank You!"'><i class="fas fa-bullhorn"></i></button>
-        </div>
+            <summary class='h3'>Menu</summary>
+            <div class='list-group'>                      
+                <button id='add-squadron' class='btn btn-outline-primary list-group-item add-squadron'>Add Squadron</button>
+                <button id='rem-squadron' class='btn btn-outline-danger  list-group-item rem-squadron'>Remove Squadron</button>
+                <button id='reset'        class='btn btn-outline-danger  list-group-item' it Down!'>Reset</i></button>
+                <button id='refresh'      class='btn btn-outline-primary list-group-item' >Refresh</button>
+                <label  id='load'         class='btn btn-outline-primary list-group-item my-0' >Load Airplan<input type='file' id='filepath' hidden></label>
+                <button id='save'         class='btn btn-outline-primary list-group-item' >Save Airplan</button>
+                <button id='export'       class='btn btn-outline-primary list-group-item' PDF'>Export PDF</button>
+                <button id="help"         class='btn btn-outline-warning list-group-item' >Help</button>
+                <button id="feedback"     class='btn btn-outline-success list-group-item' onclick='location.href="mailto:alexander.j.buck@navy.mil?subject=Airplan feedback&body=Three things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:%0d%0a%0d%0aThank You!"'>Feedback</button>
+            </div>
         </details>
         `;
         $('#menu').html(html)
@@ -71,42 +67,43 @@ class View {
     drawHelp() {
         let html = `
         <div class='container'>
-        <div class='row'>
-        <div>
-        <h3>BAD MAX airplan writer: \u2708</h3>
-        <h5>For when you don't have ADMACS, <em>and <sup>maybe <sup>even <sup>when <sup>you do!</sup></sup></sup></sup></em></h5>
-        </div>
-        <div class='ml-auto'>
-        <small>Version: 0.3.0</small>
-        </div>
-        </div>
+            <div class='row'>
+                <div>
+                    <h3>BAD MAX airplan writer: \u2708</h3>
+                    <h5>For when you don't have ADMACS, <em>and <sup>maybe <sup>even <sup>when <sup>you do!</sup></sup></sup></sup></em></h5>
+                </div>
+                <div class='ml-auto'>
+                    <small>Version: 0.3.0</small>
+                </div>
+            </div>
         </div>
         <hr>
         <p>
-        Writing airplan's in PowerPoint is the worst &#129324;.
-        This is a simple web app that allows you to view and edit your squadron's air plans.
-        You can add new flights, edit existing flights, and delete flights.
-        You can also export your air plan to PDF <i class="far fa-file-pdf"></i>.
+            Writing airplan's in PowerPoint is the worst &#129324;.
+            This is a simple web app that allows you to view and edit your squadron's air plans.
+            You can add new flights, edit existing flights, and delete flights.
+            You can also export your air plan to PDF <i class="far fa-file-pdf"></i>.
         </p>
         <i class="fas fa-exclamation-triangle"></i> Tips:
         <ol>
-        <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> or red <i style="color:red" class='fas fa-minus'></i> in the menu to add or remove a squadron.</li>
-        <li>Click on the squadron text block in the graphical view to edit the name, callsign, TMS, and modex.</li>
-        <li>Start adding cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
-        <li>Add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button and selecting a squadron.</li>
-        <li>Add a sortie in the line by clicking "<i class='fas fa-plus'></i> Add Sortie" underneath the desired line.</li>
-        <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This downloads a file that you can load <i class='fas fa-folder-open'></i> to resume your progress.</li>
-        <li>Items on the display to the left open edit menu's if they have a <span class='blue-border'>blue border</span> when you hover over them.</li>
-        </ol><ul>
-        <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
-        <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
+            <li>To get started, click the blue <i style="color:blue" class='fas fa-plus'></i> or red <i style="color:red" class='fas fa-minus'></i> in the menu to add or remove a squadron.</li>
+            <li>Click on the squadron text block in the graphical view to edit the name, callsign, TMS, and modex.</li>
+            <li>Start adding cycles by clicking the "<i class='fas fa-plus'></i> Add Cycle" button and providing the cycle times</li>
+            <li>Add an aircraft line by clicking the "<i class='fas fa-plus'></i> Add Line" button and selecting a squadron.</li>
+            <li>Add a sortie in the line by clicking "<i class='fas fa-plus'></i> Add Sortie" underneath the desired line.</li>
+            <li>Save your airplan by clicking the <i class='fas fa-save'></i> button. This downloads a file that you can load <i class='fas fa-folder-open'></i> to resume your progress.</li>
+            <li>Items on the display to the left open edit menu's if they have a <span class='blue-border'>blue border</span> when you hover over them.</li>
+        </ol>
+        <ul>
+            <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
+            <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
         </ul>
         <p>
-        Play around, you can't break anything, and hopefully you find this app useful!
+            Play around, you can't break anything, and hopefully you find this app useful!
         </p>
         <p>
-        Please provide feedback to <span class='jarvis'>JARVIS</span> at <a href=mailto:alexander.j.buck@gmail.com>alexander.j.buck@navy.mil</a> by
-        clicking the green <span style="color:green"><i class="fas fa-bullhorn"></i></span> button in the menu.
+            Please provide feedback to <span class='jarvis'>JARVIS</span> at <a href=mailto:alexander.j.buck@gmail.com>alexander.j.buck@navy.mil</a> by
+            clicking the green <span style="color:green"><i class="fas fa-bullhorn"></i></span> button in the menu.
         </p>
         `
         openModal(html)
@@ -230,6 +227,7 @@ class View {
         html += "<label for='modex' class='col-12 col-md-3 text-left text-md-right'>Modex</label>";
         html += "<input type='text' class='col form-control mr-5' id='modex' placeholder='Airplan Title'>";
         html += "</div>";
+        // Submit / Delete Buttons
         html += "<div class='btn-group'>";
         html += "<button id='"+squadron.ID+"' class='btn btn-primary edit-squadron-submit'>Submit</button>";
         html += "<button id='"+squadron.ID+"' class='btn btn-danger edit-squadron-remove'><i class='fas fa-trash-alt'></i></button>";
@@ -467,13 +465,15 @@ class View {
         html +=     `<div class='list-group'>`
         Object.values(airplan.squadrons).forEach(squadron => {
             Object.values(airplan.lines).filter(line=>line.squadronID == squadron.ID).sort((a,b)=>a.start-b.start).forEach((line,i) => {
-                html += `<div id='`+line.ID+`' class='list-group-item list-group-item-action line'>`
+                html += `<details id='`+line.ID+`' open>`
+                html += `<summary id='`+line.ID+`' class='list-group-item list-group-item-action line'>`
                 html += `<b>${squadron.name}</b>: Line ${i+1} `
                 if (line.sorties.length) {
                     html +=         `<small>${line.start.toHHMM()}-${line.end.toHHMM()}</small> `
                 }
                 html +=             `<i id='`+line.ID+`' class='fas fa-trash-alt line-remove'></i> `
                 html +=             `<i id='`+line.ID+`' class='fas fa-edit edit-line-menu'></i> `
+                html += `</summary>`
                 html +=     `<div class='list-group list-group-flush'>`
                 Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
                     html += `
@@ -490,7 +490,8 @@ class View {
                 <small><i class='fas fa-plus'></i> Add Sortie...</small>
                 </div>`
                 html +=     `</div>
-                </div>`
+                </div>
+                </details>`
             })
         })
         html +=         `<div class='list-group-item list-group-item-action add-line-menu'><i class='fas fa-plus'></i> Add Line...</div>`        
