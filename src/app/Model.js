@@ -240,4 +240,8 @@ class Model {
         }
         return map
     }
+
+    toggleLineDisplay(id) {
+        this.lines[id].toggleDisplay()
+    }
 }

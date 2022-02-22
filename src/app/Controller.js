@@ -41,6 +41,7 @@ class Controller {
         this.view.bindAddLineMenu(this.handleAddLineMenu)
         this.view.bindEditLineMenu(this.handleEditLineMenu)
         this.view.bindLineRemove(this.handleRemoveLine)
+        this.view.bindLineToggleDisplay(this.handleToggleLineDisplay)
         
         this.view.bindAddSortieMenu(this.handleAddSortieMenu)
         this.view.bindEditSortieMenu(this.handleEditSortieMenu)
@@ -259,6 +260,7 @@ class Controller {
     handleAddLine = (id) => { this.airplan.addLine(id) }
     handleRemoveLine = (id) => { this.airplan.removeLine(id) }
     handleEditLine = (id, squadronID) => { this.airplan.editLine(id, squadronID) }
+    handleToggleLineDisplay = (id) => { this.airplan.toggleLineDisplay(id) }
 
     // Add/Remove/Edit Sortie
     handleAddSortie = (lineID, start, end, startType, endType, note, startCycleID, endCycleID) => {

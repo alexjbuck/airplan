@@ -410,6 +410,13 @@ class View {
             handler(lineID)
         })
     }
+    bindLineToggleDisplay(handler){
+        this.lineToggleDisplay.on('click', event=>{
+            let lineID = event.currentTarget.id
+            handler(lineID)
+        })
+    }
+
     //    _       _                __  __                          
     //   | |     (_)              |  \/  |                         
     //   | |      _  _ __    ___  | \  / |  ___  _ __   _   _  ___ 
@@ -460,37 +467,44 @@ class View {
     * @param {Model} airplan
     * @method drawSortieList populates the #sorties-view div view with sorties information
     */
-    drawSortieList = (airplan) => {
+     drawSortieList = (airplan) => {
         let html =  `
         <details open>
         <summary class='h3'>Lines and Sorties</summary>`
         html +=     `<div class='list-group'>`
         Object.values(airplan.squadrons).forEach(squadron => {
             Object.values(airplan.lines).filter(line=>line.squadronID == squadron.ID).sort((a,b)=>a.start-b.start).forEach((line,i) => {
-                html += `<div id='`+line.ID+`' class='list-group-item list-group-item-action line'>`
+                let display='open'
+                if(line.display!=undefined && !line.display){
+                    display=''
+                }
+                html += `<details id='${line.ID}' ${display}>`
+                html += `<summary id='${line.ID}' class='list-group-item list-group-item-action line line-toggle-display'>`
                 html += `<b>${squadron.name}</b>: Line ${i+1} `
                 if (line.sorties.length) {
                     html +=         `<small>${line.start.toHHMM()}-${line.end.toHHMM()}</small> `
                 }
-                html +=             `<i id='`+line.ID+`' class='fas fa-trash-alt line-remove'></i> `
-                html +=             `<i id='`+line.ID+`' class='fas fa-edit edit-line-menu'></i> `
+                html +=             `<i id='${line.ID}' class='fas fa-trash-alt line-remove'></i> `
+                html +=             `<i id='${line.ID}' class='fas fa-edit edit-line-menu'></i> `
+                html += `</summary>`
                 html +=     `<div class='list-group list-group-flush'>`
                 Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
                     html += `
-                    <div id='`+sortie.ID+`' class='list-group-item list-group-item-action edit-sortie-menu px-4 py-1 sortie'>
+                    <div id='${sortie.ID}' class='list-group-item list-group-item-action edit-sortie-menu px-4 py-1 sortie'>
                     <small>
                     <b>${sortie.event}:</b> ${sortie.start.toHHMM()}-${sortie.end.toHHMM()} ${sortie.note}
                     </small>
-                    <i id='`+sortie.ID+`' class='fas fa-trash-alt sortie-remove'></i>
-                    <i id='`+sortie.ID+`' class='fas fa-edit edit-sortie-menu'></i>
+                    <i id='${sortie.ID}' class='fas fa-trash-alt sortie-remove'></i>
+                    <i id='${sortie.ID}' class='fas fa-edit edit-sortie-menu'></i>
                     </div>`
                 })
                 html += `
-                <div id='`+line.ID+`' class='list-group-item list-group-item-action px-4 py-1 sortie add-sortie-menu'>
+                <div id='${line.ID}' class='list-group-item list-group-item-action px-4 py-1 sortie add-sortie-menu'>
                 <small><i class='fas fa-plus'></i> Add Sortie...</small>
                 </div>`
                 html +=     `</div>
-                </div>`
+                </div>
+                </details>`
             })
         })
         html +=         `<div class='list-group-item list-group-item-action add-line-menu'><i class='fas fa-plus'></i> Add Line...</div>`        
@@ -504,6 +518,7 @@ class View {
         this.addSortieMenu = $('.add-sortie-menu')
         this.editSortieMenu = $('.edit-sortie-menu')
         this.sortieRemove = $('.sortie-remove')
+        this.lineToggleDisplay = $('.line-toggle-display')
     }
     //     _____               _    _         ____   _             _  _                    
     //    / ____|             | |  (_)       |  _ \ (_)           | |(_)                   
