@@ -17,6 +17,7 @@ class Controller {
         this.view.bindMenuSave(this.handleSaveFile)
         this.view.bindMenuExport(this.handleExportFile)
         this.view.bindMenuHelp(this.handleHelp)
+        this.view.bindMenuFeedback(this.handleFeedback)
         
         // Draw the spash page help.
         this.view.drawHelp()
@@ -81,6 +82,13 @@ class Controller {
     }
     handleHelp = () => { this.view.drawHelp() }
     
+    handleFeedback = () => {
+        let email = `alexander.j.buck@navy.mil`
+        let subject=`BadMax Airplan Writer Feedback`
+        let body=`If you're reporting an issue, please save and export your working file. Attach the json and pdf to this email to assist troubleshooting.%0d%0a%0d%0aThree things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:%0d%0a%0d%0aThank You!`
+        window.open(`mailto:${email}?subject=${subject}&body=${body}`)
+    }
+
     /**
      * ADD/EDIT MENU HANDLERS
      */

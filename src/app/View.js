@@ -49,8 +49,8 @@ class View {
         <button id='export'  class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Export PDF'>   <i class='fas fa-file-pdf'>      </i></button>
         </div>
         <div class='btn-group menu-group'>
-        <button id="help"            class='btn btn-outline-warning'      data-toggle='tooltip' data-placement='top' title='Help'>         <i class='fas fa-question-circle'></i></button>
-        <button id="feedback" class='btn btn-outline-success' data-toggle='tooltip' data-placement='top' title='Send Feedback'        onclick='location.href="mailto:alexander.j.buck@navy.mil?subject=Airplan feedback&body=Three things I liked:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aThree things I did not like:%0d%0a1. %0d%0a2. %0d%0a3. %0d%0a%0d%0aAny other feedback:%0d%0a%0d%0aThank You!"'><i class="fas fa-bullhorn"></i></button>
+        <button id="help"            class='btn btn-outline-warning' data-toggle='tooltip' data-placement='top' title='Help'>         <i class='fas fa-question-circle'></i></button>
+        <button id="feedback"        class='btn btn-outline-success' data-toggle='tooltip' data-placement='top' title='Send Feedback'><i class="fas fa-bullhorn"></i>       </button>
         </div>
         </details>
         `;
@@ -155,6 +155,11 @@ class View {
     }
     bindMenuHelp(handler){
         this.menu.info.help.on('click', event=>{
+            handler()
+        })
+    }
+    bindMenuFeedback(handler){
+        this.menu.info.feedback.on('click', event=>{
             handler()
         })
     }
