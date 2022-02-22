@@ -22,11 +22,15 @@ class Cycle extends Event {
     }
    
     get launchCount() {
-        return 0;
+        if (this.parent) {
+            return Object.values(this.parent.sorties).filter(s=>s.start.valueOf() == this.start.valueOf()).length
+        }
     }
 
     get landCount() {
-        return 0;
+        if (this.parent) {
+            return Object.values(this.parent.sorties).filter(s=>s.end.valueOf() == this.end.valueOf()).length
+        }
     }
 
     after() {
