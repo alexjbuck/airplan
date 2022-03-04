@@ -169,14 +169,14 @@ class Model {
         delete this.sorties[id]
         this.onChange()
     }
-    addSortie(lineID, start, end, startType, endType, note, startCycleID=null, endCycleID=null) {
-        let sortie = new Sortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID)
+    addSortie(lineID, start, end, startType, endType, note, startCycleID=null, endCycleID=null, isAlert=false) {
+        let sortie = new Sortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert=false)
         sortie.parent = this;
         this.sorties[sortie.ID] = sortie;
         this.onChange()
         return sortie
     }
-    editSortie(id, start, end, startType, endType, note, startCycleID=null, endCycleID=null) {
+    editSortie(id, start, end, startType, endType, note, startCycleID=null, endCycleID=null, isAlert=false) {
         this.sorties[id].start = start
         this.sorties[id].end = end
         this.sorties[id].startType = startType
@@ -184,6 +184,7 @@ class Model {
         this.sorties[id].note = note
         this.sorties[id].startCycleID = startCycleID
         this.sorties[id].endCycleID = endCycleID
+        this.sorties[id].isAlert = isAlert
         this.onChange()
     }
     
