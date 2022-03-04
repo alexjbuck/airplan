@@ -4,7 +4,7 @@
 
 [![S3 Host](https://github.com/alexjbuck/airplan/actions/workflows/s3sync.yml/badge.svg)](https://airplan.alexjbuck.com/)
 
-Version: 0.3.0
+Version: 0.3.1
 
 Writing airplans in PowerPoint is a big bummer 🤬.
 Never again will you chained to dragging around little lines on the screen ⛓.
@@ -23,4 +23,4 @@ Tips:
 
 Play around, you can't break anything, and hopefully you find this app useful!
 
-Please provide feedback to JARVIS at [alexander.j.buck@navy.mil](mailto:alexander.j.buck@navy.mil) by clicking the green "Feedback" button in the menu.
+Please provide feedback to Jarvis at [alexander.j.buck@navy.mil](mailto:alexander.j.buck@navy.mil) by clicking the green "Feedback" button in the menu.

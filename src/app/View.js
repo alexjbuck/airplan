@@ -18,6 +18,7 @@ class View {
         this.topRow             = 20;
         this.bottomRow          = 20;
         this.drawMenu();
+        this.drawSquadrons();
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
         })          
@@ -33,14 +34,10 @@ class View {
     * @method drawMenu Populate the #menu in the menu div.
     */
     drawMenu = () => {
-        this.menu = {squadron:{},file:{},info:{}}
+        this.menu = {file:{},info:{}}
         var html =`
         <details open>
-        <summary class='h3'>Menu</summary>
-        <div class='btn-group menu-group'>
-        <button id='add-squadron' class='btn btn-outline-primary add-squadron' data-toggle='tooltip' data-placement='top' title='Add Squadron'>   <i class='fas fa-plus'> </i></button>
-        <button id='rem-squadron' class='btn btn-outline-danger rem-squadron'  data-toggle='tooltip' data-placement='top' title='Remove Squadron'><i class='fas fa-minus'></i></button>
-        </div>
+        <summary class='h3'>Menu / Help</summary>
         <div class='btn-group menu-group'>
         <button id='reset'   class='btn btn-outline-danger'       data-toggle='tooltip' data-placement='top' title='Burn it Down!'><i class='fas fa-dumpster-fire'> </i></button>
         <button id='refresh' class='btn btn-outline-primary'      data-toggle='tooltip' data-placement='top' title='Refresh'>      <i class='fas fa-sync'>          </i></button>
@@ -55,8 +52,8 @@ class View {
         </details>
         `;
         $('#menu').html(html)
-        this.menu.squadron.add = $('#add-squadron')
-        this.menu.squadron.rem = $('#rem-squadron')
+        // this.squadron.add = $('#add-squadron')
+        // this.squadron.rem = $('#rem-squadron')
         this.menu.file.reset = $('#reset')
         this.menu.file.refresh = $('#refresh')
         this.menu.file.load = $('#load')
@@ -77,7 +74,7 @@ class View {
         <h5>For when you don't have ADMACS, <em>and <sup>maybe <sup>even <sup>when <sup>you do!</sup></sup></sup></sup></em></h5>
         </div>
         <div class='ml-auto'>
-        <small>Version: 0.3.0</small>
+        <small>Version: 0.3.1</small>
         </div>
         </div>
         </div>
@@ -163,7 +160,21 @@ class View {
             handler()
         })
     }
-    
+
+  drawSquadrons() {
+    var html =`
+        <details open>
+        <summary class='h3'>Squadrons</summary>
+          <div class='btn-group menu-group'>
+            <button id='add-squadron' class='btn btn-outline-primary add-squadron' data-toggle='tooltip' data-placement='top' title='Add Squadron'>   <i class='fas fa-plus'> </i> Add </button>
+            <button id='rem-squadron' class='btn btn-outline-danger rem-squadron'  data-toggle='tooltip' data-placement='top' title='Remove Squadron'><i class='fas fa-minus'></i> Rem</button>
+          </div>
+        </details>`
+    $('#squadrons').html(html)
+    this.squadron = {}
+    this.squadron.add = $('#add-squadron')
+    this.squadron.rem = $('#rem-squadron')
+  }
     
     //     _____                           _                      ____   _             _  _                    
     //    / ____|                         | |                    |  _ \ (_)           | |(_)                   
@@ -178,12 +189,12 @@ class View {
     * @param {Function} handler 
     */
     bindMenuAddPlaceholderSquadron(handler){
-        this.menu.squadron.add.on('click', event=>{
+        this.squadron.add.on('click', event=>{
             handler()
         })
     }
     bindMenuRemoveSquadron(handler){
-        this.menu.squadron.rem.on('click', event=>{
+        this.squadron.rem.on('click', event=>{
             handler()
         })
     }
