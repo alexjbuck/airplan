@@ -271,12 +271,12 @@ class Controller {
     handleToggleLineDisplay = (id) => { this.airplan.toggleLineDisplay(id) }
 
     // Add/Remove/Edit Sortie
-    handleAddSortie = (lineID, start, end, startType, endType, note, startCycleID, endCycleID) => {
-        this.airplan.addSortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID)
+    handleAddSortie = (lineID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert) => {
+        this.airplan.addSortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert)
     }
     handleRemoveSortie = (id) => { this.airplan.removeSortie(id) }
-    handleEditSortie = (id, start, end, startType, endType, note, startCycleID, endCycleID) => {
-        this.airplan.editSortie(id, start, end, startType, endType, note, startCycleID, endCycleID);
+    handleEditSortie = (id, start, end, startType, endType, note, startCycleID, endCycleID, isAlert) => {
+        this.airplan.editSortie(id, start, end, startType, endType, note, startCycleID, endCycleID, isAlert);
     }
 
     // Edit Header
