@@ -182,6 +182,7 @@ class Controller {
             $('#end').val(end.toLocalTimeString())
             $('#startType').val(startType)
             $('#endType').val(endType)
+            $('#isAlert').prop('checked',false)
             // Bind handleAddSortie to the submit button.
             this.view.bindAddSortieSubmit(this.handleAddSortie)
         })
@@ -194,6 +195,7 @@ class Controller {
         $('#startType').val(sortie.startType)
         $('#endType').val(sortie.endType)
         $('#note').val(sortie.note)
+        $('#isAlert').prop('checked',sortie.isAlert)
         this.view.bindEditSortieSubmit(this.handleEditSortie)
         this.view.bindEditSortieRemove(this.handleRemoveSortie)
     }

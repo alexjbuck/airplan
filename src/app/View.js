@@ -570,7 +570,8 @@ class View {
             let note = $( "#note" ).val()
             let startCycleID = null
             let endCycleID = null
-            handler(lineID, start, end, startType, endType, note, startCycleID, endCycleID)
+            let isAlert = $('#isAlert').prop('checked')
+            handler(lineID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert)
             closeModal()
         })
     }
@@ -584,7 +585,8 @@ class View {
             let note = $( "#note" ).val()
             let startCycleID = null
             let endCycleID = null
-            handler(sortieID, start, end, startType, endType, note, startCycleID, endCycleID)
+            let isAlert = $('#isAlert').prop('checked')
+            handler(sortieID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert)
             closeModal()
         })
     }
@@ -650,6 +652,11 @@ class View {
         html += "<label for='note' class='col-12 col-md-3 text-left text-md-right'>Note</label>";
         html += "<input type='text' class='col form-control mr-5' id='note' placeholder='Mission'>";
         html += "</div>";
+        // isAlert
+        html += "<div class='form-gorup row align-items-center'>"
+        html += "<label for='isAlert' class='col-12 col-md-3 text-left text-md-right'>Alert?</label>"
+        html += "<input type='checkbox' class='col form-control mr-5' id='isAlert'>"
+        html += "</div>"
         return html
     }
     /**
