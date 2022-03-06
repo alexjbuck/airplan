@@ -59,7 +59,7 @@ class Controller {
         this.airplan.addSquadron('Squadron ' + (Object.keys(this.airplan.squadrons).length+1),'CS','TMS','MODEX')
     }
     handleReset = () => { this.airplan.init() }
-    handleRefresh = () => { this.onAirplanChanged() }
+    handleRefresh = () => { this.onAirplanChanged(); this.view.fitStageIntoParentContainer() }
     handleLoadFile = (file) => {
         let reader = new FileReader();
         reader.onload = (e) => {
