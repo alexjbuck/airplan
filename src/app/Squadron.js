@@ -25,14 +25,14 @@ class Squadron {
         if (this.parent) {
             let sr = this.parent.sunrise
             let ss = this.parent.sunset
-            return this.sorties.filter(s=> s.start > sr && s.end < ss).length
+            return this.sorties.filter(s=>!s.isAlert).filter(s=> s.start > sr && s.end < ss).length
         }
     }
     get night() {
         if (this.parent) {
             let sr = this.parent.sunrise
             let ss = this.parent.sunset
-            return this.sorties.filter(s=> s.start < sr || s.end > ss).length
+            return this.sorties.filter(s=>!s.isAlert).filter(s=> s.start < sr || s.end > ss).length
         }
     }
 }
