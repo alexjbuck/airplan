@@ -74,7 +74,7 @@ class View {
         <h5>For when you don't have ADMACS, <em>and <sup>maybe <sup>even <sup>when <sup>you do!</sup></sup></sup></sup></em></h5>
         </div>
         <div class='ml-auto'>
-        <small>Version: 0.4.0</small>
+        <small>Version: 0.5.0</small>
         </div>
         </div>
         </div>
@@ -484,10 +484,10 @@ class View {
     * @method drawSortieList populates the #sorties-view div view with sorties information
     */
     drawSortieList = (airplan) => {
-        let html =  `
-        <details open>
-        <summary class='h3'>Lines and Sorties</summary>`
-        html +=     `<div class='list-group'>`
+        let html = ``
+        html += `<details open>`
+            html += `<summary class='h3'>Lines and Sorties</summary>`
+            html += `<div class='list-group'>`
         Object.values(airplan.squadrons).forEach(squadron => {
             Object.values(airplan.lines).filter(line=>line.squadronID == squadron.ID).sort((a,b)=>a.start-b.start).forEach((line,i) => {
                 let display='open'
@@ -495,36 +495,35 @@ class View {
                     display=''
                 }
                 html += `<details id='${line.ID}' ${display}>`
-                html += `<summary id='${line.ID}' class='list-group-item list-group-item-action line line-toggle-display'>`
-                html += `<b>${squadron.name}</b>: Line ${i+1} `
-                if (line.sorties.length) {
-                    html +=         `<small>${line.start.toHHMM()}-${line.end.toHHMM()}</small> `
-                }
-                html +=             `<i id='${line.ID}' class='fas fa-trash-alt line-remove'></i> `
-                html +=             `<i id='${line.ID}' class='fas fa-edit edit-line-menu'></i> `
-                html += `</summary>`
-                html +=     `<div class='list-group list-group-flush'>`
-                Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
-                    html += `
-                    <div id='${sortie.ID}' class='list-group-item list-group-item-action edit-sortie-menu px-4 py-1 sortie'>
-                    <small>
-                    <b>${sortie.event}:</b> ${sortie.start.toHHMM()}-${sortie.end.toHHMM()} ${sortie.note}
-                    </small>
-                    <i id='${sortie.ID}' class='fas fa-trash-alt sortie-remove'></i>
-                    <i id='${sortie.ID}' class='fas fa-edit edit-sortie-menu'></i>
-                    </div>`
-                })
-                html += `
-                <div id='${line.ID}' class='list-group-item list-group-item-action px-4 py-1 sortie add-sortie-menu'>
-                <small><i class='fas fa-plus'></i> Add Sortie...</small>
-                </div>`
-                html +=     `</div>
-                </div>
-                </details>`
+                    html += `<summary id='${line.ID}' class='list-group-item list-group-item-action line line-toggle-display'>`
+                    html +=     `<b>${squadron.name}</b>: Line ${i+1} `
+                    if (line.sorties.length) {
+                        html +=  `<small>${line.start.toHHMM()}-${line.end.toHHMM()}</small> `
+                    }
+                    html +=      `<i id='${line.ID}' class='fas fa-trash-alt line-remove'></i> `
+                    html +=      `<i id='${line.ID}' class='fas fa-edit edit-line-menu'></i> `
+                    html += `</summary>`
+                    html += `<div class='list-group list-group-flush'>`
+                    Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
+                        html += `<div id='${sortie.ID}' class='list-group-item list-group-item-action edit-sortie-menu px-4 py-1 sortie'>`
+                            html += `<small>`
+                                html += `<b>${sortie.event}:</b> ${sortie.start.toHHMM()}-${sortie.end.toHHMM()} ${sortie.note}`
+                            html += `</small>`
+                            html += `<i id='${sortie.ID}' class='fas fa-trash-alt sortie-remove'></i>`
+                            html += `<i id='${sortie.ID}' class='fas fa-edit edit-sortie-menu'></i>`
+                        html += `</div>`
+                    })
+                        html += `<div id='${line.ID}' class='list-group-item list-group-item-action px-4 py-1 sortie add-sortie-menu'>`
+                            html += `<small><i class='fas fa-plus'></i> Add Sortie...</small>`
+                        html += `</div>`
+                    html += `</div>`
+                html += `</details>`
             })
         })
-        html +=         `<div class='list-group-item list-group-item-action add-line-menu'><i class='fas fa-plus'></i> Add Line...</div>`        
-        html +=     `</div>`
+                html += `<div class='list-group-item list-group-item-action add-line-menu'>`
+                    html += `<i class='fas fa-plus'></i> Add Line...`
+                html += `</div>`        
+            html += `</div>`
         html += `</details>`
         
         $('#sorties-list').html(html)
@@ -570,7 +569,8 @@ class View {
             let note = $( "#note" ).val()
             let startCycleID = $('.start-on-cycle').prop('checked') ? $('#start-cycle').val() : null
             let endCycleID   = $('.end-on-cycle').prop('checked')   ? $('#end-cycle').val()   : null
-            handler(lineID, start, end, startType, endType, note, startCycleID, endCycleID)
+            let isAlert = $('#isAlert').prop('checked')
+            handler(lineID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert)
             closeModal()
         })
     }
@@ -584,7 +584,8 @@ class View {
             let note = $( "#note" ).val()
             let startCycleID = $('.start-on-cycle').prop('checked') ? $('#start-cycle').val() : null
             let endCycleID = $('.end-on-cycle').prop('checked') ? $('#end-cycle').val() : null
-            handler(sortieID, start, end, startType, endType, note, startCycleID, endCycleID)
+            let isAlert = $('#isAlert').prop('checked')
+            handler(sortieID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert)
             closeModal()
         })
     }
@@ -672,6 +673,11 @@ class View {
         html += `<label for='note' class='col-12 col-md-3 text-left text-md-right'>Note</label>`;
         html += `<input type='text' class='col form-control mr-5' id='note' placeholder='Mission'>`;
         html += `</div>`;
+        // isAlert
+        html += `<div class='form-gorup row align-items-center'>`
+        html += `<label for='isAlert' class='col-12 col-md-3 text-left text-md-right'>Alert?</label>`
+        html += `<input type='checkbox' class='col form-control mr-5' id='isAlert'>`
+        html += `</div>`
         return html
     }
     /**
@@ -1091,7 +1097,7 @@ class View {
                     }).addTo(timebox)
                     
                     // Sortie Line
-                    new Konva.Line({stroke:'black', strokeWidth:1, points:[0,0,sortieGroup.width(),0]}).addTo(sortieGroup)
+                    new Konva.Line({stroke:'black', strokeWidth:1, points:[0,0,sortieGroup.width(),0], dash:[10,10], dashEnabled: sortie.isAlert}).addTo(sortieGroup)
                     View.drawCondition[sortie.startType](0,0).addTo(sortieGroup)
                     View.drawCondition[sortie.endType](sortieGroup.width(),0).addTo(sortieGroup)
                     

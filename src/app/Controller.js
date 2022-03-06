@@ -50,6 +50,7 @@ class Controller {
         this.view.bindSortieRemove(this.handleRemoveSortie)
 
         this.view.bindCanvasClick(this.handleCanvasClick)
+        this.view.fitStageIntoParentContainer();
     }
     
     /**
@@ -188,6 +189,7 @@ class Controller {
             $('.end-on-cycle').prop('checked', endOnCycle).trigger('change')
             $('#startType').val(startType)
             $('#endType').val(endType)
+            $('#isAlert').prop('checked',false)
             // Bind handleAddSortie to the submit button.
             this.view.bindAddSortieSubmit(this.handleAddSortie)
         })
@@ -206,6 +208,7 @@ class Controller {
         $('#startType').val(sortie.startType)
         $('#endType').val(sortie.endType)
         $('#note').val(sortie.note)
+        $('#isAlert').prop('checked',sortie.isAlert)
     }
     handleEditSquadronMenu = (squadronID) => {
         let squadron = this.airplan.squadrons[squadronID]
@@ -281,12 +284,12 @@ class Controller {
     handleToggleLineDisplay = (id) => { this.airplan.toggleLineDisplay(id) }
 
     // Add/Remove/Edit Sortie
-    handleAddSortie = (lineID, start, end, startType, endType, note, startCycleID, endCycleID) => {
-        this.airplan.addSortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID)
+    handleAddSortie = (lineID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert) => {
+        this.airplan.addSortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert)
     }
     handleRemoveSortie = (id) => { this.airplan.removeSortie(id) }
-    handleEditSortie = (id, start, end, startType, endType, note, startCycleID, endCycleID) => {
-        this.airplan.editSortie(id, start, end, startType, endType, note, startCycleID, endCycleID);
+    handleEditSortie = (id, start, end, startType, endType, note, startCycleID, endCycleID, isAlert) => {
+        this.airplan.editSortie(id, start, end, startType, endType, note, startCycleID, endCycleID, isAlert);
     }
 
     // Edit Header
