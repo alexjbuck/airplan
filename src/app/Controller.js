@@ -4,6 +4,7 @@ class Controller {
         this.view = new View();
         window.addEventListener('resize', this.view.fitStageIntoParentContainer);
         this.onAirplanChanged();
+        this.view.fitStageIntoParentContainer();
         
         // Bind Model update events
         this.airplan.bindOnChange(this.onAirplanChanged)
@@ -58,7 +59,7 @@ class Controller {
         this.airplan.addSquadron('Squadron ' + (Object.keys(this.airplan.squadrons).length+1),'CS','TMS','MODEX')
     }
     handleReset = () => { this.airplan.init() }
-    handleRefresh = () => { this.onAirplanChanged() }
+    handleRefresh = () => { this.onAirplanChanged(); this.view.fitStageIntoParentContainer() }
     handleLoadFile = (file) => {
         let reader = new FileReader();
         reader.onload = (e) => {
@@ -157,11 +158,16 @@ class Controller {
     * @param {String} lineID 
     */
     handleAddSortieMenu = (lineID) => {
-        this.view.drawAddSortieMenu(this.airplan.lines[lineID])
+        this.view.drawAddSortieMenu(this.airplan.lines[lineID], this.airplan.cycleList)
         .then(()=>{
             let start = new Date()
             let end = new Date()
+            let startOnCycle = false
+            let endOnCycle = false
+            let startCycleID = null
+            let endCycleID = null
             let startType = 'pull'
+            let endType = 'stuff'
             if(this.airplan.lines[lineID].end != undefined) {
                 start = new Date(this.airplan.lines[lineID].end)
                 end = new Date(start.valueOf()+3600*1000)
@@ -172,14 +178,14 @@ class Controller {
                 start = new Date(this.airplan.start)
                 end = new Date(start.valueOf()+3600*1000)
             }
+            // Match start type to prev sortie end type
             if (this.airplan.lines[lineID].sorties.length>0) {
                 startType = this.airplan.endStartTypeMap[this.airplan.lines[lineID].sorties.at(-1).endType]
             }
-            let endType = 'stuff'
-            let startCycleID = null
-            let endCycleID = null
             $('#start').val(start.toLocalTimeString())
             $('#end').val(end.toLocalTimeString())
+            $('.start-on-cycle').prop('checked', startOnCycle).trigger('change')
+            $('.end-on-cycle').prop('checked', endOnCycle).trigger('change')
             $('#startType').val(startType)
             $('#endType').val(endType)
             $('#isAlert').prop('checked',false)
@@ -189,25 +195,29 @@ class Controller {
     }
     handleEditSortieMenu = (sortieID) => {
         let sortie = this.airplan.sorties[sortieID]
-        this.view.drawEditSortieMenu(sortie)
+        this.view.drawEditSortieMenu(sortie, this.airplan.cycleList)
+        this.view.bindEditSortieSubmit(this.handleEditSortie)
+        this.view.bindEditSortieRemove(this.handleRemoveSortie)
+        $('.start-on-cycle').prop('checked', sortie.startOnCycle).trigger('change')
+        $('.end-on-cycle').prop('checked', sortie.endOnCycle).trigger('change')
         $('#start').val(sortie.start.toLocalTimeString())
+        $('#start-cycle').val(sortie.startCycleID!=null ? sortie.startCycleID : sortie.cycle.ID)  // If there is a startCycleID, set the input to the startCycleID, if not, set it to the sortie cycle.
         $('#end').val(sortie.end.toLocalTimeString())
+        $('#end-cycle').val(sortie.endCycleID!=null ? sortie.endCycleID : sortie.cycle.ID)  // If there is a startCycleID, set the input to the startCycleID, if not, set it to the sortie cycle.
         $('#startType').val(sortie.startType)
         $('#endType').val(sortie.endType)
         $('#note').val(sortie.note)
         $('#isAlert').prop('checked',sortie.isAlert)
-        this.view.bindEditSortieSubmit(this.handleEditSortie)
-        this.view.bindEditSortieRemove(this.handleRemoveSortie)
     }
     handleEditSquadronMenu = (squadronID) => {
         let squadron = this.airplan.squadrons[squadronID]
         this.view.drawEditSquadronData(squadron)
+        this.view.bindEditSquadronSubmit(this.handleEditSquadron)
+        this.view.bindEditSquadronRemove(this.handleRemoveSquadron)
         $('#name').val(squadron.name)
         $('#cs').val(squadron.cs)
         $('#tms').val(squadron.tms)
         $('#modex').val(squadron.modex)
-        this.view.bindEditSquadronSubmit(this.handleEditSquadron)
-        this.view.bindEditSquadronRemove(this.handleRemoveSquadron)
     }
     handleEditHeaderMenu = () => {
         this.view.drawEditHeaderData(this.airplan)
@@ -241,7 +251,7 @@ class Controller {
      * @param {Object} e Event object e. Triggered from on.click events.
      */
     handleCanvasClick = (e) => {
-        console.log(e.parent.name() + ' ' + e.parent.id())
+        // console.log(e.parent.name() + ' ' + e.parent.id())
         if (e.parent.name() == 'sortie') {
             this.handleEditSortieMenu(e.parent.id())
         } else if (e.parent.name() == 'cycle') {
