@@ -10,8 +10,6 @@ class Sortie extends Event {
         this.startType = startType;
         this.endType = endType;
         this.note = note;
-        this.startOnCycle = startCycleID ? true : false;
-        this.endOnCycle = endCycleID ? true : false;
         this.startCycleID = startCycleID;
         this.endCycleID = endCycleID;
     }
@@ -32,6 +30,22 @@ class Sortie extends Event {
     get line() {
         if (this.parent) {
             return this.parent.lines[this.lineID];
+        }
+    }
+
+    get startOnCycle() {
+        if (this.startCycleID != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    get endOnCycle() {
+        if (this.endCycleID != null) {
+            return true;
+        } else {
+            return false;
         }
     }
     

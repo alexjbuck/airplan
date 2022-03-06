@@ -20,7 +20,7 @@ class View {
         this.drawMenu();
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
-        })          
+        })
     }
     // ASCII Comments generated with: https://patorjk.com/software/taag
     //    __  __                      __      __ _                      
@@ -421,7 +421,7 @@ class View {
             handler(lineID)
         })
     }
-
+    
     //    _       _                __  __                          
     //   | |     (_)              |  \/  |                         
     //   | |      _  _ __    ___  | \  / |  ___  _ __   _   _  ___ 
@@ -472,7 +472,7 @@ class View {
     * @param {Model} airplan
     * @method drawSortieList populates the #sorties-view div view with sorties information
     */
-     drawSortieList = (airplan) => {
+    drawSortieList = (airplan) => {
         let html =  `
         <details open>
         <summary class='h3'>Lines and Sorties</summary>`
@@ -557,8 +557,8 @@ class View {
             let startType = $( "#startType" ).val()
             let endType   = $( "#endType" ).val()
             let note = $( "#note" ).val()
-            let startCycleID = null
-            let endCycleID = null
+            let startCycleID = $('.start-on-cycle').prop('checked') ? $('#start-cycle').val() : null
+            let endCycleID   = $('.end-on-cycle').prop('checked')   ? $('#end-cycle').val()   : null
             handler(lineID, start, end, startType, endType, note, startCycleID, endCycleID)
             closeModal()
         })
@@ -571,8 +571,8 @@ class View {
             let startType = $( "#startType" ).val()
             let endType   = $( "#endType" ).val()
             let note = $( "#note" ).val()
-            let startCycleID = null
-            let endCycleID = null
+            let startCycleID = $('.start-on-cycle').prop('checked') ? $('#start-cycle').val() : null
+            let endCycleID = $('.end-on-cycle').prop('checked') ? $('#end-cycle').val() : null
             handler(sortieID, start, end, startType, endType, note, startCycleID, endCycleID)
             closeModal()
         })
@@ -594,6 +594,8 @@ class View {
             handler(sortieID)
         })
     }
+    
+    
     //     _____               _    _         __  __                          
     //    / ____|             | |  (_)       |  \/  |                         
     //   | (___    ___   _ __ | |_  _   ___  | \  / |  ___  _ __   _   _  ___ 
@@ -602,43 +604,63 @@ class View {
     //   |_____/  \___/ |_|    \__||_| \___| |_|  |_| \___||_| |_| \__,_||___/
     //                                                                        
     //                                                                        
-    makeAddEditSortieMenu(line) {
+    makeAddEditSortieMenu(line, cycleList) {
         let html = '<h3>Add/Edit Sortie: ' + line.squadron.name + ' Line ' + line.number+'</h3>'
+        html += `<input type='checkbox' class='start-on-cycle'>Attach launch to cycle</input>`
+        html += `<input type='checkbox' class='end-on-cycle'>Attach recovery to cycle</input>`
         // Start Time
-        html += "<div class='form-group row align-items-center'>";
-        html += "<label for='start' class='col-12 col-md-3 text-left text-md-right'>Start Time</label>";
-        html += "<input type='datetime-local' class='col form-control mr-5' id='start' placeholder='0000'>";
-        html += "</div>";
+        html += `<div class='form-group row align-items-center start-time'>`;
+        html += `<label for='start' class='col-12 col-md-3 text-left text-md-right'>Start Time</label>`;
+        html += `<input type='datetime-local' class='col form-control mr-5' id='start' placeholder='0000'>`;
+        html += `</div>`;
+        // Start cycle
+        html += `<div class='form-group row align-items-center start-cycle'>`;
+        html += `<label for='start-cycle' class='col-12 col-md-3 text-left text-md-right'>Start Cycle</label>`;
+        html += `<select type='text' class='col form-control mr-5' id='start-cycle' placeholder='0000'>`;
+        cycleList.forEach(cycle=>{
+            html += `<option value='${cycle.ID}'>${cycle.number}</option>`
+        })
+        html += `</select>`;
+        html += `</div>`;
         // Start Condition
-        html += "<div class='form-group row align-items-center'>";
-        html += "<label for='startType' class='col-12 col-md-3 text-left text-md-right'>Start Condition</label>";
-        html += "<select type='text' class='col form-control mr-5' id='startType' placeholder='Start Condition'>";
-        html += "<option value='pull'>Pull</option>";
-        html += "<option value='flyon'>Fly On</option>";
-        html += "<option value='hp'>Hot Pump</option>";
-        html += "<option value='hpcs'>Hot Pump & Crew Swap</option>";
-        html += "</select>";
-        html += "</div>";
+        html += `<div class='form-group row align-items-center'>`;
+        html += `<label for='startType' class='col-12 col-md-3 text-left text-md-right'>Start Condition</label>`;
+        html += `<select type='text' class='col form-control mr-5' id='startType' placeholder='Start Condition'>`;
+        html += `<option value='pull'>Pull</option>`;
+        html += `<option value='flyon'>Fly On</option>`;
+        html += `<option value='hp'>Hot Pump</option>`;
+        html += `<option value='hpcs'>Hot Pump & Crew Swap</option>`;
+        html += `</select>`;
+        html += `</div>`;
         // End time
-        html += "<div class='form-group row align-items-center end-time'>";
-        html += "<label for='end' class='col-12 col-md-3 text-left text-md-right'>End Time</label>";
-        html += "<input type='datetime-local' class='col form-control mr-5' id='end' placeholder='0000'>";
-        html += "</div>";
+        html += `<div class='form-group row align-items-center end-time'>`;
+        html += `<label for='end' class='col-12 col-md-3 text-left text-md-right'>End Time</label>`;
+        html += `<input type='datetime-local' class='col form-control mr-5' id='end' placeholder='0000'>`;
+        html += `</div>`;
+        // end cycle
+        html += `<div class='form-group row align-items-center end-cycle'>`;
+        html += `<label for='end-cycle' class='col-12 col-md-3 text-left text-md-right'>end Cycle</label>`;
+        html += `<select type='text' class='col form-control mr-5' id='end-cycle' placeholder='0000'>`;
+        cycleList.forEach(cycle=>{
+            html += `<option value='${cycle.ID}'>${cycle.number}</option>`
+        })
+        html += `</select>`;
+        html += `</div>`;
         // End Condition
-        html += "<div class='form-group row align-items-center'>";
-        html += "<label for='endType' class='col-12 col-md-3 text-left text-md-right'>End Condition</label>";
-        html += "<select type='text' class='col form-control mr-5' id='endType' placeholder='End Condition'>";
-        html += "<option value='stuff'>Stuff</option>";
-        html += "<option value='flyoff'>Fly Off</option>";
-        html += "<option value='hp'>Hot Pump</option>";
-        html += "<option value='hpcs'>Hot Pump & Crew Swap</option>";
-        html += "</select>";
-        html += "</div>";
+        html += `<div class='form-group row align-items-center'>`;
+        html += `<label for='endType' class='col-12 col-md-3 text-left text-md-right'>End Condition</label>`;
+        html += `<select type='text' class='col form-control mr-5' id='endType' placeholder='End Condition'>`;
+        html += `<option value='stuff'>Stuff</option>`;
+        html += `<option value='flyoff'>Fly Off</option>`;
+        html += `<option value='hp'>Hot Pump</option>`;
+        html += `<option value='hpcs'>Hot Pump & Crew Swap</option>`;
+        html += `</select>`;
+        html += `</div>`;
         // note
-        html += "<div class='form-group row align-items-center'>";
-        html += "<label for='note' class='col-12 col-md-3 text-left text-md-right'>Note</label>";
-        html += "<input type='text' class='col form-control mr-5' id='note' placeholder='Mission'>";
-        html += "</div>";
+        html += `<div class='form-group row align-items-center'>`;
+        html += `<label for='note' class='col-12 col-md-3 text-left text-md-right'>Note</label>`;
+        html += `<input type='text' class='col form-control mr-5' id='note' placeholder='Mission'>`;
+        html += `</div>`;
         return html
     }
     /**
@@ -647,22 +669,48 @@ class View {
     * it is expecting a promise.
     * @param {Line} line 
     */
-    async drawAddSortieMenu(line) {
-        let html = this.makeAddEditSortieMenu(line)
+    async drawAddSortieMenu(line,cycleList) {
+        let html = this.makeAddEditSortieMenu(line,cycleList)
         html += "<button id='"+line.ID+"' class='btn btn-primary add-sortie-submit'>Submit</button>";
         openModal(html)
         this.addSortieSubmit = $('.add-sortie-submit')
+        this.startOnCycle = $('.start-on-cycle')
+        this.endOnCycle = $('.end-on-cycle')
+        this.startOnCycle.change(this.handleStartOnCycleToggle)
+        this.endOnCycle.change(this.handleEndOnCycleToggle)
     }
-    drawEditSortieMenu(sortie) { 
+    drawEditSortieMenu(sortie,cycleList) { 
         let line = sortie.line
-        let html = this.makeAddEditSortieMenu(line)
+        let html = this.makeAddEditSortieMenu(line,cycleList)
         html += "<div class='btn-group'>";
         html += "<button id='"+sortie.ID+"' class='btn btn-primary edit-sortie-submit'>Submit</button>";
-        html += "<button id='"+sortie.ID+"' class='btn btn-danger edit-sortie-remove'><i class='fas fa-trash-alt'></i></button>";
+        html += "<button id='"+sortie.ID+"' class='btn btn-danger  edit-sortie-remove'><i class='fas fa-trash-alt'></i></button>";
         html += "</div>";
         openModal(html)
         this.editSortieSubmit = $('.edit-sortie-submit')
         this.editSortieRemove = $('.edit-sortie-remove')
+        this.startOnCycle = $('.start-on-cycle')
+        this.endOnCycle = $('.end-on-cycle')
+        this.startOnCycle.change(this.handleStartOnCycleToggle)
+        this.endOnCycle.change(this.handleEndOnCycleToggle)
+    }
+    handleStartOnCycleToggle(event){
+        if(event.currentTarget.checked){
+            $('.start-cycle').show()
+            $('.start-time').hide()
+        }else{
+            $('.start-cycle').hide()
+            $('.start-time').show()
+        }
+    }
+    handleEndOnCycleToggle(event){
+        if(event.currentTarget.checked){
+            $('.end-cycle').show()
+            $('.end-time').hide()
+        }else{
+            $('.end-cycle').hide()
+            $('.end-time').show()
+        }
     }
     
     //     _____                                 ____   _             _  _                    
@@ -1043,7 +1091,7 @@ class View {
                 })
             })
         })
-        this.fitStageIntoParentContainer();
+        // this.fitStageIntoParentContainer();
     }
     
     //     _____                                 _    _        _                         
