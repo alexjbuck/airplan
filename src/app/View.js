@@ -1097,7 +1097,7 @@ class View {
                     }).addTo(timebox)
                     
                     // Sortie Line
-                    new Konva.Line({stroke:'black', strokeWidth:1, points:[0,0,sortieGroup.width(),0]}).addTo(sortieGroup)
+                    new Konva.Line({stroke:'black', strokeWidth:1, points:[0,0,sortieGroup.width(),0], dash:[10,10], dashEnabled: sortie.isAlert}).addTo(sortieGroup)
                     View.drawCondition[sortie.startType](0,0).addTo(sortieGroup)
                     View.drawCondition[sortie.endType](sortieGroup.width(),0).addTo(sortieGroup)
                     

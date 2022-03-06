@@ -58,7 +58,7 @@ class Model {
      */
     updateCounts() {
         this.counts = {}
-        Object.values(this.sorties).sort((a,b)=>a.start-b.start).forEach(s=>{
+        this.sortieList.filter(s=>!s.isAlert).sort((a,b)=>a.start-b.start).forEach(s=>{
             if (this.counts[[s.cycle.number,s.line.squadron.letter]] == undefined) {
                 this.counts[[s.cycle.number,s.line.squadron.letter]] = 1
             } else {
@@ -170,7 +170,7 @@ class Model {
         this.onChange()
     }
     addSortie(lineID, start, end, startType, endType, note, startCycleID=null, endCycleID=null, isAlert=false) {
-        let sortie = new Sortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert=false)
+        let sortie = new Sortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert)
         sortie.parent = this;
         this.sorties[sortie.ID] = sortie;
         this.onChange()

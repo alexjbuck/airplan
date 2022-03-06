@@ -17,19 +17,19 @@ class Cycle extends Event {
 
     get number() {
         if (this.parent) {
-            return Object.values(this.parent.cycles).sort((a,b)=>a.start-b.start).findIndex(c=>c.ID == this.ID)+1
+            return this.parent.cycleList.findIndex(c=>c.ID == this.ID)+1
         }
     }
    
     get launchCount() {
         if (this.parent) {
-            return Object.values(this.parent.sorties).filter(s=>s.start.valueOf() == this.start.valueOf()).length
+            return this.parent.sortieList.filter(s=>!s.isAlert).filter(s=>s.start.valueOf() == this.start.valueOf()).length
         }
     }
 
     get landCount() {
         if (this.parent) {
-            return Object.values(this.parent.sorties).filter(s=>s.end.valueOf() == this.end.valueOf()).length
+            return this.parent.sortieList.filter(s=>!s.isAlert).filter(s=>s.end.valueOf() == this.end.valueOf()).length
         }
     }
 

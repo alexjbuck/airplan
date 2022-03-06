@@ -116,7 +116,11 @@ class Sortie extends Event {
      * */
     get event() {
         if (this.parent) {
-            return this.cycle.number + this.line.squadron.letter + this.parent.squadronCycleSortieMap[this.ID]
+            if (this.isAlert) {
+                return '';
+            } else {
+                return this.cycle.number + this.line.squadron.letter + this.parent.squadronCycleSortieMap[this.ID]
+            }
         }
     }
 

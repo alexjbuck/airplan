@@ -50,6 +50,7 @@ class Controller {
         this.view.bindSortieRemove(this.handleRemoveSortie)
 
         this.view.bindCanvasClick(this.handleCanvasClick)
+        this.view.fitStageIntoParentContainer();
     }
     
     /**
