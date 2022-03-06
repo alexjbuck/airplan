@@ -2,6 +2,7 @@ class Line extends Event {
     constructor(squadronID) {
         super(new Date(),new Date());
         this.squadronID = squadronID;
+        this.display = true;
     }
     static convert({squadronID, ID}) {
         let line = new Line(squadronID);
@@ -35,4 +36,8 @@ class Line extends Event {
             return (Object.values(this.parent.lines).filter(l=>l.squadronID==this.squadronID).findIndex(l=>l.ID==this.ID) + 1)
         }
     }
+    toggleDisplay() {
+        this.display = !this.display;
+    }
+
 }

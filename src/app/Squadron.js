@@ -16,10 +16,23 @@ class Squadron {
     get letter() {
         return String.fromCharCode(Object.values(this.parent.squadrons).findIndex(squadron => squadron.ID === this.ID)+65);
     }
+    get sorties() {
+        if (this.parent) {
+            return this.parent.sortieList.filter(s=>s.line.squadronID==this.ID)
+        }
+    }
     get day() {
-        return this._day;
+        if (this.parent) {
+            let sr = this.parent.sunrise
+            let ss = this.parent.sunset
+            return this.sorties.filter(s=>!s.isAlert).filter(s=> s.start > sr && s.end < ss).length
+        }
     }
     get night() {
-        return this._night;
+        if (this.parent) {
+            let sr = this.parent.sunrise
+            let ss = this.parent.sunset
+            return this.sorties.filter(s=>!s.isAlert).filter(s=> s.start < sr || s.end > ss).length
+        }
     }
 }

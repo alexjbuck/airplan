@@ -18,9 +18,10 @@ class View {
         this.topRow             = 20;
         this.bottomRow          = 20;
         this.drawMenu();
+        this.drawSquadrons();
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
-        })          
+        })
     }
     // ASCII Comments generated with: https://patorjk.com/software/taag
     //    __  __                      __      __ _                      
@@ -33,7 +34,7 @@ class View {
     * @method drawMenu Populate the #menu in the menu div.
     */
     drawMenu = () => {
-        this.menu = {squadron:{},file:{},info:{}}
+        this.menu = {file:{},info:{}}
         var html =`
         <details open>
             <summary class='h3'>Menu</summary>
@@ -51,8 +52,8 @@ class View {
         </details>
         `;
         $('#menu').html(html)
-        this.menu.squadron.add = $('#add-squadron')
-        this.menu.squadron.rem = $('#rem-squadron')
+        // this.squadron.add = $('#add-squadron')
+        // this.squadron.rem = $('#rem-squadron')
         this.menu.file.reset = $('#reset')
         this.menu.file.refresh = $('#refresh')
         this.menu.file.load = $('#load')
@@ -73,7 +74,7 @@ class View {
                     <h5>For when you don't have ADMACS, <em>and <sup>maybe <sup>even <sup>when <sup>you do!</sup></sup></sup></sup></em></h5>
                 </div>
                 <div class='ml-auto'>
-                    <small>Version: 0.3.0</small>
+                    <small>Version: 0.5.0</small>
                 </div>
             </div>
         </div>
@@ -155,7 +156,26 @@ class View {
             handler()
         })
     }
-    
+    bindMenuFeedback(handler){
+        this.menu.info.feedback.on('click', event=>{
+            handler()
+        })
+    }
+
+  drawSquadrons() {
+    var html =`
+        <details open>
+        <summary class='h3'>Squadrons</summary>
+          <div class='btn-group menu-group'>
+            <button id='add-squadron' class='btn btn-outline-primary add-squadron' data-toggle='tooltip' data-placement='top' title='Add Squadron'>   <i class='fas fa-plus'> </i> Add </button>
+            <button id='rem-squadron' class='btn btn-outline-danger rem-squadron'  data-toggle='tooltip' data-placement='top' title='Remove Squadron'><i class='fas fa-minus'></i> Rem</button>
+          </div>
+        </details>`
+    $('#squadrons').html(html)
+    this.squadron = {}
+    this.squadron.add = $('#add-squadron')
+    this.squadron.rem = $('#rem-squadron')
+  }
     
     //     _____                           _                      ____   _             _  _                    
     //    / ____|                         | |                    |  _ \ (_)           | |(_)                   
@@ -170,12 +190,12 @@ class View {
     * @param {Function} handler 
     */
     bindMenuAddPlaceholderSquadron(handler){
-        this.menu.squadron.add.on('click', event=>{
+        this.squadron.add.on('click', event=>{
             handler()
         })
     }
     bindMenuRemoveSquadron(handler){
-        this.menu.squadron.rem.on('click', event=>{
+        this.squadron.rem.on('click', event=>{
             handler()
         })
     }
@@ -408,6 +428,13 @@ class View {
             handler(lineID)
         })
     }
+    bindLineToggleDisplay(handler){
+        this.lineToggleDisplay.on('click', event=>{
+            let lineID = event.currentTarget.id
+            handler(lineID)
+        })
+    }
+    
     //    _       _                __  __                          
     //   | |     (_)              |  \/  |                         
     //   | |      _  _ __    ___  | \  / |  ___  _ __   _   _  ___ 
@@ -459,43 +486,46 @@ class View {
     * @method drawSortieList populates the #sorties-view div view with sorties information
     */
     drawSortieList = (airplan) => {
-        let html =  `
-        <details open>
-        <summary class='h3'>Lines and Sorties</summary>`
-        html +=     `<div class='list-group'>`
+        let html = ``
+        html += `<details open>`
+            html += `<summary class='h3'>Lines and Sorties</summary>`
+            html += `<div class='list-group'>`
         Object.values(airplan.squadrons).forEach(squadron => {
             Object.values(airplan.lines).filter(line=>line.squadronID == squadron.ID).sort((a,b)=>a.start-b.start).forEach((line,i) => {
-                html += `<details id='`+line.ID+`' open>`
-                html += `<summary id='`+line.ID+`' class='list-group-item list-group-item-action line'>`
-                html += `<b>${squadron.name}</b>: Line ${i+1} `
-                if (line.sorties.length) {
-                    html +=         `<small>${line.start.toHHMM()}-${line.end.toHHMM()}</small> `
+                let display='open'
+                if(line.display!=undefined && !line.display){
+                    display=''
                 }
-                html +=             `<i id='`+line.ID+`' class='fas fa-trash-alt line-remove'></i> `
-                html +=             `<i id='`+line.ID+`' class='fas fa-edit edit-line-menu'></i> `
-                html += `</summary>`
-                html +=     `<div class='list-group list-group-flush'>`
-                Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
-                    html += `
-                    <div id='`+sortie.ID+`' class='list-group-item list-group-item-action edit-sortie-menu px-4 py-1 sortie'>
-                    <small>
-                    <b>${sortie.event}:</b> ${sortie.start.toHHMM()}-${sortie.end.toHHMM()} ${sortie.note}
-                    </small>
-                    <i id='`+sortie.ID+`' class='fas fa-trash-alt sortie-remove'></i>
-                    <i id='`+sortie.ID+`' class='fas fa-edit edit-sortie-menu'></i>
-                    </div>`
-                })
-                html += `
-                <div id='`+line.ID+`' class='list-group-item list-group-item-action px-4 py-1 sortie add-sortie-menu'>
-                <small><i class='fas fa-plus'></i> Add Sortie...</small>
-                </div>`
-                html +=     `</div>
-                </div>
-                </details>`
+                html += `<details id='${line.ID}' ${display}>`
+                    html += `<summary id='${line.ID}' class='list-group-item list-group-item-action line line-toggle-display'>`
+                    html +=     `<b>${squadron.name}</b>: Line ${i+1} `
+                    if (line.sorties.length) {
+                        html +=  `<small>${line.start.toHHMM()}-${line.end.toHHMM()}</small> `
+                    }
+                    html +=      `<i id='${line.ID}' class='fas fa-trash-alt line-remove'></i> `
+                    html +=      `<i id='${line.ID}' class='fas fa-edit edit-line-menu'></i> `
+                    html += `</summary>`
+                    html += `<div class='list-group list-group-flush'>`
+                    Object.values(airplan.sorties).filter(sortie => sortie.lineID === line.ID).forEach(sortie => {
+                        html += `<div id='${sortie.ID}' class='list-group-item list-group-item-action edit-sortie-menu px-4 py-1 sortie'>`
+                            html += `<small>`
+                                html += `<b>${sortie.event}:</b> ${sortie.start.toHHMM()}-${sortie.end.toHHMM()} ${sortie.note}`
+                            html += `</small>`
+                            html += `<i id='${sortie.ID}' class='fas fa-trash-alt sortie-remove'></i>`
+                            html += `<i id='${sortie.ID}' class='fas fa-edit edit-sortie-menu'></i>`
+                        html += `</div>`
+                    })
+                        html += `<div id='${line.ID}' class='list-group-item list-group-item-action px-4 py-1 sortie add-sortie-menu'>`
+                            html += `<small><i class='fas fa-plus'></i> Add Sortie...</small>`
+                        html += `</div>`
+                    html += `</div>`
+                html += `</details>`
             })
         })
-        html +=         `<div class='list-group-item list-group-item-action add-line-menu'><i class='fas fa-plus'></i> Add Line...</div>`        
-        html +=     `</div>`
+                html += `<div class='list-group-item list-group-item-action add-line-menu'>`
+                    html += `<i class='fas fa-plus'></i> Add Line...`
+                html += `</div>`        
+            html += `</div>`
         html += `</details>`
         
         $('#sorties-list').html(html)
@@ -505,6 +535,7 @@ class View {
         this.addSortieMenu = $('.add-sortie-menu')
         this.editSortieMenu = $('.edit-sortie-menu')
         this.sortieRemove = $('.sortie-remove')
+        this.lineToggleDisplay = $('.line-toggle-display')
     }
     //     _____               _    _         ____   _             _  _                    
     //    / ____|             | |  (_)       |  _ \ (_)           | |(_)                   
@@ -538,9 +569,10 @@ class View {
             let startType = $( "#startType" ).val()
             let endType   = $( "#endType" ).val()
             let note = $( "#note" ).val()
-            let startCycleID = null
-            let endCycleID = null
-            handler(lineID, start, end, startType, endType, note, startCycleID, endCycleID)
+            let startCycleID = $('.start-on-cycle').prop('checked') ? $('#start-cycle').val() : null
+            let endCycleID   = $('.end-on-cycle').prop('checked')   ? $('#end-cycle').val()   : null
+            let isAlert = $('#isAlert').prop('checked')
+            handler(lineID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert)
             closeModal()
         })
     }
@@ -552,9 +584,10 @@ class View {
             let startType = $( "#startType" ).val()
             let endType   = $( "#endType" ).val()
             let note = $( "#note" ).val()
-            let startCycleID = null
-            let endCycleID = null
-            handler(sortieID, start, end, startType, endType, note, startCycleID, endCycleID)
+            let startCycleID = $('.start-on-cycle').prop('checked') ? $('#start-cycle').val() : null
+            let endCycleID = $('.end-on-cycle').prop('checked') ? $('#end-cycle').val() : null
+            let isAlert = $('#isAlert').prop('checked')
+            handler(sortieID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert)
             closeModal()
         })
     }
@@ -575,6 +608,8 @@ class View {
             handler(sortieID)
         })
     }
+    
+    
     //     _____               _    _         __  __                          
     //    / ____|             | |  (_)       |  \/  |                         
     //   | (___    ___   _ __ | |_  _   ___  | \  / |  ___  _ __   _   _  ___ 
@@ -583,43 +618,68 @@ class View {
     //   |_____/  \___/ |_|    \__||_| \___| |_|  |_| \___||_| |_| \__,_||___/
     //                                                                        
     //                                                                        
-    makeAddEditSortieMenu(line) {
+    makeAddEditSortieMenu(line, cycleList) {
         let html = '<h3>Add/Edit Sortie: ' + line.squadron.name + ' Line ' + line.number+'</h3>'
+        html += `<input type='checkbox' class='start-on-cycle'>Attach launch to cycle</input>`
+        html += `<input type='checkbox' class='end-on-cycle'>Attach recovery to cycle</input>`
         // Start Time
-        html += "<div class='form-group row align-items-center'>";
-        html += "<label for='start' class='col-12 col-md-3 text-left text-md-right'>Start Time</label>";
-        html += "<input type='datetime-local' class='col form-control mr-5' id='start' placeholder='0000'>";
-        html += "</div>";
+        html += `<div class='form-group row align-items-center start-time'>`;
+        html += `<label for='start' class='col-12 col-md-3 text-left text-md-right'>Start Time</label>`;
+        html += `<input type='datetime-local' class='col form-control mr-5' id='start' placeholder='0000'>`;
+        html += `</div>`;
+        // Start cycle
+        html += `<div class='form-group row align-items-center start-cycle'>`;
+        html += `<label for='start-cycle' class='col-12 col-md-3 text-left text-md-right'>Start Cycle</label>`;
+        html += `<select type='text' class='col form-control mr-5' id='start-cycle' placeholder='0000'>`;
+        cycleList.forEach(cycle=>{
+            html += `<option value='${cycle.ID}'>${cycle.number}</option>`
+        })
+        html += `</select>`;
+        html += `</div>`;
         // Start Condition
-        html += "<div class='form-group row align-items-center'>";
-        html += "<label for='startType' class='col-12 col-md-3 text-left text-md-right'>Start Condition</label>";
-        html += "<select type='text' class='col form-control mr-5' id='startType' placeholder='Start Condition'>";
-        html += "<option value='pull'>Pull</option>";
-        html += "<option value='flyon'>Fly On</option>";
-        html += "<option value='hp'>Hot Pump</option>";
-        html += "<option value='hpcs'>Hot Pump & Crew Swap</option>";
-        html += "</select>";
-        html += "</div>";
+        html += `<div class='form-group row align-items-center'>`;
+        html += `<label for='startType' class='col-12 col-md-3 text-left text-md-right'>Start Condition</label>`;
+        html += `<select type='text' class='col form-control mr-5' id='startType' placeholder='Start Condition'>`;
+        html += `<option value='pull'>Pull</option>`;
+        html += `<option value='flyon'>Fly On</option>`;
+        html += `<option value='hp'>Hot Pump</option>`;
+        html += `<option value='hpcs'>Hot Pump & Crew Swap</option>`;
+        html += `</select>`;
+        html += `</div>`;
         // End time
-        html += "<div class='form-group row align-items-center end-time'>";
-        html += "<label for='end' class='col-12 col-md-3 text-left text-md-right'>End Time</label>";
-        html += "<input type='datetime-local' class='col form-control mr-5' id='end' placeholder='0000'>";
-        html += "</div>";
+        html += `<div class='form-group row align-items-center end-time'>`;
+        html += `<label for='end' class='col-12 col-md-3 text-left text-md-right'>End Time</label>`;
+        html += `<input type='datetime-local' class='col form-control mr-5' id='end' placeholder='0000'>`;
+        html += `</div>`;
+        // end cycle
+        html += `<div class='form-group row align-items-center end-cycle'>`;
+        html += `<label for='end-cycle' class='col-12 col-md-3 text-left text-md-right'>end Cycle</label>`;
+        html += `<select type='text' class='col form-control mr-5' id='end-cycle' placeholder='0000'>`;
+        cycleList.forEach(cycle=>{
+            html += `<option value='${cycle.ID}'>${cycle.number}</option>`
+        })
+        html += `</select>`;
+        html += `</div>`;
         // End Condition
-        html += "<div class='form-group row align-items-center'>";
-        html += "<label for='endType' class='col-12 col-md-3 text-left text-md-right'>End Condition</label>";
-        html += "<select type='text' class='col form-control mr-5' id='endType' placeholder='End Condition'>";
-        html += "<option value='stuff'>Stuff</option>";
-        html += "<option value='flyoff'>Fly Off</option>";
-        html += "<option value='hp'>Hot Pump</option>";
-        html += "<option value='hpcs'>Hot Pump & Crew Swap</option>";
-        html += "</select>";
-        html += "</div>";
+        html += `<div class='form-group row align-items-center'>`;
+        html += `<label for='endType' class='col-12 col-md-3 text-left text-md-right'>End Condition</label>`;
+        html += `<select type='text' class='col form-control mr-5' id='endType' placeholder='End Condition'>`;
+        html += `<option value='stuff'>Stuff</option>`;
+        html += `<option value='flyoff'>Fly Off</option>`;
+        html += `<option value='hp'>Hot Pump</option>`;
+        html += `<option value='hpcs'>Hot Pump & Crew Swap</option>`;
+        html += `</select>`;
+        html += `</div>`;
         // note
-        html += "<div class='form-group row align-items-center'>";
-        html += "<label for='note' class='col-12 col-md-3 text-left text-md-right'>Note</label>";
-        html += "<input type='text' class='col form-control mr-5' id='note' placeholder='Mission'>";
-        html += "</div>";
+        html += `<div class='form-group row align-items-center'>`;
+        html += `<label for='note' class='col-12 col-md-3 text-left text-md-right'>Note</label>`;
+        html += `<input type='text' class='col form-control mr-5' id='note' placeholder='Mission'>`;
+        html += `</div>`;
+        // isAlert
+        html += `<div class='form-gorup row align-items-center'>`
+        html += `<label for='isAlert' class='col-12 col-md-3 text-left text-md-right'>Alert?</label>`
+        html += `<input type='checkbox' class='col form-control mr-5' id='isAlert'>`
+        html += `</div>`
         return html
     }
     /**
@@ -628,22 +688,48 @@ class View {
     * it is expecting a promise.
     * @param {Line} line 
     */
-    async drawAddSortieMenu(line) {
-        let html = this.makeAddEditSortieMenu(line)
+    async drawAddSortieMenu(line,cycleList) {
+        let html = this.makeAddEditSortieMenu(line,cycleList)
         html += "<button id='"+line.ID+"' class='btn btn-primary add-sortie-submit'>Submit</button>";
         openModal(html)
         this.addSortieSubmit = $('.add-sortie-submit')
+        this.startOnCycle = $('.start-on-cycle')
+        this.endOnCycle = $('.end-on-cycle')
+        this.startOnCycle.change(this.handleStartOnCycleToggle)
+        this.endOnCycle.change(this.handleEndOnCycleToggle)
     }
-    drawEditSortieMenu(sortie) { 
+    drawEditSortieMenu(sortie,cycleList) { 
         let line = sortie.line
-        let html = this.makeAddEditSortieMenu(line)
+        let html = this.makeAddEditSortieMenu(line,cycleList)
         html += "<div class='btn-group'>";
         html += "<button id='"+sortie.ID+"' class='btn btn-primary edit-sortie-submit'>Submit</button>";
-        html += "<button id='"+sortie.ID+"' class='btn btn-danger edit-sortie-remove'><i class='fas fa-trash-alt'></i></button>";
+        html += "<button id='"+sortie.ID+"' class='btn btn-danger  edit-sortie-remove'><i class='fas fa-trash-alt'></i></button>";
         html += "</div>";
         openModal(html)
         this.editSortieSubmit = $('.edit-sortie-submit')
         this.editSortieRemove = $('.edit-sortie-remove')
+        this.startOnCycle = $('.start-on-cycle')
+        this.endOnCycle = $('.end-on-cycle')
+        this.startOnCycle.change(this.handleStartOnCycleToggle)
+        this.endOnCycle.change(this.handleEndOnCycleToggle)
+    }
+    handleStartOnCycleToggle(event){
+        if(event.currentTarget.checked){
+            $('.start-cycle').show()
+            $('.start-time').hide()
+        }else{
+            $('.start-cycle').hide()
+            $('.start-time').show()
+        }
+    }
+    handleEndOnCycleToggle(event){
+        if(event.currentTarget.checked){
+            $('.end-cycle').show()
+            $('.end-time').hide()
+        }else{
+            $('.end-cycle').hide()
+            $('.end-time').show()
+        }
     }
     
     //     _____                                 ____   _             _  _                    
@@ -1013,7 +1099,7 @@ class View {
                     }).addTo(timebox)
                     
                     // Sortie Line
-                    new Konva.Line({stroke:'black', strokeWidth:1, points:[0,0,sortieGroup.width(),0]}).addTo(sortieGroup)
+                    new Konva.Line({stroke:'black', strokeWidth:1, points:[0,0,sortieGroup.width(),0], dash:[10,10], dashEnabled: sortie.isAlert}).addTo(sortieGroup)
                     View.drawCondition[sortie.startType](0,0).addTo(sortieGroup)
                     View.drawCondition[sortie.endType](sortieGroup.width(),0).addTo(sortieGroup)
                     
@@ -1024,7 +1110,7 @@ class View {
                 })
             })
         })
-        this.fitStageIntoParentContainer();
+        // this.fitStageIntoParentContainer();
     }
     
     //     _____                                 _    _        _                         

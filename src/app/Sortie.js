@@ -4,27 +4,26 @@
  * @see Event
  * */
 class Sortie extends Event {
-    constructor(lineID, start, end, startType, endType, note, startCycleID=null, endCycleID=null) {
+    constructor(lineID, start, end, startType, endType, note, startCycleID=null, endCycleID=null, isAlert=false) {
         super(start, end);
         this.lineID = lineID;
         this.startType = startType;
         this.endType = endType;
         this.note = note;
-        this.startOnCycle = startCycleID ? true : false;
-        this.endOnCycle = endCycleID ? true : false;
         this.startCycleID = startCycleID;
         this.endCycleID = endCycleID;
+        this.isAlert = isAlert
     }
     static defaultDuration = 1;
-    static convert({lineID, _start, _end, startType, endType, note, startCycleID=null, endCycleID=null, ID}) {
+    static convert({lineID, _start, _end, startType, endType, note, startCycleID=null, endCycleID=null, isAlert=false, ID}) {
         let start = Date.parse(_start);
         let end = Date.parse(_end);
-        let sortie = new Sortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID);
+        let sortie = new Sortie(lineID, start, end, startType, endType, note, startCycleID, endCycleID, isAlert);
         sortie.ID = ID
         return sortie;
     }
     
-    /** @param {String} lineID */
+    /** @param {Line} line */
     set line(line) {
         this.lineID = line.ID;
     }
@@ -32,6 +31,22 @@ class Sortie extends Event {
     get line() {
         if (this.parent) {
             return this.parent.lines[this.lineID];
+        }
+    }
+
+    get startOnCycle() {
+        if (this.startCycleID != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    get endOnCycle() {
+        if (this.endCycleID != null) {
+            return true;
+        } else {
+            return false;
         }
     }
     
@@ -101,7 +116,11 @@ class Sortie extends Event {
      * */
     get event() {
         if (this.parent) {
-            return this.cycle.number + this.line.squadron.letter + this.parent.squadronCycleSortieMap[this.ID]
+            if (this.isAlert) {
+                return '';
+            } else {
+                return this.cycle.number + this.line.squadron.letter + this.parent.squadronCycleSortieMap[this.ID]
+            }
         }
     }
 
