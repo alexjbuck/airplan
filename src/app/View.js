@@ -74,13 +74,13 @@ class View {
         <h5>For when you don't have ADMACS, <em>and <sup>maybe <sup>even <sup>when <sup>you do!</sup></sup></sup></sup></em></h5>
         </div>
         <div class='ml-auto'>
-        <small>Version: 0.5.0</small>
+        <small>Version: 0.5.1</small>
         </div>
         </div>
         </div>
         <hr>
         <p>
-        Writing airplan's in PowerPoint is the worst &#129324;.
+        Writing airplans in PowerPoint is the worst &#129324;.
         This is a simple web app that allows you to view and edit your squadron's air plans.
         You can add new flights, edit existing flights, and delete flights.
         You can also export your air plan to PDF <i class="far fa-file-pdf"></i>.
