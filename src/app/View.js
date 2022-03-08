@@ -97,6 +97,7 @@ class View {
         </ol><ul>
         <li><b>Best Practice</b>: Add all of your squadrons, then save your airplan. Use that file as your starting point for the future.</li>
         <li><b>Pro Tip</b>: View these tips anytime by clicking the <i style='color:#ffc107' class='fa fa-question-circle'></i> help icon in the menu.</li>
+        <li><b>NMCI Tip</b>: Use the proxy based connection. If edit forms do not populate with dates/times, you are using the Menlo Security connection and this will cause problems.</li>
         </ul>
         <p>
         Play around, you can't break anything, and hopefully you find this app useful!
