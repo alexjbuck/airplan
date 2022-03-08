@@ -226,6 +226,8 @@ class Model {
             'hpcs': 'hpcs',
             'stuff': 'pull',
             'flyoff': 'flyon',
+            'open': 'open',
+            'closed': 'closed',
         }
         return map
     }
@@ -238,6 +240,8 @@ class Model {
             'hpcs': 'hpcs',
             'pull': 'stuff',
             'flyon': 'stuff',
+            'open': 'open',
+            'closed': 'closed',
         }
         return map
     }

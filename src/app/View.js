@@ -642,6 +642,8 @@ class View {
         html += `<option value='flyon'>Fly On</option>`;
         html += `<option value='hp'>Hot Pump</option>`;
         html += `<option value='hpcs'>Hot Pump & Crew Swap</option>`;
+        html += `<option value='open'>Open Stone</option>`;
+        html += `<option value='closed'>Closed Stone</option>`;
         html += `</select>`;
         html += `</div>`;
         // End time
@@ -666,6 +668,8 @@ class View {
         html += `<option value='flyoff'>Fly Off</option>`;
         html += `<option value='hp'>Hot Pump</option>`;
         html += `<option value='hpcs'>Hot Pump & Crew Swap</option>`;
+        html += `<option value='open'>Open Stone</option>`;
+        html += `<option value='closed'>Closed Stone</option>`;
         html += `</select>`;
         html += `</div>`;
         // note
@@ -1182,6 +1186,30 @@ class View {
                 closed: true,
                 fill: 'black', fillEnabled: true,
             })
+        },
+        open: (x,y) => {
+            return new Konva.Circle({
+                x: x,
+                y: y,
+                radius: 5,
+                stroke: 'black',
+                strokeWidth:2,
+                fill: 'white',
+                fillEnabled: true,
+            })
+        },
+        closed: (x,y) => {
+            return new Konva.Circle({
+                x: x,
+                y: y,
+                radius: 5,
+                stroke: 'black',
+                strokeWidth:2,
+                fill: 'black',
+                fillEnabled: true,
+            })
         }
+
     }
 }
+
